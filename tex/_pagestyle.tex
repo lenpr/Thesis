@@ -1,0 +1,61 @@
+% Zeilenabstand der mit dem normalen Satz von 1,2x Zeilenabstand konform geht
+\usepackage{setspace}
+\setstretch{1.50}
+
+% Seitenränder
+\geometry{a4paper,left=30mm,right=30mm, top=25mm, bottom=35mm}
+%\geometry{a4paper, top=25mm, bottom=40mm}
+
+% für gebundenen Druck können die Seiten verschoben werden
+%\setlength{\oddsidemargin}{+9mm}
+%\setlength{\evensidemargin}{-3mm}
+
+% Kopf- und Fußzeilen
+\pagestyle{scrheadings}
+
+% Kopf- und Fußzeile auch auf Kapitelanfangsseiten 
+\renewcommand*{\chapterpagestyle}{scrheadings}
+
+% Schriftform der Kopfzeile
+\renewcommand{\headfont}{\normalfont}
+
+% Kopfzeile
+\ihead{}
+%\ihead{\small{\textsc{\titel}}}
+%\ihead{\small{\textsc{\titel}} \\ \textit{\headmark}}
+%\ihead{\small{\textsc{\titel}} - \footnotesize{\untertitel}\\ \textit{\headmark}}
+\chead{}
+\ohead{\textit{\headmark}}
+%\ohead{\includegraphics[width=12mm]{tu_logo.png}}
+
+\setlength{\headheight}{15mm} 			% Höhe der Kopfzeile
+\setlength{\headsep}{10mm} 			% Abstand der Kopfzeile zum Text
+\setheadsepline[text]{0.4pt} 			% Trennlinie unter Kopfzeile
+\setlength{\skip\footins}{7.5mm}		% Abstand Text und Fußnoten
+
+% Fußzeile ohne \autor
+\ifoot{}
+\cfoot{\pagemark}
+\ofoot{}
+
+% erzeugt mehr Platz hinter einem Punkt
+\frenchspacing 
+
+% Witwen und Waisen vermeiden
+\clubpenalty = 10000
+\widowpenalty = 10000 
+\displaywidowpenalty = 10000
+% Waise ist ein Satzende/Zeilenende, das allein auf einer neuen Seite steht
+% Witwe die erste Zeile eines neuen Absatzes erscheint am Seitenende
+
+% Fußnoten fortlaufend durchnummerieren
+\counterwithout{footnote}{chapter}
+% Symbolische Fußnoten können benutzt werden: \symbolfootnote[2]{}
+\long\def\symbolfootnote[#1]#2{\begingroup\def\thefootnote{\fnsymbol{footnote}}\footnote[#1]{#2}\endgroup}
+
+% {itemize}-Listen formatieren, die Einrückungsweite wird im _packages File verwaltet
+\renewcommand{\labelitemi}{$\rightharpoonup$}
+\renewcommand{\labelitemii}{$\bullet$}
+\renewcommand{\labelitemiii}{$\diamond$}
+\renewcommand{\labelitemiv}{$\ast$}
+% Alternativen: \mapsto \rightarrow

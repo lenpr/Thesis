@@ -1,0 +1,104 @@
+\chapter{User-Guided Mesh Simplification}
+\label{topstoc0}
+
+\begin{flushright}
+\textit{``The original motivation to do research [that led to technological discoveries]\\was to expand the range of possibilities for storytellers.''}\\
+-- Ed Catmull {[}at the 73rd Scientific and Technical Academy Awards, 2001{]}
+\end{flushright}
+
+
+%\newpage
+%\vspace*{1ex}
+\section{TopStoc Algorithm}
+\label{topstoc1}
+
+Lorem Ipsum.
+
+
+%\newpage
+%\vspace*{1ex}
+\section{Simplifying Topology}
+\label{topstoc2}
+
+Our goal is to provide the user with clear and unambiguous information, so that he can easily decide whether to dismiss or keep a topological feature.
+It took the entire chapter \ref{math0}, to lay down the mathematical foundations and introduce the algorithms to do so, yet it is very important not to underestimate the role of presentation.
+Therefore we want to talk about how to visualize our results.\\
+Lorem Ipsum.
+
+
+%\newpage
+%\vspace*{1ex}
+\section{Drawing on Meshes}
+\label{topstoc3}
+
+Lorem Ipsum.
+
+\subsection{Explicit Control Points}
+\label{topstoc31}
+
+\subsection{Sketchy Regions}
+\label{topstoc32}
+
+
+%\newpage
+%\vspace*{1ex}
+\section{Context Setting}
+\label{topstoc4}
+
+Lorem Ipsum.
+
+\subsection{Textures}
+\label{topstoc41}
+
+\subsection{Point of View}
+\label{topstoc42}
+
+\subsection{Bounding Boxes}
+\label{topstoc43}
+
+\subsection{Materials}
+\label{topstoc44}
+
+\subsection{Textures}
+\label{topstoc45}
+
+\subsection{Adaptive Flood-filling}
+\label{topstoc46}
+
+\subsubsection{Geodesic Approximation}
+\label{topstoc461}
+
+\subsection{Saving Mesh Proxy}
+\label{topstoc47}
+
+\newpage
+\section{Meassurements}
+\label{topstoc5}
+
+
+In the case of 1D-signals and images, many distortion measurements have been studied.
+They range from simple analytic methods such as the mean square error to very elaborate techniques based on the characteristics of human perception \citep[cf.][]{Winkler2001}.
+Despite the constantly growing usage of 3D models, the distortion measurements for such data seem to be less thorough.
+Still the predominant approach to compare two meshes is the \textit{Hausdorff distance}\footnote{ First introduced in the book \textit{Grundzüge der Mengenlehre}, published in 1914 and named after the German mathematician \textit{Felix Hausdorff} (1868 – 1942), one of the founders of modern topology. Technically the Hausdorff distance it is not a real distance function since it lacks symmetry. It is better to think of it in terms of set containment, for more information and examples see Appendix \ref{appendix5}.}, defined as:
+\begin{equation} \label{eq:hausdorff}
+\hspace*{0.5cm} d_{\mathrm H}(\mathcal{M},\mathcal{M}') = \sup_{p \in \mathcal{M}} \inf_{p' \in \mathcal{M}'} d(p, p')
+\end{equation}
+respectively the symmetric version:
+\begin{equation}
+d_{\mathrm H_{sym}}(\mathcal{M},\mathcal{M}') = \max \{\sup_{p \in \mathcal{M}} \inf_{p' \in \mathcal{M}'} d(p, p')~, \sup_{p' \in \mathcal{M}'} \inf_{p \in \mathcal{M}} d(p', p)\}
+\end{equation}
+Where the distance $d(p, p')$ between two points $p$ and $p'$ on the surfaces of the mesh $\mathcal{M}$ and it's simplified version $\mathcal{M}'$ is defined as: $d(p, p') = || p-p' ||$ with $||.||$ denoting the usual Euclidean norm.
+We will refer to $d_{\mathrm H}(\mathcal{M},\mathcal{M}')$ as the forward distance, and to $d_{\mathrm H}(\mathcal{M}',\mathcal{M})$ as the backward distance.\\
+The distance between any point $p$ belonging to $\mathcal{M}$ and $\mathcal{M}'$ can be computed analytically, since it can be reduced to the minimum of the distances between p and all the triangles $\mathcal{F}_{\mathcal{M}'}$.
+It is worth noting that $p$ might not be a vertex of the list $\mathcal{V}_{\mathcal{M}}$ but any point on the surface.
+Hence, although straightforward, the algorithm becomes too complex if implemented naively\footnote{ In fact, for each sample point $p$ it would be necessary to calculate the distance to all triangles $\mathcal{F}_{\mathcal{M}'}$ in order to find the minimum.
+This leads to a complexity $\mathcal{O}(|p| \cdot |\mathcal{F}_{\mathcal{M}'}|)$, where $|p|$ is the number of sample points taken on $\mathcal{M}$ and $|\mathcal{F}_{\mathcal{M}'}|$ is the number of triangles.}.
+To achieve reasonable running times we followed the implementation strategy described in the paper \textit{``Mesh: Measuring errors between surfaces using the hausdorff distance''}, where a cell partitioning strategy is used to greatly reduces the number of point-triangle distance evaluations.
+Each triangles is sampled via a regular grid according to a length criterion, thus avoiding uniform sampling \citep[for more details see][especially chapter 3]{Aspert2002}.
+
+still hausdorff important here
+
+for POV simplification makes no sense
+
+two approaches, we focus on visual error
+

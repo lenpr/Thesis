@@ -1,0 +1,113 @@
+% Dokumentenkopf - die Vorlage basiert auf "scrreprt" aus dem koma-script!
+\documentclass[
+	11pt,					% Schriftgröße
+	DIV11,					% Seitengroesse (siehe Koma Skript Dokumentation !)
+	DIV=calc,					% automatische Berechnung einer guten Zeilenlaenge
+	ngerman,
+	english,					% die zweite Sprachangabe dominiert (Inhaltsverzeichnis vs. Contents)
+	a4paper,					% Papierformat
+	titlepage,				% es wird eine Titelseite verwendet
+	twoside,					% zweiseitiges Dokument
+	openright,				% Kapitel beginnen immer auf der rechten Seite alt. (openany,)
+	cleardoublepage=empty,	% leere, linke Seite - Seitenstil 'plain' alt. (cleardouble=plain,)
+	parskip=half,				% Abstand zwischen Absätzen (halbe Zeile)
+	headings=normal,			% Größe der Überschriften verkleinern
+	bibtotoc,				% Bibliographie ins TOC
+	liststotoc,				% Tabellen & Abbildungsverzeichnis ins TOC
+	idxtotoc,				% Index ins TOC
+	%bibliography=totoc,		% Literaturverzeichnis im Inhaltsverzeichnis aufführen
+	%liststof=totoc,			% Verzeichnisse im Inhaltsverzeichnis aufführen
+	%index=totoc,			% Index im Inhaltsverzeichnis aufführen
+	captions=tableheading,	% Beschriftung von Tabellen oberhalb ausgeben
+	fleqn,					% Formeln werden linksbuendig angezeigt
+	headsepline,				% Linie unter Kolumnentitel
+	final						% Status, draft sollte beim fertigen ausgeschaltet werden (final/draft)
+]{scrbook} %scrreprt
+
+% Meta-Informationen - Informationen über das Dokument, wie z.B. Titel, Autor, Matrikelnr. etc
+\input{_meta}
+
+% Benötigte Packages - "ausgelagert", um die Vorlage möglichst übersichtlich zu halten.
+\input{_packages}
+
+% Kopf- und Fußzeilen, Seitenränder etc.
+\input{_pagestyle}
+
+% Erstellung eines Index und Abkürzungsverzeichnisses
+%\makeindex
+%\makeglossaries
+%\input{content/glossary}
+
+% Eigene Definitionen für Silbentrennung
+\include{_hyphenation}
+
+
+% -----------------------------------------------------
+\begin{document}
+
+% auch Subsubsections nummerieren
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
+
+% keine Kopf-/Fußzeilen bei Deckblatt und Abstract
+\cfoot{}
+\include{content/cover}
+% für Druck Leerseite
+\thispagestyle{empty}
+\cleardoublepage
+	
+% Seitennummerierung, vor dem Hauptteil in großen römischen Ziffern 
+\pagenumbering{Roman}
+
+% Begin Fußzeilen
+\cfoot{- \pagemark \hspace*{0.75ex}-\\}
+
+%Zusammenfassung
+\include{content/abstract}
+\addcontentsline{toc}{chapter}{Abstract \& Zusammenfassung}
+% Benutzte Formeln
+\include{content/notations}
+\addcontentsline{toc}{chapter}{Used Notations \& Symbols}
+
+% Inhaltsverzeichnis
+\tableofcontents
+
+% von nun an in normalen arabischen Ziffern
+% ohne \clearpage dreht der Befehl durch
+\include{empty} % übler Hack
+\clearpage
+\pagenumbering{arabic}
+
+% --------
+% Inhalt
+\include{content/introduction}
+\include{content/simplification}
+\include{content/math}
+\include{content/topstoc}
+\include{content/conclusion}
+% --------
+
+% Abkürzungsverzeichnis & Index
+\printindex \label{index}
+%\printnomenclature \label{glossary}
+% Abbildungsverzeichnis
+{\small \listoffigures \label{listoffigures}}
+{\small \listoftables \label{listoftables}}
+
+% Vorlage für das Literaturverzeichnisses
+\bibliographystyle{plainnat}	
+{\footnotesize \bibliography{citation}}
+
+% ab hier römische Ziffern
+\clearpage
+\pagenumbering{roman}
+% disables chapter, section and subsection numbering
+%\setcounter{secnumdepth}{-1}
+\begin{appendix}
+	\input{content/appendix}
+\end{appendix}
+
+% Selbständigkeitserklärung
+\include{content/affidavit}
+
+\end{document}

@@ -1,0 +1,132 @@
+% Anpassung des Seitenlayouts, siehe Seitenstil.tex
+\usepackage[
+	automark,			% Kapitelangaben in Kopfzeile automatisch erstellen
+	headsepline,			% Trennlinie unter Kopfzeile
+	ilines				% Trennlinie linksbündig ausrichten
+]{scrpage2}
+
+% Wichtig für korrekte Zitierweise (round, square, etc.)
+\usepackage[square]{natbib}
+
+% Quellenangaben in integrierter amerik. Version
+%\bibpunct{(}{)}{;}{a}{}{,~}
+
+% Landessprache, verwendet globale Option siehe \documentclass
+\usepackage{babel}
+\usepackage{varioref} 		% eigenartige Fehler ohne, stellt Option anderen Modulen zur Verfügung
+
+% Umlaute, erlaubt automatische Trennung von Worten mit Umlauten
+%\usepackage[utf8]{inputenc}	% ist in _meta, da dort schon Umlaute
+\usepackage[T1]{fontenc}
+\usepackage{lmodern} 			% "schöneres" ß
+\usepackage{textcomp} 		% Euro-Zeichen etc.
+
+% Grafiken, einbinden von Grafiken [draft oder final]
+\usepackage[dvips,final]{graphicx}
+\graphicspath{{pics/}} 		% dort liegen die Bilder des Dokuments
+
+% Befehle aus AMSTeX für mathematische Symbole z.B. \boldsymbol \mathbb
+\usepackage{amsmath,amsfonts}
+
+% Index-Ausgabe \printindex
+\usepackage{makeidx}
+
+% Einfache Definition der Zeilenabstände und Seitenränder etc.
+\usepackage{setspace}
+\usepackage{geometry}
+
+% ein Bild wird in den laufenden Text eingebunden, Text läuft [l] oder [r] vorbei
+\usepackage{floatflt}
+
+% Lange URLs umbrechen etc.
+\usepackage{url}
+
+% Zum fortlaufenden Durchnummerieren der Fußnoten
+\usepackage{chngcntr}
+
+% Symbolverzeichnis, beruht auf MakeIndex, die Definitionen sind ausgegliedert
+%\usepackage[toc, acronym]{glossaries}
+
+
+% Zum Einbinden von Programmcode
+\usepackage{listings}
+\usepackage{xcolor} 
+\definecolor{hellgelb}{rgb}{1,1,0.9}
+\definecolor{colKeys}{rgb}{0,0,1}
+\definecolor{colIdentifier}{rgb}{0,0,0}
+\definecolor{colComments}{rgb}{1,0,0}
+\definecolor{colString}{rgb}{0,0.5,0}
+\lstset{%
+    float=hbp,%
+    basicstyle=\texttt\small, %
+    identifierstyle=\color{colIdentifier}, %
+    keywordstyle=\color{colKeys}, %
+    stringstyle=\color{colString}, %
+    commentstyle=\color{colComments}, %
+    columns=flexible, %
+    tabsize=2, %
+    frame=single, %
+    extendedchars=true, %
+    showspaces=false, %
+    showstringspaces=false, %
+    numbers=left, %
+    numberstyle=\tiny, %
+    breaklines=true, %
+    backgroundcolor=\color{hellgelb}, %
+    breakautoindent=true, %
+    inputencoding=utf8x
+    %captionpos=b%
+}
+
+% für lange Tabellen
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{ragged2e}
+\usepackage{lscape}
+
+% Spaltendefinition rechtsbündig mit definierter Breite
+\newcolumntype{w}[1]{>{\raggedleft\hspace{0pt}}p{#1}}
+
+% Formatierung von Listen ändern
+\usepackage{paralist}
+% Standardeinstellungen:
+\setdefaultleftmargin{2.5em}{1.5em}{1.87em}{1.7em}{1em}{1em}
+
+% PDF-Optionen
+\usepackage[
+	bookmarks,
+	bookmarksopen=true,
+	pdftitle={\titel},
+	pdfauthor={\autor},
+	pdfcreator={\autor},
+	pdfsubject={\titel},
+	pdfkeywords={\titel},
+	colorlinks=true,
+	% für die Druckversion können die Farben ausgeschaltet werden:
+	linkcolor=blue, 			% einfache interne Verknüpfungen
+	anchorcolor=black,		% Ankertext
+	citecolor=blue, 			% Verweise auf Literaturverzeichniseinträge im Text
+	filecolor=magenta, 		% Verknüpfungen, die lokale Dateien öffnen
+	menucolor=red, 		% Acrobat-Menüpunkte
+	urlcolor=cyan, 
+	%linkcolor=black, 		
+	%anchorcolor=black,	
+	%citecolor=black, 		
+	%filecolor=black, 
+	%menucolor=black, 
+	%urlcolor=black, 
+	backref,
+	%pagebackref,
+	plainpages=false,		% zur korrekten Erstellung der Bookmarks
+	pdfpagelabels,		% -||-
+	hypertexnames=false,	% -||-
+	linktocpage 			% Seitenzahlen anstatt Text im Inhaltsverzeichnis verlinken
+]{hyperref}
+
+% \Item schreibt eine Equation Nummer ans Ende der Zeile, die Zeile muss aber mit $ anfangen 
+\def\Item$#1${\item $\displaystyle#1$
+\hfill\refstepcounter{equation}(\theequation)}
+
+% Packages um Pseudocode zu erzeugen und zu nutzen
+%\usepackage{algorithm}
+%\usepackage{algorithmic}
