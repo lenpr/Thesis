@@ -123,10 +123,3 @@
 	linktocpage 			% Seitenzahlen anstatt Text im Inhaltsverzeichnis verlinken
 ]{hyperref}
 
-% \Item schreibt eine Equation Nummer ans Ende der Zeile, die Zeile muss aber mit $ anfangen 
-\def\Item$#1${\item $\displaystyle#1$
-\hfill\refstepcounter{equation}(\theequation)}
-
-% Packages um Pseudocode zu erzeugen und zu nutzen
-%\usepackage{algorithm}
-%\usepackage{algorithmic}

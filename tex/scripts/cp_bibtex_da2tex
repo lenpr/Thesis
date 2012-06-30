@@ -1,0 +1,5 @@
+#!/bin/bash
+
+cp ~/Documents/University/Mendeley/WiIng-Diplomarbeit.bib ~/Documents/University/Diplomarbeit/tex/citation.bib
+echo "bibtex kopiert"
+
