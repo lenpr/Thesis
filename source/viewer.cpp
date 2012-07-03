@@ -25,7 +25,7 @@ void Viewer::draw() {
 		// draw point cloud
 	case 0:        
 		glDisable(GL_LIGHTING);
-        glPointSize(5.5f);
+        glPointSize(2.5f);
         glBegin (GL_POINTS);
 		if (decimatedMesh)
 			topstoc.drawDecimatedMesh(vertexWeights);
@@ -36,6 +36,8 @@ void Viewer::draw() {
 
 		if (sampledVertices || controlPoints)
 			topstoc.drawSamplAndControlPoints (sampledVertices, controlPoints);
+
+        this->sendCameraPosition();
 		break;
 
 		// draw wireframe
@@ -57,6 +59,7 @@ void Viewer::draw() {
 		if (sampledVertices || controlPoints)
 			topstoc.drawSamplAndControlPoints (sampledVertices, controlPoints);
 
+        this->sendCameraPosition();
 		glEnable (GL_LIGHTING);
 		break;
 
@@ -74,25 +77,27 @@ void Viewer::draw() {
 		if (sampledVertices || controlPoints)
 			topstoc.drawSamplAndControlPoints (sampledVertices, controlPoints);
 
-		glDisable(GL_LIGHT0);
-		break;
+        this->sendCameraPosition();
+        glDisable(GL_LIGHT0);
+        break;
 
         // draw smooth shading
-	case 3:
-		glEnable(GL_LIGHT0);
+    case 3:
+        glEnable(GL_LIGHT0);
         glShadeModel(GL_SMOOTH);
-		glBegin(GL_TRIANGLES);
-		if (decimatedMesh)
-			topstoc.drawDecimatedMesh(vertexWeights);
-		else
+        glBegin(GL_TRIANGLES);
+        if (decimatedMesh)
+            topstoc.drawDecimatedMesh(vertexWeights);
+        else
             //topstoc.drawTriangles();
             topstoc.drawMesh(vertexWeights, remeshedRegions);
-		glEnd();
-		if (sampledVertices || controlPoints)
-			topstoc.drawSamplAndControlPoints (sampledVertices, controlPoints);
+        glEnd();
+        if (sampledVertices || controlPoints)
+            topstoc.drawSamplAndControlPoints (sampledVertices, controlPoints);
 
-		glDisable(GL_LIGHT0);
-		break;
+        this->sendCameraPosition();
+        glDisable(GL_LIGHT0);
+        break;
 
         // draw textures
 	case 4:
@@ -120,6 +125,22 @@ void Viewer::mouseReleaseEvent(QMouseEvent* e) {
     QGLViewer::mouseReleaseEvent(e);
 }
 
+
+void Viewer::keyPressEvent(QKeyEvent *k) {
+
+    int keyboardcharIdx = k->key();
+    QString keyboardchar = k->text();
+
+    if (keyboardchar == "j")
+        qDebug() << "DOWN";
+    if (keyboardchar == "k")
+        qDebug() << "UP";
+    qDebug() << "Keyboard: " << keyboardchar << " - " << keyboardcharIdx;
+
+    QGLViewer::keyPressEvent(k);
+}
+
+
 void Viewer::selectVertex(int x, int y) {
 
     // This function will find 2 points in world space that are on the line into the screen defined by screen-space( ie. window-space ) point (x,y)
@@ -131,21 +152,19 @@ void Viewer::selectVertex(int x, int y) {
        glGetIntegerv(GL_VIEWPORT, viewport);
        glGetDoublev (GL_MODELVIEW_MATRIX, mvmatrix);
        glGetDoublev (GL_PROJECTION_MATRIX, projmatrix);
-       dClickY = double (700 - y); // OpenGL renders with (0,0) on bottom, mouse reports with (0,0) on top (viewport[3])
+       dClickY = double (viewport[3] - y); // OpenGL renders with (0,0) on bottom, mouse reports with (0,0) on top
 
        gluUnProject ((double) x, dClickY, 0.0, mvmatrix, projmatrix, viewport, &dX1, &dY1, &dZ1);
-      // ClickRayP1 = Vector3 ( (float) dX, (float) dY, (float) dZ );
+       // ClickRayP1 = Vector3 ( (float) dX, (float) dY, (float) dZ );
        gluUnProject ((double) x, dClickY, 1.0, mvmatrix, projmatrix, viewport, &dX2, &dY2, &dZ2);
-      // ClickRayP2 = Vector3 ( (float) dX, (float) dY, (float) dZ );
+       // ClickRayP2 = Vector3 ( (float) dX, (float) dY, (float) dZ );
 
-       qDebug() << "x " << dX1 << " - y " << dY1 << " - z " << dZ1 << endl;
-
+       //qDebug() << "x " << dX1 << " - y " << dY1 << " - z " << dZ1 << endl;
 
        OpenMesh::Vec3f rayP1(dX1, dY1, dZ1);
        OpenMesh::Vec3f rayP2(dX2, dY2, dZ2);
 
        topstoc.rayIntersectsTriangle(rayP1, rayP2);
-
 }
 
 
@@ -163,7 +182,9 @@ void Viewer::loadModel (const QString& fileName) {
 
 	// calculate bounds of model and set scene accordingly
 	topstoc.setModelBounds();
-	setSceneBoundingBox (topstoc.bbox.getMinPoint(), topstoc.bbox.getMaxPoint());;
+    Vec sceneMin = topstoc.bbox.getMinPoint();
+    Vec sceneMax = topstoc.bbox.getMaxPoint();
+    setSceneBoundingBox(sceneMin, sceneMax);
 	camera()->showEntireScene();
 
 	// generat vertex/face normals if needed
@@ -233,6 +254,19 @@ void Viewer::invertNormals () {
 
 void Viewer::passToConsole (const QString& msg, int mode) {
 	emit writeToConsole (msg, mode);
+}
+
+void Viewer::hausdorff (double sampling_density_user) {
+    topstoc.calculateHausdorff (sampling_density_user);
+}
+
+void Viewer::sendCameraPosition() {
+
+    GLfloat m[16];
+    glGetFloatv (GL_MODELVIEW_MATRIX, m);
+    Vec viewVec(m[8], m[9], m[10]);
+    //qDebug() << "x " << m[8] << " - y " << m[9] << " - z " << m[10] << endl;
+    emit updateViewVec(viewVec);
 }
 
 void Viewer::test () {

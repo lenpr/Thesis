@@ -32,28 +32,34 @@ MainWidget::MainWidget(QWidget *parent)
 
 	// Connects
 	//--- cosole to viewer
-	connect (controlpanel, SIGNAL(fileload(QString)),
-					 viewer, SLOT(loadModel(QString)));
-	connect (controlpanel, SIGNAL(filesave(QString)),
-					 viewer, SLOT(saveModel(QString)));
-	connect (controlpanel, SIGNAL(calculateweights(QString)),
-					 viewer, SLOT(stocWeights(QString)));
-	connect (controlpanel, SIGNAL(runsampling(float, float)),
-					 viewer, SLOT(stocSampling(float, float)));
-	connect (controlpanel, SIGNAL(runremeshing(QString)),
-					 viewer, SLOT(topReMeshing(QString)));
-	connect (controlpanel, SIGNAL(visualization(int,bool,bool,bool,bool,bool)),
-					 viewer, SLOT(visualization(int,bool,bool,bool,bool,bool)));
-	connect (controlpanel, SIGNAL(invertNormals()),
-					 viewer,	 SLOT(invertNormals()));
-	connect (controlpanel, SIGNAL(test()),
-					 viewer, SLOT(test()));
+    connect (controlpanel, SIGNAL(fileload(QString)),
+             viewer, SLOT(loadModel(QString)));
+    connect (controlpanel, SIGNAL(filesave(QString)),
+             viewer, SLOT(saveModel(QString)));
+    connect (controlpanel, SIGNAL(calculateweights(QString)),
+             viewer, SLOT(stocWeights(QString)));
+    connect (controlpanel, SIGNAL(runsampling(float, float)),
+             viewer, SLOT(stocSampling(float, float)));
+    connect (controlpanel, SIGNAL(runremeshing(QString)),
+             viewer, SLOT(topReMeshing(QString)));
+    connect (controlpanel, SIGNAL(visualization(int,bool,bool,bool,bool,bool)),
+             viewer, SLOT(visualization(int,bool,bool,bool,bool,bool)));
+    connect (controlpanel, SIGNAL(invertNormals()),
+             viewer, SLOT(invertNormals()));
+    connect (controlpanel, SIGNAL(hausdorff(double)),
+             viewer, SLOT(hausdorff(double)));
+    connect (controlpanel, SIGNAL(cameraPosition(Vec)),
+             viewer, SLOT(setCamerVec(Vec)));
+    connect (controlpanel, SIGNAL(test()),
+             viewer, SLOT(test()));
 
 	//--- viewer to console
-	connect (viewer, SIGNAL(writeToConsole(QString,int)),
-					 controlpanel, SLOT(writeToConsole(QString,int)));
-	connect (viewer, SIGNAL(meshstatus(int)),
-					 controlpanel, SLOT(startTabFunctions(int)));
+    connect (viewer, SIGNAL(writeToConsole(QString,int)),
+             controlpanel, SLOT(writeToConsole(QString,int)));
+    connect (viewer, SIGNAL(meshstatus(int)),
+             controlpanel, SLOT(startTabFunctions(int)));
+    connect (viewer, SIGNAL(updateViewVec(Vec)),
+             controlpanel, SLOT(updateViewVec(Vec)));
 }
 
 MainWidget::~MainWidget() {

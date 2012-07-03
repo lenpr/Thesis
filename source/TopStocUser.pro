@@ -18,14 +18,24 @@ SOURCES += main.cpp\
     viewer.cpp \
     controlpanel.cpp \
     topstoc.cpp \
+    xalloc.c \
+    reporting.c \
+    geomutils.c \
+    compute_error.c \
     boundingbox.cpp
 
 HEADERS  += mainwidget.h \
     viewer.h \
     controlpanel.h \
     topstoc.h \
-    debug.h \
-    boundingbox.h
+    boundingbox.h \
+    3dmodel.h \
+    xalloc.h \
+    reporting.h \
+    geomutils.h \
+    compute_error.h \
+    model_analysis.h \
+    mymesh.h
 
 
 FORMS += \

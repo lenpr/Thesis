@@ -1,8 +1,17 @@
 #ifndef CONTROLPANEL_H
 #define CONTROLPANEL_H
 
+#include <QtGui>
+#include <QLineEdit>
+#include <QTest>
+#include <QDateTime>
+
 #include <QWidget>
 #include "ui_controlpanel.h"
+
+#include <QGLViewer/vec.h>
+using qglviewer::Vec;
+
 
 namespace Ui {
 	class ControlPanel;
@@ -21,22 +30,25 @@ public:
 
 public slots:
 	void writeToConsole(QString msg, int mode);
-
+    void updateViewVec(Vec viewVec);
 
 private slots:
 	//--- filehandling
 	void on_buttonLoad_clicked(); // Qt automatically connects ->
 	void on_buttonSave_clicked();
-	//--- sampling
+    //--- sampling & remeshing
 	void on_buttonCalculateWeights_clicked();
 	void on_buttonRunSampling_clicked();	// <-
 	void setSliderValue(int value);
-	//--- remeshing
 	void on_buttonReIndex_clicked();
+    //--- calculating and visualizing metrics
+    void on_buttonHausdorff_clicked();
 	//--- visualization
 	void commitVisualOptions(int mode);
 	void on_visualInvertNormals_stateChanged(int mode);
-	// auto connect
+    void commitSliderValues();
+    //--- interaction
+    // testerei
 	void on_buttonTest_clicked();
 
 	void startConsole ();
@@ -57,11 +69,14 @@ signals:
 	void visualization(	int drawingMode, bool vertexWeights,		bool sampledVertices,
 											bool controlPoints, bool remeshedRegions,	bool decimatedMesh);
 	void invertNormals();
+    void hausdorff( double samplingDensityUser);
+    void cameraPosition ( Vec cameraVec );
 	void test();
 
 private:
 	Ui::ControlPanel *ui;
 
+    float cutDecimal (float myNumber, int decimal);
 	int consoleLineNumber;
 };
 

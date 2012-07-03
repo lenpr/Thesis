@@ -3,19 +3,20 @@
 
 
 TopStoc::TopStoc() :
-		mesh(),
-		sampledVertexQueue(),
-		decimatedMesh(),
-		minVertexWeight(1.0),
-		maxVertexWeight(0.0),
-		meanVertexWeight(0.0),
-		meshStatus(0) {}
+    bbox(),
+    mesh(),
+    sampledVertexQueue(),
+    decimatedMesh(),
+    minVertexWeight(1.0),
+    maxVertexWeight(0.0),
+    meanVertexWeight(0.0),
+    meshStatus(0) {}
 
 bool TopStoc::loadMeshFromFile (const string &fileName) {
-	minVertexWeight = 1.0;
-	maxVertexWeight = 0.0;
-	meanVertexWeight = 0.0;
-	meshStatus = 0;
+    minVertexWeight = 1.0;
+    maxVertexWeight = 0.0;
+    meanVertexWeight = 0.0;
+    meshStatus = 0;
 
 	return OpenMesh::IO::read_mesh(mesh, fileName, opt);
 }
@@ -91,36 +92,7 @@ bool TopStoc::saveMeshToFile (const string &fileName) {
 
 void TopStoc::setModelBounds () {
 
-	MyMesh::ConstVertexIter v_it=mesh.vertices_begin();
-
-	float xMin = mesh.point(v_it)[0]; float xMax = mesh.point(v_it)[0];
-	float yMin = mesh.point(v_it)[1]; float yMax = mesh.point(v_it)[1];
-	float zMin = mesh.point(v_it)[2]; float zMax = mesh.point(v_it)[2];
-	++v_it;
-
-	for (; v_it!=mesh.vertices_end(); ++v_it){
-		float x = mesh.point(v_it)[0];
-		float y = mesh.point(v_it)[1];
-		float z = mesh.point(v_it)[2];
-
-		if (x < xMin) xMin = x;
-		if (x > xMax) xMax = x;
-
-		if (y < yMin) yMin = y;
-		if (y > yMax) yMax = y;
-
-		if (z < zMin) zMin = z;
-		if (z > zMax) zMax = z;
-	}
-
-	bbox.setMinPoint (xMin, yMin, zMin);
-	bbox.setMaxPoint (xMax, yMax, zMax);
-
-	float deltaX = fabs(xMax - xMin);
-	float deltaY = fabs(yMax - yMin);
-	float deltaZ = fabs(zMax - zMin);
-
-	bbox.setCenterPoint ((xMin+(deltaX/2)), yMin+(deltaY/2), zMin+(deltaZ/2));
+    bbox.calculateAll(mesh);
 }
 
 
@@ -254,16 +226,6 @@ void TopStoc::drawMesh(bool vertexWeights, bool remeshedRegions) {
             glVertex3f(	mesh.point(fv_it)[0],
                         mesh.point(fv_it)[1],
                         mesh.point(fv_it)[2]);
-            /*
-            glPushMatrix();
-            glLoadIdentity();
-            glTranslatef(mesh.point(fv_it)[0],
-                         mesh.point(fv_it)[1],
-                         mesh.point(fv_it)[2]);
-
-           glutWireSphere(0.1, 6, 6);
-           glPopMatrix();
-           */
         }
     }
 }
@@ -289,6 +251,16 @@ void TopStoc::drawTriangles() {
 
         glEnd();
     }
+
+    //                glPushMatrix();
+    //                glLoadIdentity();
+    //                glTranslatef(mesh.point(fv_it)[0],
+    //                             mesh.point(fv_it)[1],
+    //                             mesh.point(fv_it)[2]);
+    //                glColor3f(1.0, 0.0, 1.0);
+    //                glutWireSphere(0.1, 6, 6);
+    //                glutSolidSphere( 0.1f, 6, 6);
+    //                glPopMatrix();
 }
 
 void TopStoc::initMesh (){
@@ -762,6 +734,9 @@ bool TopStoc::runTopReMeshing (const QString &mode) {
 													 + QString::number((float)((float)decimatedMesh.size()/3)/mesh.n_faces())
 													 + "% of base the mesh";
 	writeToConsole (consoleMessage, 2);
+    // if the meshes changes, updated panel
+    writeToConsole ("-", 7);
+    writeToConsole ("-", 8);
 	meshStatus = 1;
 
 	return (true);
@@ -850,8 +825,141 @@ float TopStoc::adaptivityCalculation () {
 	return (result);
 }
 
+/*
+  Computes the Hausdorff distance between the original and the decimated mesh
+  of the TopStoc object. Thereby sampling_density is the average number of test
+  points per face and min_sample_freq the minimum number of test points per face
+  regardless of sampling_density. The content of stats is cleared beforehand.
+*/
+void TopStoc::calculateHausdorff(double sampling_density_user) {
+
+    int min_sample_freq = 3;
+    double sampling_density;
+
+    if (sampling_density_user < min_sample_freq)
+        sampling_density_user = min_sample_freq;
+    else
+        sampling_density = sampling_density_user;
+
+    struct dist_surf_surf_stats stats;
+
+    int i;
+    struct model m1, m2;
+    struct model_error me1;
+
+    memset(&m1, 0, sizeof(m1));
+    memset(&m2, 0, sizeof(m2));
+    memset(&me1, 0, sizeof(me1));
+    me1.mesh = &m1;
+    m2.builtin_normals = 1;
+
+    i = 0;
+    m2.num_vert = mesh.n_vertices();
+    m2.vertices = (vertex_t *) xa_malloc(m2.num_vert * sizeof(vertex_t));
+    m2.normals = (vertex_t *) xa_malloc(m2.num_vert * sizeof(vertex_t));
+    for (MyMesh::VertexIter v_it = mesh.vertices_begin(); v_it != mesh.vertices_end(); ++v_it) {
+        MyMesh::Point p = mesh.point(v_it.handle());
+        m2.vertices[i].x = p[0];
+        m2.vertices[i].y = p[1];
+        m2.vertices[i].z = p[2];
+        MyMesh::Normal n = mesh.normal(v_it.handle());
+        m2.normals[i].x = n[0];
+        m2.normals[i].y = n[1];
+        m2.normals[i].z = n[2];
+        i++;
+    }
+
+    i = 0;
+    m2.num_faces = mesh.n_faces();
+    m2.faces = (face_t *) xa_malloc(m2.num_faces * sizeof(face_t));
+    m2.face_normals = (vertex_t *) xa_malloc(m2.num_faces * sizeof(vertex_t));
+    for (MyMesh::FaceIter f_it = mesh.faces_begin(); f_it != mesh.faces_end(); ++f_it) {
+        MyMesh::FaceVertexIter fv_it = mesh.fv_iter(f_it.handle());
+        m2.faces[i].f0 = fv_it.handle().idx();
+        ++fv_it;
+        m2.faces[i].f1 = fv_it.handle().idx();
+        ++fv_it;
+        m2.faces[i].f2 = fv_it.handle().idx();
+        MyMesh::Normal n = mesh.normal(f_it.handle());
+        m2.face_normals[i].x = n[0];
+        m2.face_normals[i].y = n[1];
+        m2.face_normals[i].z = n[2];
+        ++i;
+    }
+
+    Vec boxMin = bbox.getMinPoint();
+    m2.bBox[0].x = (float) boxMin.x;
+    m2.bBox[0].y = (float) boxMin.y;
+    m2.bBox[0].z = (float) boxMin.z;
+    Vec boxMax = bbox.getMaxPoint();
+    m2.bBox[1].x = (float) boxMax.x;
+    m2.bBox[1].y = (float) boxMax.y;
+    m2.bBox[1].z = (float) boxMax.z;
+
+    m1.bBox[0] = m2.bBox[0];
+    m1.bBox[1] = m2.bBox[1];
+
+    m1.num_vert = decimatedMesh.size();
+    m1.vertices = (vertex_t *) xa_malloc(m1.num_vert * sizeof(vertex_t));
+    m1.normals = (vertex_t *) xa_malloc(m1.num_vert * sizeof(vertex_t));
+    m1.num_faces = (decimatedMesh.size()/3);
+    m1.faces = (face_t *) xa_malloc(m1.num_faces * sizeof(face_t));
+    m1.face_normals = (vertex_t *) xa_malloc(m1.num_faces * sizeof(vertex_t));
+
+    for (i = 0; i < m1.num_vert; ++i) {
+        MyMesh::Point p = mesh.point(decimatedMesh[i]);
+        m1.vertices[i].x = p[0];
+        m1.vertices[i].y = p[1];
+        m1.vertices[i].z = p[2];
+        MyMesh::Normal n1 = mesh.normal(decimatedMesh[i]);
+        m1.normals[i].x = n1[0];
+        m1.normals[i].y = n1[1];
+        m1.normals[i].z = n1[2];
+
+        if (i%3 == 0) {
+            int face_number = (i/3);
+            m1.faces[face_number].f0 = decimatedMesh[(i+0)].idx();
+            m1.faces[face_number].f1 = decimatedMesh[(i+1)].idx();
+            m1.faces[face_number].f2 = decimatedMesh[(i+2)].idx();
+
+            MyMesh::Normal n2 = mesh.normal(decimatedMesh[(i+1)]);
+            MyMesh::Normal n3 = mesh.normal(decimatedMesh[(i+2)]);
+            MyMesh::Normal n = n1 + n2 + n3;
+            n.normalize();
+            m1.face_normals[face_number].x = n[0];
+            m1.face_normals[face_number].y = n[1];
+            m1.face_normals[face_number].z = n[2];
+        }
+    }
+
+    //timer anschalten Hausdorff
+    dist_surf_surf(&me1, &m2, sampling_density, min_sample_freq, &stats, m2.builtin_normals, NULL);
+    //timer abschalten Hausdorff
+
+    writeToConsole (QString::number( stats.mean_dist ), 7);
+    writeToConsole (QString::number( stats.max_dist ), 8);
+
+    free(m1.vertices);
+    free(m1.normals);
+    free(m1.faces);
+    free(m1.face_normals);
+
+    free(m2.vertices);
+    free(m2.normals);
+    free(m2.faces);
+    free(m2.face_normals);
+
+    // ToDo Output the results
+}
 
 void TopStoc::test () {
 
     std::cout << "Testbutton " << std::endl;
+
+    BoundingBox bb;
+    bb.setMinPoint( 0.0f, 0.0f, 0.0f );
+    bb.setMaxPoint( 1.1f, 1.2f, 1.3f );
+    std::cout << "Dinstance: " << bb.getDiagonal() << std::endl;
+    std::cout << "Center: " << bb.getCenterPoint() << std::endl;
+
 }

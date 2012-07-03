@@ -1,29 +1,63 @@
 #include "boundingbox.h"
 
-BoundingBox::BoundingBox() {}
+BoundingBox::BoundingBox() :
+    minPoint(0.0, 0.0, 0.0),
+    maxPoint(0.0, 0.0, 0.0),
+    centerPoint(0.0, 0.0, 0.0),
+    diagonal(-1.0f),
+    centerPointStatus(false) {}
 
-// setter & getter
+void BoundingBox::calculateAll(const MyMesh &mesh) {
+    MyMesh::ConstVertexIter v_it=mesh.vertices_begin();
+    minPoint.x = maxPoint.x = mesh.point(v_it)[0];
+    minPoint.y = maxPoint.y = mesh.point(v_it)[1];
+    minPoint.z = maxPoint.z = mesh.point(v_it)[2];
+    ++v_it;
 
-void BoundingBox::setMinPoint (const float& vecX, const float& vecY, const float& vecZ) {
-	minPoint = Vec(vecX, vecY, vecZ);
+    for (; v_it!=mesh.vertices_end(); ++v_it){
+        float x = mesh.point(v_it)[0];
+        float y = mesh.point(v_it)[1];
+        float z = mesh.point(v_it)[2];
+
+        if (x < minPoint.x) minPoint.x = x;
+        if (x > maxPoint.x) maxPoint.x = x;
+
+        if (y < minPoint.y) minPoint.y = y;
+        if (y > maxPoint.y) maxPoint.y = y;
+
+        if (z < minPoint.z) minPoint.z = z;
+        if (z > maxPoint.z) maxPoint.z = z;
+    }
+
+    calcDiagonal();
+    calcCenterPoint();
 }
 
-void BoundingBox::setMaxPoint (const float& vecX, const float& vecY, const float& vecZ) {
-	maxPoint = Vec(vecX, vecY, vecZ);
+void BoundingBox::calcDiagonal() {
+
+    diagonal = (maxPoint-minPoint).norm();
 }
 
-void BoundingBox::setCenterPoint (const float& vecX, const float& vecY, const float& vecZ) {
-	centerPoint = Vec(vecX, vecY, vecZ);
+void BoundingBox::calcCenterPoint() {
+
+    centerPoint.x = minPoint.x + (fabs(maxPoint.x-minPoint.x))/2;
+    centerPoint.y = minPoint.y + (fabs(maxPoint.y-minPoint.y))/2;
+    centerPoint.z = minPoint.z + (fabs(maxPoint.z-minPoint.z))/2;
+    centerPointStatus = true;
 }
 
-Vec BoundingBox::getMinPoint () const {
-	return minPoint;
+float BoundingBox::getDiagonal() {
+
+    if ( diagonal < 0.0f )
+        calcDiagonal();
+
+    return diagonal;
 }
 
-Vec BoundingBox::getMaxPoint () const {
-	return maxPoint;
-}
+Vec BoundingBox::getCenterPoint() {
 
-Vec BoundingBox::getCenterPoint () const {
-	return centerPoint;
+    if (!centerPointStatus)
+        calcCenterPoint();
+
+    return centerPoint;
 }

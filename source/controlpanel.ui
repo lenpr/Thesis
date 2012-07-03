@@ -7,11 +7,11 @@
     <x>0</x>
     <y>0</y>
     <width>300</width>
-    <height>700</height>
+    <height>800</height>
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -19,12 +19,12 @@
   <property name="minimumSize">
    <size>
     <width>300</width>
-    <height>700</height>
+    <height>800</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>300</width>
+    <width>800</width>
     <height>16777215</height>
    </size>
   </property>
@@ -35,9 +35,9 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>180</y>
+     <y>174</y>
      <width>270</width>
-     <height>15</height>
+     <height>12</height>
     </rect>
    </property>
    <property name="value">
@@ -50,7 +50,7 @@
      <x>0</x>
      <y>0</y>
      <width>145</width>
-     <height>175</height>
+     <height>171</height>
     </rect>
    </property>
    <property name="title">
@@ -63,12 +63,12 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>30</y>
+      <y>20</y>
       <width>141</width>
-      <height>66</height>
+      <height>151</height>
      </rect>
     </property>
-    <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0">
+    <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,0">
      <item>
       <widget class="QPushButton" name="buttonLoad">
        <property name="text">
@@ -83,53 +83,35 @@
        </property>
       </widget>
      </item>
+     <item>
+      <widget class="Line" name="line_3">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="buttonSettingLoad">
+       <property name="text">
+        <string>Save Settings</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="buttonSettingSave">
+       <property name="text">
+        <string>Load Settings</string>
+       </property>
+      </widget>
+     </item>
     </layout>
-   </widget>
-   <widget class="Line" name="line_3">
-    <property name="geometry">
-     <rect>
-      <x>7</x>
-      <y>100</y>
-      <width>131</width>
-      <height>3</height>
-     </rect>
-    </property>
-    <property name="orientation">
-     <enum>Qt::Horizontal</enum>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>110</y>
-      <width>141</width>
-      <height>32</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Load Preset</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton_2">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>140</y>
-      <width>141</width>
-      <height>32</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Save Settings</string>
-    </property>
    </widget>
   </widget>
   <widget class="QTabWidget" name="tabWidgetFunctions">
    <property name="geometry">
     <rect>
      <x>0</x>
-     <y>199</y>
+     <y>190</y>
      <width>300</width>
      <height>181</height>
     </rect>
@@ -137,9 +119,27 @@
    <property name="currentIndex">
     <number>1</number>
    </property>
-   <widget class="QWidget" name="TabSampling">
+   <widget class="QWidget" name="TabTopology">
     <attribute name="title">
-     <string>Sampling</string>
+     <string>Topology</string>
+    </attribute>
+    <widget class="QPushButton" name="buttonTest">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>50</y>
+       <width>114</width>
+       <height>32</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Test</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="TabDecimation">
+    <attribute name="title">
+     <string>Decimation</string>
     </attribute>
     <widget class="QSlider" name="sliderSubset">
      <property name="geometry">
@@ -252,9 +252,9 @@
     <widget class="QWidget" name="layoutWidget1">
      <property name="geometry">
       <rect>
-       <x>10</x>
+       <x>0</x>
        <y>10</y>
-       <width>251</width>
+       <width>298</width>
        <height>32</height>
       </rect>
      </property>
@@ -273,38 +273,181 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QPushButton" name="buttonReIndex">
+        <property name="text">
+         <string>Triangulate</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </widget>
-   <widget class="QWidget" name="TabReIndexing">
+   <widget class="QWidget" name="TabMetrics">
     <attribute name="title">
-     <string>ReMeshing</string>
+     <string>Metrics</string>
     </attribute>
-    <widget class="QPushButton" name="buttonReIndex">
+    <widget class="QWidget" name="verticalLayoutWidget_6">
      <property name="geometry">
       <rect>
-       <x>90</x>
-       <y>30</y>
-       <width>114</width>
-       <height>32</height>
+       <x>0</x>
+       <y>0</y>
+       <width>291</width>
+       <height>154</height>
       </rect>
      </property>
-     <property name="text">
-      <string>ReIndex</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="buttonTest">
-     <property name="geometry">
-      <rect>
-       <x>90</x>
-       <y>70</y>
-       <width>114</width>
-       <height>32</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Test</string>
-     </property>
+     <layout class="QVBoxLayout" name="verticalLayoutHausdorffMultiView">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayoutHausdorff">
+        <item>
+         <widget class="QPushButton" name="buttonHausdorff">
+          <property name="minimumSize">
+           <size>
+            <width>100</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Hausdorff</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_2">
+          <item>
+           <widget class="QLabel" name="labelHausdorffMeanDistanceDescription">
+            <property name="text">
+             <string>Mean Dist.</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="labelHausdorffMeanDistance">
+            <property name="text">
+             <string>-</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_3">
+          <item>
+           <widget class="QLabel" name="labelHausdorffMaxDistanceDescription">
+            <property name="text">
+             <string>Max. Dist.</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="labelHausdorffMaxDistance">
+            <property name="text">
+             <string>-</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="Line" name="line_13">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayoutMultiView">
+        <item>
+         <widget class="QPushButton" name="buttonMultiView">
+          <property name="minimumSize">
+           <size>
+            <width>105</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>MultiView</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_5">
+          <item>
+           <widget class="QLabel" name="labelMultiViewVariance">
+            <property name="text">
+             <string>Variance</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSpinBox" name="spinBoxMultiViewVariance">
+            <property name="minimumSize">
+             <size>
+              <width>78</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximum">
+             <number>20</number>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_6">
+          <item>
+           <widget class="QLabel" name="labelMultiViewWindows">
+            <property name="text">
+             <string>Windows</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSpinBox" name="spinBoxMultiViewWindows">
+            <property name="minimumSize">
+             <size>
+              <width>78</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="suffix">
+             <string/>
+            </property>
+            <property name="maximum">
+             <number>16</number>
+            </property>
+            <property name="value">
+             <number>1</number>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <spacer name="verticalSpacer_4">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>40</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
     </widget>
    </widget>
   </widget>
@@ -312,7 +455,7 @@
    <property name="geometry">
     <rect>
      <x>0</x>
-     <y>580</y>
+     <y>670</y>
      <width>111</width>
      <height>16</height>
     </rect>
@@ -321,27 +464,20 @@
     <string>Console Output</string>
    </property>
   </widget>
-  <widget class="Line" name="line">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>560</y>
-     <width>300</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="orientation">
-    <enum>Qt::Horizontal</enum>
-   </property>
-  </widget>
   <widget class="QTabWidget" name="tabWidgetInput">
    <property name="geometry">
     <rect>
      <x>0</x>
-     <y>390</y>
+     <y>380</y>
      <width>300</width>
-     <height>160</height>
+     <height>281</height>
     </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>0</width>
+     <height>280</height>
+    </size>
    </property>
    <property name="currentIndex">
     <number>1</number>
@@ -485,145 +621,316 @@
     <attribute name="title">
      <string>Visualization</string>
     </attribute>
-    <widget class="QComboBox" name="visualDrawingMethod">
+    <widget class="QWidget" name="verticalLayoutWidget_9">
      <property name="geometry">
       <rect>
-       <x>140</x>
-       <y>5</y>
-       <width>141</width>
-       <height>26</height>
+       <x>0</x>
+       <y>0</y>
+       <width>290</width>
+       <height>251</height>
       </rect>
      </property>
-     <item>
-      <property name="text">
-       <string>point cloud</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>wireframe</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>flat</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>smooth</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>texture</string>
-      </property>
-     </item>
-    </widget>
-    <widget class="QLabel" name="label_2">
-     <property name="geometry">
-      <rect>
-       <x>15</x>
-       <y>9</y>
-       <width>115</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Drawing Method:</string>
-     </property>
-    </widget>
-    <widget class="Line" name="line_4">
-     <property name="geometry">
-      <rect>
-       <x>5</x>
-       <y>40</y>
-       <width>280</width>
-       <height>3</height>
-      </rect>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-    <widget class="QWidget" name="layoutWidget3">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>50</y>
-       <width>131</width>
-       <height>81</height>
-      </rect>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayoutSampling">
+     <layout class="QVBoxLayout" name="verticalLayout_4">
       <item>
-       <widget class="QCheckBox" name="visualInvertNormals">
-        <property name="text">
-         <string>invert normals</string>
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>Drawing Method:</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="visualDrawingMethod">
+          <item>
+           <property name="text">
+            <string>point cloud</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>wireframe</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>flat</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>smooth</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>texture</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="Line" name="line_8">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QCheckBox" name="visualVertexWeights">
-        <property name="text">
-         <string>vertex weights</string>
-        </property>
-        <property name="checked">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QCheckBox" name="visualSampledVertices">
-        <property name="text">
-         <string>sampled vertices</string>
-        </property>
-        <property name="checked">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-    <widget class="QWidget" name="layoutWidget4">
-     <property name="geometry">
-      <rect>
-       <x>150</x>
-       <y>50</y>
-       <width>139</width>
-       <height>81</height>
-      </rect>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayoutRemeshing">
-      <item>
-       <widget class="QCheckBox" name="visualControlPoints">
-        <property name="text">
-         <string>control points</string>
-        </property>
-        <property name="checked">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QCheckBox" name="visualRemeshedRegions">
-        <property name="text">
-         <string>remeshed regions</string>
-        </property>
-        <property name="checked">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QCheckBox" name="visualDecimatedMesh">
-        <property name="text">
-         <string>decimated mesh</string>
-        </property>
-        <property name="checked">
-         <bool>false</bool>
-        </property>
-       </widget>
+       <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayoutSampling">
+          <item>
+           <widget class="QCheckBox" name="visualInvertNormals">
+            <property name="text">
+             <string>invert normals</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="visualVertexWeights">
+            <property name="text">
+             <string>vertex weights</string>
+            </property>
+            <property name="checked">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="visualSampledVertices">
+            <property name="text">
+             <string>sampled vertices</string>
+            </property>
+            <property name="checked">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="visualControlPoints">
+            <property name="text">
+             <string>control points</string>
+            </property>
+            <property name="checked">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="visualRemeshedRegions">
+            <property name="text">
+             <string>remeshed regions</string>
+            </property>
+            <property name="checked">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="visualDecimatedMesh">
+            <property name="text">
+             <string>decimated mesh</string>
+            </property>
+            <property name="checked">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="Line" name="line_4">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayoutCamera">
+          <item>
+           <widget class="QLabel" name="labelCameraDescription">
+            <property name="text">
+             <string>Camera Direction</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayoutVectorLabel_2">
+            <item>
+             <widget class="QLabel" name="labelVecX">
+              <property name="text">
+               <string>0</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="labelVecY">
+              <property name="text">
+               <string>0</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="labelVecZ">
+              <property name="text">
+               <string>0</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayoutVector">
+            <item>
+             <widget class="QSlider" name="sliderVecX">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>50</height>
+               </size>
+              </property>
+              <property name="minimum">
+               <number>-10</number>
+              </property>
+              <property name="maximum">
+               <number>10</number>
+              </property>
+              <property name="singleStep">
+               <number>1</number>
+              </property>
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSlider" name="sliderVecY">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>50</height>
+               </size>
+              </property>
+              <property name="minimum">
+               <number>-10</number>
+              </property>
+              <property name="maximum">
+               <number>10</number>
+              </property>
+              <property name="singleStep">
+               <number>1</number>
+              </property>
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSlider" name="sliderVecZ">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>50</height>
+               </size>
+              </property>
+              <property name="minimum">
+               <number>-10</number>
+              </property>
+              <property name="maximum">
+               <number>10</number>
+              </property>
+              <property name="singleStep">
+               <number>1</number>
+              </property>
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayoutVectorLabel">
+            <item>
+             <widget class="QLabel" name="labelVecWorldX">
+              <property name="text">
+               <string>0</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignHCenter|Qt::AlignTop</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="labelVecWorldY">
+              <property name="text">
+               <string>0</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="labelVecWorldZ">
+              <property name="text">
+               <string>0</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="Line" name="line_7">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="buttonTurntable">
+            <property name="text">
+             <string>Turntable</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="verticalSpacer_3">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+       </layout>
       </item>
      </layout>
     </widget>
@@ -632,21 +939,226 @@
     <attribute name="title">
      <string>Interaction</string>
     </attribute>
+    <widget class="QWidget" name="horizontalLayoutWidget">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>291</width>
+       <height>251</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayoutInteraction_2">
+        <item>
+         <widget class="QLabel" name="labelMouseAction_2">
+          <property name="text">
+           <string>Mouse Action</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="comboBoxMouseAction_2">
+          <item>
+           <property name="text">
+            <string>Fix</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Increase Weight</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Decrease Weight</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Dismiss</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item>
+         <widget class="Line" name="line_10">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="checkBoxPOV_2">
+          <property name="text">
+           <string>POV Decimation</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayoutPOV_2">
+          <item>
+           <widget class="QLabel" name="labelPOVDescription_2">
+            <property name="text">
+             <string>Ratio:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QDoubleSpinBox" name="spinBoxPOV_2">
+            <property name="decimals">
+             <number>1</number>
+            </property>
+            <property name="minimum">
+             <double>0.000000000000000</double>
+            </property>
+            <property name="maximum">
+             <double>1.000000000000000</double>
+            </property>
+            <property name="singleStep">
+             <double>0.100000000000000</double>
+            </property>
+            <property name="value">
+             <double>0.500000000000000</double>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="checkBoxSilhouette_2">
+          <property name="text">
+           <string>Keep Silhouette</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="Line" name="line_11">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="checkBoxUVBoarders_2">
+          <property name="text">
+           <string>Keep UV Boarders</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="Line" name="line_12">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayoutElementInformation">
+        <item>
+         <widget class="QLabel" name="labelElementInformation">
+          <property name="text">
+           <string>Element Info</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayoutElementInfo1">
+          <item>
+           <widget class="QLabel" name="labelElementNr1">
+            <property name="text">
+             <string>Nr.</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="labelElementNr2">
+            <property name="text">
+             <string>-</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayoutElementInfo2">
+          <item>
+           <widget class="QLabel" name="labelElementWeight1">
+            <property name="text">
+             <string>Weight</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="labelElementWeight2">
+            <property name="text">
+             <string>-</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="Line" name="line_6">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
    </widget>
   </widget>
   <widget class="QTextEdit" name="ConsoleOutput">
    <property name="geometry">
     <rect>
      <x>0</x>
-     <y>600</y>
+     <y>690</y>
      <width>300</width>
-     <height>100</height>
+     <height>200</height>
     </rect>
    </property>
    <property name="sizePolicy">
-    <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+    <sizepolicy hsizetype="Fixed" vsizetype="MinimumExpanding">
      <horstretch>0</horstretch>
-     <verstretch>0</verstretch>
+     <verstretch>1</verstretch>
     </sizepolicy>
    </property>
    <property name="minimumSize">
@@ -658,7 +1170,7 @@
    <property name="maximumSize">
     <size>
      <width>260</width>
-     <height>16777215</height>
+     <height>10000</height>
     </size>
    </property>
    <property name="html">
@@ -675,7 +1187,7 @@ p, li { white-space: pre-wrap; }
      <x>155</x>
      <y>0</y>
      <width>145</width>
-     <height>175</height>
+     <height>171</height>
     </rect>
    </property>
    <property name="title">
@@ -755,6 +1267,12 @@ p, li { white-space: pre-wrap; }
      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
     </property>
    </widget>
+   <zorder>labelNumberVertices</zorder>
+   <zorder>labelNumberVerticesValue</zorder>
+   <zorder>labelSampledVertices</zorder>
+   <zorder>labelSampledVerticesValue</zorder>
+   <zorder>labelSampledVerticesRatio</zorder>
+   <zorder>boxFileHandling</zorder>
   </widget>
  </widget>
  <resources/>

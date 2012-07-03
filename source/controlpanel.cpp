@@ -1,7 +1,3 @@
-#include <QtGui>
-#include <QLineEdit>
-#include <QTest>
-#include <QDateTime>
 
 #include "controlpanel.h"
 
@@ -39,6 +35,13 @@ ControlPanel::ControlPanel(QWidget *parent) :
 							this,	SLOT(copyToClipboard()));
 	connect(		ui->sliderSubset,	SIGNAL(valueChanged(int)),
 							this, SLOT(setSliderValue(int)));
+    //
+    connect(    ui->sliderVecX, SIGNAL(valueChanged(int)),
+                this, SLOT(commitSliderValues()) );
+    connect(    ui->sliderVecY, SIGNAL(valueChanged(int)),
+                this, SLOT(commitSliderValues()) );
+    connect(    ui->sliderVecZ, SIGNAL(valueChanged(int)),
+                this, SLOT(commitSliderValues()) );
 	// visualization
 	connect(		ui->visualDrawingMethod, SIGNAL(currentIndexChanged(int)),
 							this,	SLOT(commitVisualOptions(int)));
@@ -194,18 +197,23 @@ void ControlPanel::writeToConsole (QString msg, int mod) {
 	}
 
 	// for the information panel, I don't like the code
-		if (mod == 4) {
-			ui->labelNumberVerticesValue->setText (msg);
-			return;
-		}
-		if (mod == 5) {
-			ui->labelSampledVerticesValue->setText (msg);
-			return;
-		}
-		if (mod == 6) {
-			ui->labelSampledVerticesRatio->setText (msg);
-			return;
-		}
+    switch (mod) {
+    case 4:
+        ui->labelNumberVerticesValue->setText (msg);
+        return;
+    case 5:
+        ui->labelSampledVerticesValue->setText (msg);
+        return;
+    case 6:
+        ui->labelSampledVerticesRatio->setText (msg);
+        return;
+    case 7:
+        ui->labelHausdorffMeanDistance->setText (msg);
+        return;
+    case 8:
+        ui->labelHausdorffMaxDistance->setText (msg);
+        return;
+    }
 	// ---
 
 	switch (ui->consolOutputSelect->currentIndex()) {
@@ -237,26 +245,29 @@ void ControlPanel::writeToConsole (QString msg, int mod) {
 		break;
 	}
 }
-
+// ToDo dieses Funktionalität wurde halb zerstört
 void ControlPanel::startTabFunctions (int mode) {
 	switch (mode) {
 	case 1:
 		ui->tabWidgetFunctions->setEnabled (true);
-		ui->TabSampling->setEnabled (true);
-		ui->TabReIndexing->setDisabled (true);
-		writeToConsole ("mesh can be sampled", 1);
+        ui->TabDecimation->setEnabled(true);
+        ui->TabTopology->setEnabled(true);
+        ui->TabMetrics->setEnabled(false);
+        writeToConsole ("mesh can be sampled and triangulated", 1);
 		break;
 	case 2:
-		ui->tabWidgetFunctions->setEnabled (true);
-		ui->TabSampling->setEnabled (true);
-		ui->TabReIndexing->setEnabled (true);
+        ui->tabWidgetFunctions->setEnabled (true);
+        ui->TabDecimation->setEnabled(true);
+        ui->TabTopology->setEnabled(true);
+        ui->TabMetrics->setEnabled(true);
 		writeToConsole ("mesh can be re-indexed", 2);
 		break;
 	case 3:
-		ui->tabWidgetFunctions->setEnabled (true);
-		ui->TabSampling->setEnabled (false);
-		ui->TabReIndexing->setEnabled (true);
-		writeToConsole ("custom re-indexing", 2);
+        ui->tabWidgetFunctions->setEnabled (true);
+        ui->TabDecimation->setEnabled(true);
+        ui->TabTopology->setEnabled(true);
+        ui->TabMetrics->setEnabled(true);
+        writeToConsole ("custom re-indexing", 2);
 		break;
 	default:
 		ui->tabWidgetFunctions->setDisabled (true);
@@ -317,6 +328,53 @@ void ControlPanel::debug () {
 			std::cout <<x<<","<<y<<","<<z<< std::endl;
 		}
 	*/
+}
+
+void ControlPanel::on_buttonHausdorff_clicked() {
+    double samplingDensityUser = 0.0l;
+
+    ui->ProgressBar->setVisible (true);
+    ui->ProgressBar->setValue (20);
+    QTest::qWait (1);
+
+    emit hausdorff(samplingDensityUser);
+
+    for (int i=21; i<101; ++i) {
+        ui->ProgressBar->setValue (i);
+    }
+    QTest::qWait (1);
+    ui->ProgressBar->setVisible (false);
+}
+
+void ControlPanel::commitSliderValues() {
+
+    Vec cameraVec;
+
+    cameraVec[0] = ui->sliderVecX->value();
+    cameraVec[1] = ui->sliderVecY->value();
+    cameraVec[2] = ui->sliderVecZ->value();
+
+    ui->labelVecX->setText( QString::number(cameraVec[0]/10) );
+    ui->labelVecY->setText( QString::number(cameraVec[1]/10) );
+    ui->labelVecZ->setText( QString::number(cameraVec[2]/10) );
+
+    emit cameraPosition( cameraVec );
+}
+
+void ControlPanel::updateViewVec(Vec viewVec) {
+
+    ui->labelVecWorldX->setText( QString::number(cutDecimal(viewVec[0],1)) );
+    ui->labelVecWorldY->setText( QString::number(cutDecimal(viewVec[1],1)) );
+    ui->labelVecWorldZ->setText( QString::number(cutDecimal(viewVec[2],1)) );
+}
+
+float ControlPanel::cutDecimal(float myNumber, int decimal) {
+
+    myNumber = myNumber*( pow(10,decimal) );
+    myNumber = (int)myNumber;
+    myNumber = myNumber/( pow(10,decimal) );
+
+    return myNumber;
 }
 
 void ControlPanel::on_buttonTest_clicked () {
