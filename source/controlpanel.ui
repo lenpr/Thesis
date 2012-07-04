@@ -24,8 +24,8 @@
   </property>
   <property name="maximumSize">
    <size>
-    <width>800</width>
-    <height>16777215</height>
+    <width>300</width>
+    <height>2000</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -151,10 +151,10 @@
       </rect>
      </property>
      <property name="minimum">
-      <number>1</number>
+      <number>0</number>
      </property>
      <property name="maximum">
-      <number>100</number>
+      <number>50</number>
      </property>
      <property name="singleStep">
       <number>1</number>
@@ -626,7 +626,7 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>290</width>
+       <width>297</width>
        <height>251</height>
       </rect>
      </property>
@@ -645,6 +645,9 @@
         </item>
         <item>
          <widget class="QComboBox" name="visualDrawingMethod">
+          <property name="currentIndex">
+           <number>2</number>
+          </property>
           <item>
            <property name="text">
             <string>point cloud</string>
@@ -668,6 +671,11 @@
           <item>
            <property name="text">
             <string>texture</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>hausdorff</string>
            </property>
           </item>
          </widget>
@@ -729,6 +737,16 @@
             </property>
             <property name="checked">
              <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="visualDisplayUpdate">
+            <property name="text">
+             <string>auto uptade</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -808,13 +826,13 @@
                </size>
               </property>
               <property name="minimum">
-               <number>-10</number>
+               <number>-100</number>
               </property>
               <property name="maximum">
-               <number>10</number>
+               <number>100</number>
               </property>
               <property name="singleStep">
-               <number>1</number>
+               <number>10</number>
               </property>
               <property name="orientation">
                <enum>Qt::Vertical</enum>
@@ -830,13 +848,13 @@
                </size>
               </property>
               <property name="minimum">
-               <number>-10</number>
+               <number>-100</number>
               </property>
               <property name="maximum">
-               <number>10</number>
+               <number>100</number>
               </property>
               <property name="singleStep">
-               <number>1</number>
+               <number>10</number>
               </property>
               <property name="orientation">
                <enum>Qt::Vertical</enum>
@@ -852,13 +870,13 @@
                </size>
               </property>
               <property name="minimum">
-               <number>-10</number>
+               <number>-100</number>
               </property>
               <property name="maximum">
-               <number>10</number>
+               <number>100</number>
               </property>
               <property name="singleStep">
-               <number>1</number>
+               <number>10</number>
               </property>
               <property name="orientation">
                <enum>Qt::Vertical</enum>
@@ -948,18 +966,28 @@
        <height>251</height>
       </rect>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <layout class="QHBoxLayout" name="horizontalLayoutInteraction">
       <item>
-       <layout class="QVBoxLayout" name="verticalLayoutInteraction_2">
+       <layout class="QVBoxLayout" name="verticalLayoutInteraction">
         <item>
-         <widget class="QLabel" name="labelMouseAction_2">
+         <widget class="QLabel" name="labelMouseAction">
           <property name="text">
            <string>Mouse Action</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QComboBox" name="comboBoxMouseAction_2">
+         <widget class="QComboBox" name="comboBoxMouseAction">
+          <item>
+           <property name="text">
+            <string>-</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Select</string>
+           </property>
+          </item>
           <item>
            <property name="text">
             <string>Fix</string>
@@ -990,25 +1018,25 @@
          </widget>
         </item>
         <item>
-         <widget class="QCheckBox" name="checkBoxPOV_2">
+         <widget class="QCheckBox" name="checkBoxPOV">
           <property name="text">
            <string>POV Decimation</string>
           </property>
          </widget>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayoutPOV_2">
+         <layout class="QHBoxLayout" name="horizontalLayoutPOV">
           <item>
-           <widget class="QLabel" name="labelPOVDescription_2">
+           <widget class="QLabel" name="labelPOVDescription">
             <property name="text">
              <string>Ratio:</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QDoubleSpinBox" name="spinBoxPOV_2">
+           <widget class="QDoubleSpinBox" name="spinBoxPOV">
             <property name="decimals">
-             <number>1</number>
+             <number>2</number>
             </property>
             <property name="minimum">
              <double>0.000000000000000</double>
@@ -1017,7 +1045,7 @@
              <double>1.000000000000000</double>
             </property>
             <property name="singleStep">
-             <double>0.100000000000000</double>
+             <double>0.050000000000000</double>
             </property>
             <property name="value">
              <double>0.500000000000000</double>
@@ -1027,11 +1055,35 @@
          </layout>
         </item>
         <item>
-         <widget class="QCheckBox" name="checkBoxSilhouette_2">
+         <widget class="QCheckBox" name="checkBoxSilhouette">
           <property name="text">
            <string>Keep Silhouette</string>
           </property>
          </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayoutSilhouette">
+          <item>
+           <widget class="QLabel" name="labelSilhouetteDescription">
+            <property name="text">
+             <string>Angle:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSpinBox" name="spinBoxSilhouette">
+            <property name="minimum">
+             <number>1</number>
+            </property>
+            <property name="maximum">
+             <number>180</number>
+            </property>
+            <property name="value">
+             <number>5</number>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
         <item>
          <widget class="Line" name="line_11">
@@ -1041,7 +1093,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QCheckBox" name="checkBoxUVBoarders_2">
+         <widget class="QCheckBox" name="checkBoxUVBoarders">
           <property name="text">
            <string>Keep UV Boarders</string>
           </property>
@@ -1267,12 +1319,6 @@ p, li { white-space: pre-wrap; }
      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
     </property>
    </widget>
-   <zorder>labelNumberVertices</zorder>
-   <zorder>labelNumberVerticesValue</zorder>
-   <zorder>labelSampledVertices</zorder>
-   <zorder>labelSampledVerticesValue</zorder>
-   <zorder>labelSampledVerticesRatio</zorder>
-   <zorder>boxFileHandling</zorder>
   </widget>
  </widget>
  <resources/>

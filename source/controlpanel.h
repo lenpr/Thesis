@@ -19,7 +19,23 @@ namespace Ui {
 
 enum consoleMode {ALL, SAMPLING, INDEXING, DEBUG};
 
-//unterschied zu... : public QWidget, private Ui::ControlPanel, wrecks the app
+struct interactionVariables {
+    interactionVariables() :
+        mouseAction(0), povDecimation(false), povRatio(0.5f),
+        keepSilhouette(false), silhouetteAngle(5),
+        keepUVBoarders(false), cameraView(0.0f,0.0f,0.0f) {}
+
+    int mouseAction;
+    bool povDecimation;
+    float povRatio;
+    bool keepSilhouette;
+    int silhouetteAngle;
+    bool keepUVBoarders;
+    Vec cameraView;
+};
+
+
+//unterschied zu... : public QWidget, private Ui::ControlPanel, wrecks the app - why?
 class ControlPanel : public QWidget {
 	Q_OBJECT
 
@@ -48,6 +64,7 @@ private slots:
 	void on_visualInvertNormals_stateChanged(int mode);
     void commitSliderValues();
     //--- interaction
+    void commitInteractionOptions();
     // testerei
 	void on_buttonTest_clicked();
 
@@ -66,11 +83,10 @@ signals:
 
 	void runremeshing (const QString& mode);
 
-	void visualization(	int drawingMode, bool vertexWeights,		bool sampledVertices,
-											bool controlPoints, bool remeshedRegions,	bool decimatedMesh);
-	void invertNormals();
+    void visualization(	int drawingMode, bool vertexWeights, bool sampledVertices, bool controlPoints, bool remeshedRegions, bool decimatedMesh, bool displayUpdate);
+    void interaction( interactionVariables options );
+    void invertNormals();
     void hausdorff( double samplingDensityUser);
-    void cameraPosition ( Vec cameraVec );
 	void test();
 
 private:
@@ -78,6 +94,7 @@ private:
 
     float cutDecimal (float myNumber, int decimal);
 	int consoleLineNumber;
+    interactionVariables options;
 };
 
 #endif // CONTROLPANEL_H

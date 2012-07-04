@@ -4,6 +4,7 @@
 
 TopStoc::TopStoc() :
     bbox(),
+    options(),
     mesh(),
     sampledVertexQueue(),
     decimatedMesh(),
@@ -90,6 +91,7 @@ bool TopStoc::saveMeshToFile (const string &fileName) {
     return true;
 }
 
+
 void TopStoc::setModelBounds () {
 
     bbox.calculateAll(mesh);
@@ -98,10 +100,6 @@ void TopStoc::setModelBounds () {
 
 
 void TopStoc::drawSamplAndControlPoints (bool sampledVertices, bool controlPoints) {
-
-	glDisable(GL_LIGHTING);
-	glPointSize(3.0f);
-	glBegin(GL_POINTS);
 
 	for (int i=0; i<(int)sampledVertexQueue.size(); ++i){
 		if (controlPoints && (mesh.data( sampledVertexQueue[i] ).getWeight() > 1.0)) {
@@ -117,8 +115,6 @@ void TopStoc::drawSamplAndControlPoints (bool sampledVertices, bool controlPoint
 									mesh.point( sampledVertexQueue[i] )[2]);
 		}
 	}
-	glEnd();
-	glEnable (GL_LIGHTING);
 }
 
 
@@ -374,43 +370,53 @@ bool TopStoc::runStocSampling (const float& adaptivity, const float& subsetTarge
 	writeToConsole (consoleMessage, 1);
 
 	float alpha = adaptivity;
-	float k = subsetTargetSize/100.0;
+    float k = subsetTargetSize/100.0f;
 	srand( (unsigned)time(0) );
 
 	MyMesh::VertexIter v_it = mesh.vertices_begin();
 	int sampled_vertices = 0, sampled_smalls = 0;
-	float probability = 0.0;
+    float probability = 0.0f;
+    float currentWeight = 0.0f;
 	sampledVertexQueue.clear();
 
 	for (; 	v_it != mesh.vertices_end(); ++v_it){
-		if (mesh.data(v_it).getWeight() >= 1.0) {
-			// add to queue
-			sampledVertexQueue.push_front( v_it );
-			++sampled_vertices;
-		} else {
-			probability = k*(1+alpha*((mesh.data(v_it).getWeight()/meanVertexWeight)-1));
 
-            /* View dependency
-            float x = 0.5774;
-            MyMesh::Point viewDirection = MyMesh::Point(x, 0.5774, 0.5774);
-            if ( (mesh.normal(v_it) | viewDirection) < -0.1) {
-                probability /= 20;
+        currentWeight = mesh.data(v_it).getWeight() + mesh.data(v_it).getUserWeight();
+
+        if (currentWeight >= 1.0f) {
+            // add to queue
+            sampledVertexQueue.push_front( v_it );
+            ++sampled_vertices;
+        } else if (currentWeight <= 0.0f) {
+            continue;
+        } else {
+            probability = k*(1+alpha*((currentWeight/meanVertexWeight)-1));
+            MyMesh::Point viewDirection(options.cameraView[0],
+                                        options.cameraView[1],
+                                        options.cameraView[2]);
+
+            if (options.povDecimation) {
+                if ( (mesh.normal(v_it) | viewDirection) < 0.0) {
+                    probability *= options.povRatio;
+                }
             }
-            if ( (mesh.normal(v_it) | viewDirection) > -0.01 &&
-                     (mesh.normal(v_it) | viewDirection) < +0.01) {
-                probability *= 20;
-            }*/
+            if (options.keepSilhouette) {
+                float val = (1-cos((options.silhouetteAngle*M_PI)/(180.0f)))/2;
+                if ( (mesh.normal(v_it) | viewDirection) >= (-val) &&
+                     (mesh.normal(v_it) | viewDirection) <= (+val) ) {
+                    probability = 1.0f;
+                }
+            }
 
-			if (probability > ((float)rand()/(float)RAND_MAX) ) {
-				++sampled_vertices;
-				// add to queue
-				sampledVertexQueue.push_front( v_it );
-				if (mesh.data(v_it).getWeight() < meanVertexWeight)
-					++sampled_smalls;
-			}
-		}
-	}
-
+            if (probability >= ((float)rand()/(float)RAND_MAX) ) {
+                // add to queue
+                sampledVertexQueue.push_front( v_it );
+                ++sampled_vertices;
+                if (mesh.data(v_it).getWeight() < meanVertexWeight)
+                    ++sampled_smalls;
+            }
+        }
+    }
 
 	/* set a few "user contol points" ... dangerous code
 	for (int i=31; i<357; ++i) {
@@ -432,49 +438,46 @@ bool TopStoc::runStocSampling (const float& adaptivity, const float& subsetTarge
 }
 
 
-bool TopStoc::rayIntersectsTriangle(OpenMesh::Vec3f rayP1, OpenMesh::Vec3f rayP2) {
-
-
-    // camera pos berechnen
+// This function will find 2 points in world space that are on the line into the screen defined by screen-space( ie. window-space ) point (x,y)
+OpenMesh::FaceHandle TopStoc::rayIntersectsTriangle(int x, int y) {
 
     double mvmatrix[16];
     double projmatrix[16];
     int viewport[4];
+    double dX1, dY1, dZ1, dX2, dY2, dZ2, dClickY; // glUnProject uses doubles, but I'm using floats for these 3D vectors
+
     glGetIntegerv(GL_VIEWPORT, viewport);
     glGetDoublev (GL_MODELVIEW_MATRIX, mvmatrix);
     glGetDoublev (GL_PROJECTION_MATRIX, projmatrix);
+    dClickY = double (viewport[3] - y); // OpenGL renders with (0,0) on bottom, mouse reports with (0,0) on top
 
+    gluUnProject ((double) x, dClickY, 0.0, mvmatrix, projmatrix, viewport, &dX1, &dY1, &dZ1);
+    gluUnProject ((double) x, dClickY, 1.0, mvmatrix, projmatrix, viewport, &dX2, &dY2, &dZ2);
+    //qDebug() << "x " << dX1 << " - y " << dY1 << " - z " << dZ1 << endl;
+
+    OpenMesh::Vec3f rayP1(dX1, dY1, dZ1);
+    OpenMesh::Vec3f rayP2(dX2, dY2, dZ2);
+
+    // camera pos berechnen
     double camX, camY, camZ;
     gluUnProject (((double) viewport[2] - viewport[0]) / 2.0, ((double) viewport[3] - viewport[1]) / 2.0, 0.0, mvmatrix, projmatrix, viewport, &camX, &camY, &camZ);
 
     OpenMesh::Vec3f camPos(camX, camY, camZ);
-
     //
 
+    bool firstIntersection = true;
+    //OpenMesh::Vec3f pp;
 
-     bool firstIntersection = true;
-     //OpenMesh::Vec3f pp;
-
-     float intersectingFaceCamDist = 0.0f;
-     OpenMesh::FaceHandle intersectionFace;
+    float intersectingFaceCamDist = 0.0f;
+    OpenMesh::FaceHandle intersectionFace;
 
     int hits = 0;
     for (MyMesh::FaceIter f_it=mesh.faces_begin(); f_it!=mesh.faces_end(); ++f_it) {
-        //f_it.handle();
-
-
 
         MyMesh::ConstFaceVertexIter cfv_it = mesh.cfv_iter(f_it);
         MyMesh::VertexHandle vh1 = cfv_it;
         MyMesh::VertexHandle vh2 = (++cfv_it);
         MyMesh::VertexHandle vh3 = (++cfv_it);
-
-        //f_it.normal;
-        //mesh.normal(f_it);
-
-        //OpenMesh::Vec3f dist1 = (mesh.point(vh1) - mesh.point(vh2));
-        //dist1 = dist1 * (mesh.normal(f_it));
-        //float dist1 = (mesh.point(vh1))[0];
 
         float dist1 = OpenMesh::dot(rayP1 - mesh.point(vh1), mesh.normal(f_it));
         float dist2 = OpenMesh::dot(rayP2 - mesh.point(vh1), mesh.normal(f_it));
@@ -497,10 +500,8 @@ bool TopStoc::rayIntersectsTriangle(OpenMesh::Vec3f rayP1, OpenMesh::Vec3f rayP2
         if (OpenMesh::dot(test, intersectionPoint - mesh.point(vh1)) < 0.0f) continue;
 
         float currentIntersectionPointSQ = pow(intersectionPoint[0] - camPos[0], 2) +
-                                         pow(intersectionPoint[1] - camPos[1], 2) +
-                                         pow(intersectionPoint[2] - camPos[2], 2);
-
-
+                                           pow(intersectionPoint[1] - camPos[1], 2) +
+                                           pow(intersectionPoint[2] - camPos[2], 2);
 
         if (firstIntersection || currentIntersectionPointSQ < intersectingFaceCamDist) {
             intersectingFaceCamDist = currentIntersectionPointSQ;
@@ -509,69 +510,62 @@ bool TopStoc::rayIntersectsTriangle(OpenMesh::Vec3f rayP1, OpenMesh::Vec3f rayP2
         }
         hits++;
     }
+    //std::cout << "hits: " << hits << std::endl;
+    if (hits > 0)
+        mesh.data(intersectionFace).setSelected(true);
 
+    return intersectionFace;
+}
 
-    if (hits > 0) {
+bool TopStoc::setUserWeights(MyMesh::FaceHandle selectedFace, float value) {
 
-        MyMesh::ConstFaceVertexIter cfv_it = mesh.cfv_iter(intersectionFace);
+    if (!selectedFace.is_valid())
+        return false;
+    else {
+        MyMesh::ConstFaceVertexIter cfv_it = mesh.cfv_iter(selectedFace);
         MyMesh::VertexHandle vha = cfv_it;
         MyMesh::VertexHandle vhb = (++cfv_it);
         MyMesh::VertexHandle vhc = (++cfv_it);
 
-        if ( mesh.data(intersectionFace).isSelected() ){
-
-            std::vector<MyMesh::VertexHandle> vh;
-            vh.push_back(vha);
-            vh.push_back(vhb);
-            vh.push_back(vhc);
-
-            while ( !vh.empty() ) {
-                // circulate around the vertex
-                MyMesh::VertexVertexIter vv_it=mesh.vv_iter(vh.back());
-                MyMesh::VertexHandle v_it = vh.back();
-                vh.pop_back();
-                float weight = 0.0f;
-
-                for (; vv_it; ++vv_it) {
-                    // vector product (scalar)
-                    float loc_weight = (mesh.normal(v_it) | mesh.normal(vv_it));
-
-                    // if normals are not accurate enough
-                    if (loc_weight > 1.0)
-                        loc_weight = 1.0;
-                    if (loc_weight < -1.0)
-                        loc_weight = -1.0;
-
-                    // transpose from [-1,1]->[0,1]
-                    weight += (1-loc_weight)/2;
-                }
-                // calculate result and save to custom vertex variable
-                weight = (weight/mesh.valence(v_it));
-                mesh.data(v_it).setWeight(weight);
-            }
-
-            mesh.data(intersectionFace).setSelected(false);
+        if ((value == +1.0) || (value == -1.0)) {
+            mesh.data(vha).setUserWeight(value);
+            mesh.data(vhb).setUserWeight(value);
+            mesh.data(vhc).setUserWeight(value);
+        } else {
+            mesh.data(vha).setUserWeight(mesh.data(vha).getUserWeight() + value);
+            mesh.data(vhb).setUserWeight(mesh.data(vhb).getUserWeight() + value);
+            mesh.data(vhc).setUserWeight(mesh.data(vhc).getUserWeight() + value);
         }
-        else {
-            mesh.data(vha).setWeight(1.0f);
-            mesh.data(vhb).setWeight(1.0f);
-            mesh.data(vhc).setWeight(1.0f);
 
-            mesh.data(intersectionFace).setSelected(true);
+        return true;
+    }
+}
+
+bool TopStoc::setUserWeights(std::vector<MyMesh::FaceHandle> selectedFace, float value) {
+
+    if (selectedFace.empty())
+        return false;
+
+    while (!selectedFace.empty()) {
+
+        MyMesh::FaceHandle current = selectedFace.back();
+        selectedFace.pop_back();
+
+        MyMesh::ConstFaceVertexIter cfv_it = mesh.cfv_iter(current);
+        MyMesh::VertexHandle vha = cfv_it;
+        MyMesh::VertexHandle vhb = (++cfv_it);
+        MyMesh::VertexHandle vhc = (++cfv_it);
+
+        if ((value == +1.0) || (value == -1.0)) {
+            mesh.data(vha).setUserWeight(value);
+            mesh.data(vhb).setUserWeight(value);
+            mesh.data(vhc).setUserWeight(value);
+        } else {
+            mesh.data(vha).setUserWeight(mesh.data(vha).getUserWeight() + value);
+            mesh.data(vhb).setUserWeight(mesh.data(vhb).getUserWeight() + value);
+            mesh.data(vhc).setUserWeight(mesh.data(vhc).getUserWeight() + value);
         }
     }
-
-    std::cout << "hits: " << hits << std::endl;
-
-    // color triangle
-
-    //mesh.color()
-    //mesh.color(fv_it)[0], mesh.color(fv_it)[1],  mesh.color(fv_it)[2]
-      /*
-    MyMesh::ConstFaceVertexIter cfv_it = mesh.cfv_iter(f_it);
-            MyMesh::VertexHandle vh1 = cfv_it;
-            MyMesh::VertexHandle vh2 = (++cfv_it);
-            MyMesh::VertexHandle vh3 = (++cfv_it);*/
     return true;
 }
 

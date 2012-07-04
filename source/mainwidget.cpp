@@ -42,16 +42,16 @@ MainWidget::MainWidget(QWidget *parent)
              viewer, SLOT(stocSampling(float, float)));
     connect (controlpanel, SIGNAL(runremeshing(QString)),
              viewer, SLOT(topReMeshing(QString)));
-    connect (controlpanel, SIGNAL(visualization(int,bool,bool,bool,bool,bool)),
-             viewer, SLOT(visualization(int,bool,bool,bool,bool,bool)));
+    connect (controlpanel, SIGNAL(visualization(int,bool,bool,bool,bool,bool,bool)),
+             viewer, SLOT(visualization(int,bool,bool,bool,bool,bool,bool)));
     connect (controlpanel, SIGNAL(invertNormals()),
              viewer, SLOT(invertNormals()));
     connect (controlpanel, SIGNAL(hausdorff(double)),
              viewer, SLOT(hausdorff(double)));
-    connect (controlpanel, SIGNAL(cameraPosition(Vec)),
-             viewer, SLOT(setCamerVec(Vec)));
     connect (controlpanel, SIGNAL(test()),
              viewer, SLOT(test()));
+    connect (controlpanel, SIGNAL(interaction(interactionVariables)),
+             viewer, SLOT(interaction(interactionVariables)));
 
 	//--- viewer to console
     connect (viewer, SIGNAL(writeToConsole(QString,int)),

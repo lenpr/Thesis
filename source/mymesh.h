@@ -35,15 +35,18 @@ struct MyTraits : public OpenMesh::DefaultTraits {
         //typedef OpenMesh::Vec3f Color;
 
     private:
-        float  weightValue;
+        float weightValue;
+        float weightUserValue;
         OpenMesh::VertexHandle seedVector;
         bool conquered;
 
     public:
-        VertexT() : weightValue(0.0), seedVector(), conquered(false) { }
+        VertexT() : weightValue(0.0), weightUserValue(0.0), seedVector(), conquered(false) { }
 
         const float& getWeight() const { return weightValue; }
         void setWeight(const float& passedValue) { weightValue=passedValue;}
+        const float& getUserWeight() const { return weightUserValue; }
+        void setUserWeight(const float& passedValue) { weightUserValue=passedValue;}
 
         const OpenMesh::VertexHandle& getSeedVector() const { return seedVector; }
         void setSeedVector(const OpenMesh::VertexHandle& passedVertex) { seedVector=passedVertex; }

@@ -15,7 +15,7 @@
 #include <fstream>
 
 
-
+#include "controlpanel.h"
 #include "boundingbox.h"
 
 // Housdorff distance
@@ -35,11 +35,14 @@ public:
 
     bool loadMeshFromFile(const string& fileName);
     bool saveMeshToFile(const string& fileName);
+    int getMeshStatus() {return meshStatus;}
 
     void initMesh();
     bool calculateWeights(const QString& mode);
     bool runStocSampling(const float& adaptivity, const float& subsetTargetSize);
-    bool rayIntersectsTriangle(OpenMesh::Vec3f rayP1, OpenMesh::Vec3f rayP2);
+    MyMesh::FaceHandle rayIntersectsTriangle(int x, int y);
+    bool setUserWeights(MyMesh::FaceHandle selectedFace, float value);
+    bool setUserWeights(std::vector<MyMesh::FaceHandle> selectedFace, float value);
     bool runTopReMeshing(const QString& mode);
     void calculateHausdorff(double sampling_density_user);
 
@@ -52,6 +55,7 @@ public:
     void test();
 
     BoundingBox bbox;
+    interactionVariables options;
 
     void gl_select(int x, int y);
     void drawTriangles();

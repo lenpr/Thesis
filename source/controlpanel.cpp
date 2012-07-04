@@ -14,6 +14,12 @@ ControlPanel::ControlPanel(QWidget *parent) :
 	ui->ConsoleOutput->setReadOnly (true);
 	//---
 	ui->tabWidgetFunctions->setDisabled (true);
+    ui->tabWidgetFunctions->setEnabled(false);
+    ui->visualVertexWeights->setEnabled(false);
+    ui->visualSampledVertices->setEnabled(false);
+    ui->visualControlPoints->setEnabled(false);
+    ui->visualRemeshedRegions->setEnabled(false);
+    ui->visualDecimatedMesh->setEnabled(false);
 	//--- console default is deactivated
 	//QFont font; font.setBold(true);
 	//ui->consoleSwitch->setFont (font);
@@ -24,43 +30,57 @@ ControlPanel::ControlPanel(QWidget *parent) :
 	//ui->LabelConsoleOutput->setVisible (false);
 	//ui->ConsoleOutput->setVisible (false);
 	//---
-	consoleLineNumber = 0;
+    consoleLineNumber = 0;
 
-	// signals/slots connect
-	connect(		ui->consoleSwitch,	SIGNAL(clicked()),
-							this,							SLOT(startConsole()));
-	connect(		ui->consoleClear, SIGNAL(clicked()),
-							ui->ConsoleOutput,	SLOT(clear()));
-	connect(		ui->consoleCopy,		SIGNAL(clicked()),
-							this,	SLOT(copyToClipboard()));
-	connect(		ui->sliderSubset,	SIGNAL(valueChanged(int)),
-							this, SLOT(setSliderValue(int)));
+    // signals/slots connect
+    connect( ui->consoleSwitch,	SIGNAL(clicked()),
+             this, SLOT(startConsole()));
+    connect( ui->consoleClear, SIGNAL(clicked()),
+             ui->ConsoleOutput,	SLOT(clear()));
+    connect( ui->consoleCopy, SIGNAL(clicked()),
+             this, SLOT(copyToClipboard()));
+    connect( ui->sliderSubset,	SIGNAL(valueChanged(int)),
+             this, SLOT(setSliderValue(int)));
     //
-    connect(    ui->sliderVecX, SIGNAL(valueChanged(int)),
-                this, SLOT(commitSliderValues()) );
-    connect(    ui->sliderVecY, SIGNAL(valueChanged(int)),
-                this, SLOT(commitSliderValues()) );
-    connect(    ui->sliderVecZ, SIGNAL(valueChanged(int)),
-                this, SLOT(commitSliderValues()) );
-	// visualization
-	connect(		ui->visualDrawingMethod, SIGNAL(currentIndexChanged(int)),
-							this,	SLOT(commitVisualOptions(int)));
-	connect(		ui->visualVertexWeights, SIGNAL(stateChanged(int)),
-							this,	SLOT(commitVisualOptions(int)));
-	connect(		ui->visualSampledVertices, SIGNAL(stateChanged(int)),
-							this,	SLOT(commitVisualOptions(int)));
-	connect(		ui->visualControlPoints, SIGNAL(stateChanged(int)),
-							this,	SLOT(commitVisualOptions(int)));
-	connect(		ui->visualRemeshedRegions, SIGNAL(stateChanged(int)),
-							this,	SLOT(commitVisualOptions(int)));
-	connect(		ui->visualDecimatedMesh, SIGNAL(stateChanged(int)),
-							this,	SLOT(commitVisualOptions(int)));
-	//connect(		ui->visualInvertNormals, SIGNAL(stateChanged(int)),
-	//						this,	SLOT(invertNormals()));
-	// debug
-	ui->buttonTest->setVisible (true);
-	connect(		ui->buttonTest, SIGNAL(clicked()),
-							this,							SLOT(debug()));
+    connect( ui->sliderVecX, SIGNAL(valueChanged(int)),
+             this, SLOT(commitSliderValues()) );
+    connect( ui->sliderVecY, SIGNAL(valueChanged(int)),
+             this, SLOT(commitSliderValues()) );
+    connect( ui->sliderVecZ, SIGNAL(valueChanged(int)),
+             this, SLOT(commitSliderValues()) );
+    // visualization
+    connect( ui->visualDrawingMethod, SIGNAL(currentIndexChanged(int)),
+             this, SLOT(commitVisualOptions(int)));
+    connect( ui->visualVertexWeights, SIGNAL(stateChanged(int)),
+             this, SLOT(commitVisualOptions(int)));
+    connect( ui->visualSampledVertices, SIGNAL(stateChanged(int)),
+             this, SLOT(commitVisualOptions(int)));
+    connect( ui->visualControlPoints, SIGNAL(stateChanged(int)),
+             this, SLOT(commitVisualOptions(int)));
+    connect( ui->visualRemeshedRegions, SIGNAL(stateChanged(int)),
+             this, SLOT(commitVisualOptions(int)));
+    connect( ui->visualDecimatedMesh, SIGNAL(stateChanged(int)),
+             this, SLOT(commitVisualOptions(int)));
+    connect( ui->visualDisplayUpdate, SIGNAL(stateChanged(int)),
+             this, SLOT(commitVisualOptions(int)));
+    // the sliders are inbetween
+    // interaction
+    connect( ui->comboBoxMouseAction, SIGNAL(currentIndexChanged(int)),
+             this, SLOT(commitInteractionOptions()));
+    connect( ui->checkBoxPOV, SIGNAL(stateChanged(int)),
+             this, SLOT(commitInteractionOptions()));
+    connect( ui->spinBoxPOV, SIGNAL(valueChanged(double)),
+             this, SLOT(commitInteractionOptions()));
+    connect( ui->checkBoxSilhouette, SIGNAL(stateChanged(int)),
+             this, SLOT(commitInteractionOptions()));
+    connect( ui->spinBoxSilhouette, SIGNAL(valueChanged(int)),
+             this, SLOT(commitInteractionOptions()));
+    connect( ui->checkBoxUVBoarders, SIGNAL(stateChanged(int)),
+             this, SLOT(commitInteractionOptions()));
+    // debug
+    ui->buttonTest->setVisible (true);
+    connect( ui->buttonTest, SIGNAL(clicked()),
+             this, SLOT(debug()));
 }
 
 ControlPanel::~ControlPanel() {
@@ -70,17 +90,15 @@ ControlPanel::~ControlPanel() {
 void ControlPanel::on_buttonLoad_clicked () {
 	QString filePath;
 
-	// QUICK FIX ACHTUNG ###
 	int mode = ui->visualDrawingMethod->currentIndex();
 
-	emit visualization ( mode, false, false, false, false, false );
+    emit visualization ( mode, false, false, false, false, false, true );
 	ui->visualVertexWeights->setChecked (false);
 	ui->visualSampledVertices->setChecked (false);
 	ui->visualControlPoints->setChecked (false);
 	ui->visualRemeshedRegions->setChecked (false);
 	ui->visualDecimatedMesh->setChecked (false);
-
-	// ###
+    ui->visualDisplayUpdate->setChecked (true);
 
 	// Bedingungen sollten nicht hart gecoded werden
 	// OpenMesh::IO::_IOManager_::qt_read_filters ();
@@ -245,32 +263,68 @@ void ControlPanel::writeToConsole (QString msg, int mod) {
 		break;
 	}
 }
-// ToDo dieses Funktionalität wurde halb zerstört
+// dumm gemacht, hätte ein struct machen sollen jetzt zu spät zum Umbauen
 void ControlPanel::startTabFunctions (int mode) {
 	switch (mode) {
+    // mesh loaded
 	case 1:
 		ui->tabWidgetFunctions->setEnabled (true);
-        ui->TabDecimation->setEnabled(true);
         ui->TabTopology->setEnabled(true);
+        ui->TabDecimation->setEnabled(true);
         ui->TabMetrics->setEnabled(false);
+        ui->visualVertexWeights->setEnabled(false);
+        ui->visualSampledVertices->setEnabled(false);
+        ui->visualControlPoints->setEnabled(true);
+        ui->visualRemeshedRegions->setEnabled(false);
+        ui->visualDecimatedMesh->setEnabled(false);
         writeToConsole ("mesh can be sampled and triangulated", 1);
 		break;
+    // weights calculated
 	case 2:
         ui->tabWidgetFunctions->setEnabled (true);
-        ui->TabDecimation->setEnabled(true);
         ui->TabTopology->setEnabled(true);
-        ui->TabMetrics->setEnabled(true);
+        ui->TabDecimation->setEnabled(true);
+        ui->TabMetrics->setEnabled(false);
+        ui->visualVertexWeights->setEnabled(true);
+        ui->visualSampledVertices->setEnabled(false);
+        ui->visualControlPoints->setEnabled(true);
+        ui->visualRemeshedRegions->setEnabled(false);
+        ui->visualDecimatedMesh->setEnabled(false);
 		writeToConsole ("mesh can be re-indexed", 2);
 		break;
+    // vertices sampled for decimated mesh
 	case 3:
+        ui->tabWidgetFunctions->setEnabled (true);
+        ui->TabTopology->setEnabled(true);
+        ui->TabDecimation->setEnabled(true);
+        ui->TabMetrics->setEnabled(false);
+        ui->visualVertexWeights->setEnabled(true);
+        ui->visualSampledVertices->setEnabled(true);
+        ui->visualControlPoints->setEnabled(true);
+        ui->visualRemeshedRegions->setEnabled(false);
+        ui->visualDecimatedMesh->setEnabled(false);
+        writeToConsole ("custom re-indexing", 2);
+		break;
+    // decimated mesh built
+    case 4:
         ui->tabWidgetFunctions->setEnabled (true);
         ui->TabDecimation->setEnabled(true);
         ui->TabTopology->setEnabled(true);
         ui->TabMetrics->setEnabled(true);
+        ui->visualVertexWeights->setEnabled(true);
+        ui->visualSampledVertices->setEnabled(true);
+        ui->visualControlPoints->setEnabled(true);
+        ui->visualRemeshedRegions->setEnabled(true);
+        ui->visualDecimatedMesh->setEnabled(true);
         writeToConsole ("custom re-indexing", 2);
-		break;
+        break;
 	default:
-		ui->tabWidgetFunctions->setDisabled (true);
+        ui->tabWidgetFunctions->setEnabled(false);
+        ui->visualVertexWeights->setEnabled(false);
+        ui->visualSampledVertices->setEnabled(false);
+        ui->visualControlPoints->setEnabled(false);
+        ui->visualRemeshedRegions->setEnabled(false);
+        ui->visualDecimatedMesh->setEnabled(false);
 		writeToConsole ("sampling/re-indexing disabled", 0);
 		break;
 	}
@@ -278,14 +332,7 @@ void ControlPanel::startTabFunctions (int mode) {
 }
 
 void ControlPanel::setSliderValue (int value) {
-	if (value > 80) {
-		ui->sliderSubset->setValue(80);
-		value = 80;
-	}
-	if (value < 1) {
-		ui->sliderSubset->setValue (1);
-		value = 1;
-	}
+
 	ui->labelSliderValue->setText ( QString::number(value) );
 }
 
@@ -306,9 +353,56 @@ void ControlPanel::commitVisualOptions (int mode) {
 				ui->visualSampledVertices->isChecked(),
 				ui->visualControlPoints->isChecked(),
 				ui->visualRemeshedRegions->isChecked(),
-				ui->visualDecimatedMesh->isChecked() );
+                ui->visualDecimatedMesh->isChecked(),
+                ui->visualDisplayUpdate->isChecked() );
 }
 
+void ControlPanel::commitInteractionOptions() {
+
+    options.mouseAction = ui->comboBoxMouseAction->currentIndex();
+    options.povDecimation = ui->checkBoxPOV->isChecked();
+    options.povRatio = ui->spinBoxPOV->value();
+    options.keepSilhouette = ui->checkBoxSilhouette->isChecked();
+    options.silhouetteAngle = ui->spinBoxSilhouette->value();
+    options.keepUVBoarders = ui->checkBoxUVBoarders->isChecked();
+    options.cameraView[0] = (float)(ui->sliderVecX->value())/100;
+    options.cameraView[1] = (float)(ui->sliderVecY->value())/100;
+    options.cameraView[2] = (float)(ui->sliderVecZ->value())/100;
+
+    if ( options.cameraView[0] != 0.0f ||
+         options.cameraView[1] != 0.0f ||
+         options.cameraView[2] != 0.0f ) {
+        options.cameraView.normalize();
+    }
+
+    if (options.povDecimation || options.keepSilhouette) {
+        if ( options.cameraView[0] == 0.0f &&
+             options.cameraView[1] == 0.0f &&
+             options.cameraView[2] == 0.0f ) {
+            ui->checkBoxPOV->setChecked(false);
+            ui->checkBoxSilhouette->setChecked(false);
+            options.povDecimation = false;
+            options.keepSilhouette = false;
+            writeToConsole ("No camera vector defined", 3);
+        }
+    }
+    emit interaction( options );
+}
+
+void ControlPanel::commitSliderValues() {
+
+    Vec cameraVec;
+
+    cameraVec[0] = ui->sliderVecX->value();
+    cameraVec[1] = ui->sliderVecY->value();
+    cameraVec[2] = ui->sliderVecZ->value();
+
+    ui->labelVecX->setText( QString::number(cameraVec[0]/100) );
+    ui->labelVecY->setText( QString::number(cameraVec[1]/100) );
+    ui->labelVecZ->setText( QString::number(cameraVec[2]/100) );
+
+    commitInteractionOptions();
+}
 
 void ControlPanel::on_visualInvertNormals_stateChanged (int mode) {
 	emit invertNormals();
@@ -344,21 +438,6 @@ void ControlPanel::on_buttonHausdorff_clicked() {
     }
     QTest::qWait (1);
     ui->ProgressBar->setVisible (false);
-}
-
-void ControlPanel::commitSliderValues() {
-
-    Vec cameraVec;
-
-    cameraVec[0] = ui->sliderVecX->value();
-    cameraVec[1] = ui->sliderVecY->value();
-    cameraVec[2] = ui->sliderVecZ->value();
-
-    ui->labelVecX->setText( QString::number(cameraVec[0]/10) );
-    ui->labelVecY->setText( QString::number(cameraVec[1]/10) );
-    ui->labelVecZ->setText( QString::number(cameraVec[2]/10) );
-
-    emit cameraPosition( cameraVec );
 }
 
 void ControlPanel::updateViewVec(Vec viewVec) {

@@ -7,102 +7,20 @@ using namespace qglviewer;
 Viewer::Viewer() :
 		topstoc(),
 		drawingMode(0), vertexWeights(false), sampledVertices(false),
-		controlPoints(false), remeshedRegions(false), decimatedMesh(false) {
+    controlPoints(false), remeshedRegions(false), decimatedMesh(false), displayUpdate(true) {
 
-	connect (&topstoc, SIGNAL(writeToConsole(QString, int)),
-					 this,	SLOT(passToConsole(QString, int)));
+    connect(&topstoc, SIGNAL(writeToConsole(QString, int)),
+            this, SLOT(passToConsole(QString, int)));
 }
 
 void Viewer::init() {
-
+    drawList = glGenLists(1);
     this->setMouseTracking(true);
 }
 
 void Viewer::draw() {
-
-	switch (drawingMode) {
-
-		// draw point cloud
-	case 0:        
-		glDisable(GL_LIGHTING);
-        glPointSize(2.5f);
-        glBegin (GL_POINTS);
-		if (decimatedMesh)
-			topstoc.drawDecimatedMesh(vertexWeights);
-		else
-            topstoc.drawMesh(vertexWeights, remeshedRegions);
-        glEnd();
-		glEnable (GL_LIGHTING);
-
-		if (sampledVertices || controlPoints)
-			topstoc.drawSamplAndControlPoints (sampledVertices, controlPoints);
-
-        this->sendCameraPosition();
-		break;
-
-		// draw wireframe
-	case 1:
-		// turn on wireframe mode
-		glDisable(GL_LIGHTING);
-		glPolygonMode(GL_FRONT, GL_LINE);
-		glPolygonMode(GL_BACK, GL_LINE);
-		glBegin(GL_TRIANGLES);
-		if (decimatedMesh)
-			topstoc.drawDecimatedMesh(vertexWeights);
-		else
-            topstoc.drawMesh(vertexWeights, remeshedRegions);
-		glEnd();
-		// turn off wireframe mode
-		glPolygonMode(GL_FRONT, GL_FILL);
-		glPolygonMode(GL_BACK, GL_FILL);
-
-		if (sampledVertices || controlPoints)
-			topstoc.drawSamplAndControlPoints (sampledVertices, controlPoints);
-
-        this->sendCameraPosition();
-		glEnable (GL_LIGHTING);
-		break;
-
-        // draw flat shading
-	case 2:
-		glEnable (GL_LIGHT0);
-        glShadeModel(GL_FLAT);
-		glBegin(GL_TRIANGLES);
-		if (decimatedMesh)
-			topstoc.drawDecimatedMesh(vertexWeights);
-		else
-            //topstoc.drawTriangles();
-            topstoc.drawMesh(vertexWeights, remeshedRegions);
-		glEnd();
-		if (sampledVertices || controlPoints)
-			topstoc.drawSamplAndControlPoints (sampledVertices, controlPoints);
-
-        this->sendCameraPosition();
-        glDisable(GL_LIGHT0);
-        break;
-
-        // draw smooth shading
-    case 3:
-        glEnable(GL_LIGHT0);
-        glShadeModel(GL_SMOOTH);
-        glBegin(GL_TRIANGLES);
-        if (decimatedMesh)
-            topstoc.drawDecimatedMesh(vertexWeights);
-        else
-            //topstoc.drawTriangles();
-            topstoc.drawMesh(vertexWeights, remeshedRegions);
-        glEnd();
-        if (sampledVertices || controlPoints)
-            topstoc.drawSamplAndControlPoints (sampledVertices, controlPoints);
-
-        this->sendCameraPosition();
-        glDisable(GL_LIGHT0);
-        break;
-
-        // draw textures
-	case 4:
-		break;
-	}
+    glCallList(drawList);
+    this->sendCameraPosition();
 }
 
 QSize Viewer::minimumSizeHint () const {
@@ -114,57 +32,79 @@ QSize Viewer::sizeHint () const {
 }
 
 
-
 void Viewer::mouseReleaseEvent(QMouseEvent* e) {
 
-    qDebug() << "x " << e->x() << "y " << e->y();
-
+    //qDebug() << "x " << e->x() << "y " << e->y();
     //topstoc.gl_select(e->x(), e->y());
-    this->selectVertex(e->x(), e->y());
 
+    /*
+      Modes:
+      0 - no mouse action
+      1 - select faces
+      2 - fix face
+      3 - inc face weight
+      4 - dec face weight
+      5 - dismiss face
+    */
+    switch (topstoc.options.mouseAction) {
+    case 0: break;
+    case 1:
+        this->selectVertex(e->x(), e->y(), 1); break;
+    case 2:
+        this->selectVertex(e->x(), e->y(), 2); break;
+    case 3:
+        this->selectVertex(e->x(), e->y(), 3); break;
+    case 4:
+        this->selectVertex(e->x(), e->y(), 4); break;
+    case 5:
+        this->selectVertex(e->x(), e->y(), 5); break;
+    default: break;
+    }
+
+    if (topstoc.options.mouseAction != 0) {
+        if (displayUpdate)
+            this->updateDisplay();
+    }
     QGLViewer::mouseReleaseEvent(e);
 }
-
 
 void Viewer::keyPressEvent(QKeyEvent *k) {
 
     int keyboardcharIdx = k->key();
     QString keyboardchar = k->text();
 
-    if (keyboardchar == "j")
-        qDebug() << "DOWN";
-    if (keyboardchar == "k")
-        qDebug() << "UP";
     qDebug() << "Keyboard: " << keyboardchar << " - " << keyboardcharIdx;
+    /* Numbers
+        j = 74
+        k = 75
+        x = 88
+        u = 85
+    */
+    switch (keyboardcharIdx) {
+        case 85: this->updateDisplay(); break;
+        case 74: qDebug() << "UP"; break;
+        case 75: qDebug() << "DOWN"; break;
+        default : break;
+    }
 
     QGLViewer::keyPressEvent(k);
+    if (displayUpdate)
+        this->updateDisplay();
 }
 
 
-void Viewer::selectVertex(int x, int y) {
+void Viewer::selectVertex(int x, int y, int mode) {
 
-    // This function will find 2 points in world space that are on the line into the screen defined by screen-space( ie. window-space ) point (x,y)
-       double mvmatrix[16];
-       double projmatrix[16];
-       int viewport[4];
-       double dX1, dY1, dZ1, dX2, dY2, dZ2, dClickY; // glUnProject uses doubles, but I'm using floats for these 3D vectors
+    mode = 0;
+    MyMesh::FaceHandle intersectionFace;
+    std::vector<MyMesh::FaceHandle> selectedTriangles;
 
-       glGetIntegerv(GL_VIEWPORT, viewport);
-       glGetDoublev (GL_MODELVIEW_MATRIX, mvmatrix);
-       glGetDoublev (GL_PROJECTION_MATRIX, projmatrix);
-       dClickY = double (viewport[3] - y); // OpenGL renders with (0,0) on bottom, mouse reports with (0,0) on top
+    intersectionFace = topstoc.rayIntersectsTriangle(x, y);
 
-       gluUnProject ((double) x, dClickY, 0.0, mvmatrix, projmatrix, viewport, &dX1, &dY1, &dZ1);
-       // ClickRayP1 = Vector3 ( (float) dX, (float) dY, (float) dZ );
-       gluUnProject ((double) x, dClickY, 1.0, mvmatrix, projmatrix, viewport, &dX2, &dY2, &dZ2);
-       // ClickRayP2 = Vector3 ( (float) dX, (float) dY, (float) dZ );
+    if (intersectionFace.is_valid())
+        selectedTriangles.push_back(intersectionFace);
 
-       //qDebug() << "x " << dX1 << " - y " << dY1 << " - z " << dZ1 << endl;
-
-       OpenMesh::Vec3f rayP1(dX1, dY1, dZ1);
-       OpenMesh::Vec3f rayP2(dX2, dY2, dZ2);
-
-       topstoc.rayIntersectsTriangle(rayP1, rayP2);
+    topstoc.setUserWeights(selectedTriangles, 1.0f);
 }
 
 
@@ -190,7 +130,7 @@ void Viewer::loadModel (const QString& fileName) {
 	// generat vertex/face normals if needed
 	topstoc.initMesh();
 
-	updateGL ();
+    this->updateDisplay();
 }
 
 void Viewer::saveModel (const QString &fileName) {
@@ -202,12 +142,12 @@ void Viewer::saveModel (const QString &fileName) {
 void Viewer::stocWeights (const QString &mode) {
 	emit writeToConsole ("calculating vertex weights", 0);
 	if (!topstoc.calculateWeights (mode)) {
-		emit writeToConsole ("could calculate weights", 0);
+        emit writeToConsole ("couldn't calculate weights", 0);
 	} else {
 		emit writeToConsole ("weights calculated", 0);
 		emit meshstatus (2);
 	}
-	updateGL ();
+    this->updateDisplay();
 }
 
 void Viewer::stocSampling (const float& adaptivity, const float& subsetTargetSize) {
@@ -216,40 +156,130 @@ void Viewer::stocSampling (const float& adaptivity, const float& subsetTargetSiz
 		emit writeToConsole ("could not sample mesh", 0);
 	} else {
 		emit writeToConsole ("mesh sampled", 0);
-		emit meshstatus (2);
+        emit meshstatus (3);
 	}
-	updateGL ();
+    this->updateDisplay();
 }
 
 void Viewer::topReMeshing (const QString &mode) {
 	emit writeToConsole ("try remeshing", 0);
 	if (!topstoc.runTopReMeshing (mode)) {
 		emit writeToConsole ("could not remesh", 0);
+        emit meshstatus (0);
 	} else {
 		emit writeToConsole ("mesheshing done", 0);
-		emit meshstatus (2);
+        emit meshstatus (4);
 	}
-	updateGL ();
+    this->updateDisplay();
+}
+
+void Viewer::updateDisplay() {
+
+    glNewList(drawList, GL_COMPILE);
+
+    if (drawingMode != DRAW_MODE_POINT && drawingMode != DRAW_MODE_WIREFRAME
+        && drawingMode != DRAW_MODE_FLAT && drawingMode != DRAW_MODE_SMOOTH) {
+        glEndList();
+        updateGL ();
+        return;
+    }
+
+    switch (drawingMode) {
+
+    case DRAW_MODE_POINT:
+        glDisable(GL_LIGHTING);
+        glPointSize(2.5f);
+        glBegin (GL_POINTS);
+        break;
+
+    case DRAW_MODE_WIREFRAME:
+        glDisable(GL_LIGHTING);
+        glPolygonMode(GL_FRONT, GL_LINE);
+        glPolygonMode(GL_BACK, GL_LINE);
+        glBegin(GL_TRIANGLES);
+        break;
+
+    case DRAW_MODE_FLAT:
+        glEnable (GL_LIGHT0);
+        glShadeModel(GL_FLAT);
+        glBegin(GL_TRIANGLES);
+        break;
+
+    case DRAW_MODE_SMOOTH:
+        glEnable(GL_LIGHT0);
+        glShadeModel(GL_SMOOTH);
+        glBegin(GL_TRIANGLES);
+        break;
+    }
+
+    if (decimatedMesh)
+        topstoc.drawDecimatedMesh(vertexWeights);
+    else
+        topstoc.drawMesh(vertexWeights, remeshedRegions);
+    glEnd();
+
+    switch (drawingMode) {
+
+    case DRAW_MODE_POINT:
+        glEnable (GL_LIGHTING);
+        break;
+
+    case DRAW_MODE_WIREFRAME:
+        glPolygonMode(GL_FRONT, GL_FILL);
+        glPolygonMode(GL_BACK, GL_FILL);
+        break;
+    }
+
+    if (sampledVertices || controlPoints) {
+        glDisable(GL_LIGHTING);
+        glPointSize(3.0f);
+        glBegin(GL_POINTS);
+
+        topstoc.drawSamplAndControlPoints (sampledVertices, controlPoints);
+
+        glEnd();
+        glEnable (GL_LIGHTING);
+    }
+
+    switch (drawingMode) {
+
+    case DRAW_MODE_WIREFRAME:
+        glEnable(GL_LIGHTING);
+        break;
+    case DRAW_MODE_FLAT: case DRAW_MODE_SMOOTH:
+        glDisable(GL_LIGHT0);
+        break;
+    }
+
+    glEndList();
+    updateGL ();
 }
 
 void Viewer::visualization (	int drawingMode, bool vertexWeights, bool sampledVertices,
-															bool controlPoints, bool remeshedRegions, bool decimatedMesh) {
+                                bool controlPoints, bool remeshedRegions, bool decimatedMesh,
+                                bool displayUpdate) {
 
 	this->drawingMode = drawingMode;
 	this->vertexWeights = vertexWeights;
-	this->sampledVertices = sampledVertices;
+    this->sampledVertices = sampledVertices;
 	this->controlPoints = controlPoints;
 	this->remeshedRegions = remeshedRegions;
 	this->decimatedMesh = decimatedMesh;
+    this->displayUpdate = displayUpdate;
 
 	emit writeToConsole ("new visualization options set", 3);
 
-	updateGL ();
+    this->updateDisplay();
+}
+
+void Viewer::interaction(interactionVariables currentOptions) {
+
+    topstoc.options = currentOptions;
 }
 
 void Viewer::invertNormals () {
 	topstoc.invertNormals ();
-	updateGL ();
+    this->updateDisplay();
 }
 
 void Viewer::passToConsole (const QString& msg, int mode) {

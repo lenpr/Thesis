@@ -4,6 +4,11 @@
 #include <QGLViewer/qglviewer.h>
 #include "topstoc.h"
 
+#define DRAW_MODE_POINT 0
+#define DRAW_MODE_WIREFRAME 1
+#define DRAW_MODE_FLAT 2
+#define DRAW_MODE_SMOOTH 3
+#define DRAW_MODE_TEXTURE 4
 
 class Viewer : public QGLViewer {
     Q_OBJECT
@@ -25,20 +30,23 @@ private:
 
     // for visualization settings
     int drawingMode;
-    bool vertexWeights, sampledVertices, controlPoints, remeshedRegions, decimatedMesh;
+    GLuint drawList;
+    bool vertexWeights, sampledVertices, controlPoints, remeshedRegions, decimatedMesh, displayUpdate;
 
     bool pickingEvent;
     void mouseReleaseEvent(QMouseEvent* e);
     void keyPressEvent(QKeyEvent *k);
 
-    void selectVertex(int x, int y);
+    void updateDisplay();
+    void selectVertex(int x, int y, int mode);
     void sendCameraPosition ();
 
 public slots:
     void loadModel(const QString& fileName);
     void saveModel(const QString& fileName);
     void visualization(	int drawingMode, bool vertexWeights, bool sampledVertices,
-                        bool controlPoints, bool remeshedRegions,	bool decimatedMesh );
+                        bool controlPoints, bool remeshedRegions,	bool decimatedMesh, bool displayUpdate);
+    void interaction(interactionVariables currentOptions);
     void invertNormals();
 
     void stocWeights (const QString& mode);
@@ -49,13 +57,15 @@ public slots:
     void hausdorff(double sampling_density_user);
 
     void passToConsole(const QString& msg, int mode);
+
     void test();
 
 signals:
     /* mode: 0 -> ALL
-                     1 -> SAMPLING
-                     2 -> INDEXING
-                     3 -> DEBUG */
+             1 -> SAMPLING
+             2 -> INDEXING
+             3 -> DEBUG
+    */
     void writeToConsole(const QString& msg, int mode);
     void updateViewVec(Vec viewVec);
     void meshstatus (int status);
