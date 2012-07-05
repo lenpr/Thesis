@@ -23,7 +23,8 @@ struct interactionVariables {
     interactionVariables() :
         mouseAction(0), povDecimation(false), povRatio(0.5f),
         keepSilhouette(false), silhouetteAngle(5),
-        keepUVBoarders(false), cameraView(0.0f,0.0f,0.0f) {}
+        keepUVBoarders(false), cameraView(0.0f,0.0f,0.0f),
+        intensity(0.0f) {}
 
     int mouseAction;
     bool povDecimation;
@@ -32,6 +33,7 @@ struct interactionVariables {
     int silhouetteAngle;
     bool keepUVBoarders;
     Vec cameraView;
+    float intensity;
 };
 
 

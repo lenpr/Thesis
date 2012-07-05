@@ -5,17 +5,17 @@
 using namespace qglviewer;
 
 Viewer::Viewer() :
-		topstoc(),
-		drawingMode(0), vertexWeights(false), sampledVertices(false),
-    controlPoints(false), remeshedRegions(false), decimatedMesh(false), displayUpdate(true) {
-
+    topstoc(), drawingMode(0), drawList(0), vertexWeights(false), sampledVertices(false),
+    controlPoints(false), remeshedRegions(false), decimatedMesh(false), displayUpdate(true),
+    pickingEvent(false)
+{
     connect(&topstoc, SIGNAL(writeToConsole(QString, int)),
             this, SLOT(passToConsole(QString, int)));
 }
 
 void Viewer::init() {
     drawList = glGenLists(1);
-    this->setMouseTracking(true);
+    this->setMouseTracking(false);
 }
 
 void Viewer::draw() {
@@ -24,11 +24,27 @@ void Viewer::draw() {
 }
 
 QSize Viewer::minimumSizeHint () const {
-	return QSize(450,600);
+    return QSize(450,600);
 }
 
 QSize Viewer::sizeHint () const {
-	return QSize(600,600);
+    return QSize(600,600);
+}
+
+void Viewer::mouseMoveEvent(QMouseEvent *e) {
+
+    if (e->buttons() & Qt::RightButton){
+        QGLViewer::mouseMoveEvent(e);
+    } else {
+
+        switch (topstoc.options.mouseAction) {
+        case 1:
+            this->selectVertex(e->x(), e->y(), 1); break;
+        case 2:
+            this->selectVertex(e->x(), e->y(), 2); break;
+        default: QGLViewer::mouseMoveEvent(e);
+        }
+    }
 }
 
 
@@ -52,12 +68,6 @@ void Viewer::mouseReleaseEvent(QMouseEvent* e) {
         this->selectVertex(e->x(), e->y(), 1); break;
     case 2:
         this->selectVertex(e->x(), e->y(), 2); break;
-    case 3:
-        this->selectVertex(e->x(), e->y(), 3); break;
-    case 4:
-        this->selectVertex(e->x(), e->y(), 4); break;
-    case 5:
-        this->selectVertex(e->x(), e->y(), 5); break;
     default: break;
     }
 
@@ -71,19 +81,88 @@ void Viewer::mouseReleaseEvent(QMouseEvent* e) {
 void Viewer::keyPressEvent(QKeyEvent *k) {
 
     int keyboardcharIdx = k->key();
-    QString keyboardchar = k->text();
-
-    qDebug() << "Keyboard: " << keyboardchar << " - " << keyboardcharIdx;
+//    QString keyboardchar = k->text();
+//    qDebug() << "Keyboard: " << keyboardchar << " - " << keyboardcharIdx;
     /* Numbers
-        j = 74
-        k = 75
-        x = 88
-        u = 85
+        Reserved by libqglviewer: a, g, f, ?, s, h, esc, space, ent, c, arrows
+        j = 74    + = 43    < = 60    ↑ = 16777235    del = 16777219
+        k = 75    * = 42    > = 62    ←	= 16777234    ent = 16777220
+        x = 88    - = 45              ↓ = 16777237
+        u = 85    _ = 95              → = 16777236
     */
+    float currentValue;
+
     switch (keyboardcharIdx) {
+        // update display
         case 85: this->updateDisplay(); break;
-        case 74: qDebug() << "UP"; break;
-        case 75: qDebug() << "DOWN"; break;
+        // selceted vertices are fix
+        case 42: topstoc.setUserWeights(+1.0f); break;
+        // selceted vertices increase weight
+        case 43: topstoc.setUserWeights(+0.05f); return;
+        // selceted vertices decrease weight
+        case 45: topstoc.setUserWeights(-0.05f); return;
+        // selceted vertices are to dismiss
+        case 95: topstoc.setUserWeights(-1.0f); break;
+        // set to slider value
+        case 35:
+            topstoc.setUserWeights(topstoc.options.intensity);
+            break;
+        // delete seletion
+        case 16777219:
+            topstoc.clearSelection();
+            this->updateDisplay(); return;
+        // change mouse action
+        case 74:
+            if (topstoc.options.mouseAction > 0) {
+                --topstoc.options.mouseAction;
+                QString msg = "Mouse Action: " + QString::number(topstoc.options.mouseAction);
+                writeToConsole(msg, 10);
+            }
+            return;
+        case 75:
+            if (topstoc.options.mouseAction < 2) {
+                ++topstoc.options.mouseAction;
+                QString msg = "Mouse Action: " + QString::number(topstoc.options.mouseAction);
+                writeToConsole(msg, 11);
+            }
+            return;
+        // increase change slider position +0,01
+        case 80:
+            currentValue = topstoc.options.intensity;
+            currentValue += 0.01f;
+            if (currentValue > 1.0f)
+                currentValue = 1.0f;
+            topstoc.options.intensity = currentValue;
+            writeToConsole( QString::number(currentValue), 12);
+            return;
+        // increase change slider position +0,10
+        case 220:
+            currentValue = topstoc.options.intensity;
+            currentValue += 0.10f;
+            if (currentValue > 1.0f)
+                currentValue = 1.0f;
+            topstoc.options.intensity = currentValue;
+            writeToConsole( QString::number(currentValue), 12);
+            return;
+        // decrease change slider position -0,01
+        case 214:
+            currentValue = topstoc.options.intensity;
+            currentValue -= 0.01f;
+            if (currentValue < -1.0f)
+                currentValue = -1.0f;
+            topstoc.options.intensity = currentValue;
+            writeToConsole( QString::number(currentValue), 12);
+            return;
+        // decrease change slider position -0,10
+        case 196:
+            currentValue = topstoc.options.intensity;
+            currentValue -= 0.10f;
+            if (currentValue < -1.0f)
+                currentValue = -1.0f;
+            topstoc.options.intensity = currentValue;
+            writeToConsole( QString::number(currentValue), 12);
+            return;
+        // ---
         default : break;
     }
 
@@ -95,16 +174,24 @@ void Viewer::keyPressEvent(QKeyEvent *k) {
 
 void Viewer::selectVertex(int x, int y, int mode) {
 
-    mode = 0;
     MyMesh::FaceHandle intersectionFace;
-    std::vector<MyMesh::FaceHandle> selectedTriangles;
-
     intersectionFace = topstoc.rayIntersectsTriangle(x, y);
+//    std::cout << "Mode: " << mode << std::endl;
+//    std::cout << "Tri: " << intersectionFace << " - " << noHit << std::endl;
+    if (intersectionFace.is_valid()) {
 
-    if (intersectionFace.is_valid())
-        selectedTriangles.push_back(intersectionFace);
-
-    topstoc.setUserWeights(selectedTriangles, 1.0f);
+        switch (mode) {
+        case 1:
+            topstoc.setUserWeights(intersectionFace, 0.0f);
+            break;
+        case 2:
+            topstoc.setUserWeights(intersectionFace, topstoc.options.intensity);
+            break;
+        default: break;
+        }
+    } else {
+        passToConsole("no triangle hit", 3);
+    }
 }
 
 

@@ -18,7 +18,7 @@ ControlPanel::ControlPanel(QWidget *parent) :
     ui->visualVertexWeights->setEnabled(false);
     ui->visualSampledVertices->setEnabled(false);
     ui->visualControlPoints->setEnabled(false);
-    ui->visualRemeshedRegions->setEnabled(false);
+    ui->visualRemeshedRegions->setEnabled(true);
     ui->visualDecimatedMesh->setEnabled(false);
 	//--- console default is deactivated
 	//QFont font; font.setBold(true);
@@ -41,13 +41,15 @@ ControlPanel::ControlPanel(QWidget *parent) :
              this, SLOT(copyToClipboard()));
     connect( ui->sliderSubset,	SIGNAL(valueChanged(int)),
              this, SLOT(setSliderValue(int)));
-    //
+    // sliders
     connect( ui->sliderVecX, SIGNAL(valueChanged(int)),
              this, SLOT(commitSliderValues()) );
     connect( ui->sliderVecY, SIGNAL(valueChanged(int)),
              this, SLOT(commitSliderValues()) );
     connect( ui->sliderVecZ, SIGNAL(valueChanged(int)),
              this, SLOT(commitSliderValues()) );
+    connect( ui->sliderIntensity, SIGNAL(valueChanged(int)),
+             this, SLOT(commitSliderValues()));
     // visualization
     connect( ui->visualDrawingMethod, SIGNAL(currentIndexChanged(int)),
              this, SLOT(commitVisualOptions(int)));
@@ -63,7 +65,6 @@ ControlPanel::ControlPanel(QWidget *parent) :
              this, SLOT(commitVisualOptions(int)));
     connect( ui->visualDisplayUpdate, SIGNAL(stateChanged(int)),
              this, SLOT(commitVisualOptions(int)));
-    // the sliders are inbetween
     // interaction
     connect( ui->comboBoxMouseAction, SIGNAL(currentIndexChanged(int)),
              this, SLOT(commitInteractionOptions()));
@@ -135,7 +136,7 @@ void ControlPanel::on_buttonSave_clicked () {
 			this,
 			"Save File",
 			QString::null,
-			"Meshes (*.off *.obj *.stla *om .stl	*.stlb *.stl);;Text Files (*.txt)",0,0);
+            "Meshes (*.off *.obj *.stla *.stl *.stlb *.stl);;Text Files (*.txt)",0,0);
 
 	if (filePath.isEmpty ()) {
 		writeToConsole ("saving canceled by user", 0);
@@ -213,7 +214,7 @@ void ControlPanel::writeToConsole (QString msg, int mod) {
 		QString timeString = time.toString();
 		output.append (timeString + "\n - ");
 	}
-
+    int cIdx;
 	// for the information panel, I don't like the code
     switch (mod) {
     case 4:
@@ -231,6 +232,25 @@ void ControlPanel::writeToConsole (QString msg, int mod) {
     case 8:
         ui->labelHausdorffMaxDistance->setText (msg);
         return;
+    case 9:
+        ui->labelElementNr2->setText (msg);
+        return;
+    case 10:
+        cIdx = ui->comboBoxMouseAction->currentIndex();
+        --cIdx;
+        ui->comboBoxMouseAction->setCurrentIndex(cIdx);
+        writeToConsole(msg, 3);
+        return;
+    case 11:
+        cIdx = ui->comboBoxMouseAction->currentIndex();
+        ++cIdx;
+        ui->comboBoxMouseAction->setCurrentIndex(cIdx);
+        writeToConsole(msg, 3);
+        return;
+    case 12:
+        int intensityValue = msg.toFloat()*100;
+        ui->sliderIntensity->setValue(intensityValue);
+        std::cout << "T: " << intensityValue << std::endl;
     }
 	// ---
 
@@ -275,7 +295,7 @@ void ControlPanel::startTabFunctions (int mode) {
         ui->visualVertexWeights->setEnabled(false);
         ui->visualSampledVertices->setEnabled(false);
         ui->visualControlPoints->setEnabled(true);
-        ui->visualRemeshedRegions->setEnabled(false);
+        ui->visualRemeshedRegions->setEnabled(true);
         ui->visualDecimatedMesh->setEnabled(false);
         writeToConsole ("mesh can be sampled and triangulated", 1);
 		break;
@@ -288,7 +308,7 @@ void ControlPanel::startTabFunctions (int mode) {
         ui->visualVertexWeights->setEnabled(true);
         ui->visualSampledVertices->setEnabled(false);
         ui->visualControlPoints->setEnabled(true);
-        ui->visualRemeshedRegions->setEnabled(false);
+        ui->visualRemeshedRegions->setEnabled(true);
         ui->visualDecimatedMesh->setEnabled(false);
 		writeToConsole ("mesh can be re-indexed", 2);
 		break;
@@ -301,7 +321,7 @@ void ControlPanel::startTabFunctions (int mode) {
         ui->visualVertexWeights->setEnabled(true);
         ui->visualSampledVertices->setEnabled(true);
         ui->visualControlPoints->setEnabled(true);
-        ui->visualRemeshedRegions->setEnabled(false);
+        ui->visualRemeshedRegions->setEnabled(true);
         ui->visualDecimatedMesh->setEnabled(false);
         writeToConsole ("custom re-indexing", 2);
 		break;
@@ -368,6 +388,7 @@ void ControlPanel::commitInteractionOptions() {
     options.cameraView[0] = (float)(ui->sliderVecX->value())/100;
     options.cameraView[1] = (float)(ui->sliderVecY->value())/100;
     options.cameraView[2] = (float)(ui->sliderVecZ->value())/100;
+    options.intensity = (ui->sliderIntensity->value()/100.0f);
 
     if ( options.cameraView[0] != 0.0f ||
          options.cameraView[1] != 0.0f ||
@@ -400,6 +421,9 @@ void ControlPanel::commitSliderValues() {
     ui->labelVecX->setText( QString::number(cameraVec[0]/100) );
     ui->labelVecY->setText( QString::number(cameraVec[1]/100) );
     ui->labelVecZ->setText( QString::number(cameraVec[2]/100) );
+
+    QString value = QString::number(ui->sliderIntensity->value()/100.0f);
+    ui->labelSliderIntensity->setText(value);
 
     commitInteractionOptions();
 }

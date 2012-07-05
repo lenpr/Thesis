@@ -11,7 +11,8 @@ TopStoc::TopStoc() :
     minVertexWeight(1.0),
     maxVertexWeight(0.0),
     meanVertexWeight(0.0),
-    meshStatus(0) {}
+    meshStatus(0),
+    numberSelectedTriangles(0) {}
 
 bool TopStoc::loadMeshFromFile (const string &fileName) {
     minVertexWeight = 1.0;
@@ -101,20 +102,27 @@ void TopStoc::setModelBounds () {
 
 void TopStoc::drawSamplAndControlPoints (bool sampledVertices, bool controlPoints) {
 
-	for (int i=0; i<(int)sampledVertexQueue.size(); ++i){
-		if (controlPoints && (mesh.data( sampledVertexQueue[i] ).getWeight() > 1.0)) {
-			glColor3f(0.20, 0.80, 0.20);
-			glVertex3f(	mesh.point( sampledVertexQueue[i] )[0],
-									mesh.point( sampledVertexQueue[i] )[1],
-									mesh.point( sampledVertexQueue[i] )[2]);
-		}
-		if (sampledVertices && (mesh.data( sampledVertexQueue[i] ).getWeight() <= 1.0)) {
-			glColor3f(1.0, 0.25, 0.25);
-			glVertex3f(	mesh.point( sampledVertexQueue[i] )[0],
-									mesh.point( sampledVertexQueue[i] )[1],
-									mesh.point( sampledVertexQueue[i] )[2]);
-		}
-	}
+    if (controlPoints) {
+        for (MyMesh::VertexIter v_it=mesh.vertices_begin(); v_it!=mesh.vertices_end(); ++v_it) {
+            if ( mesh.data(v_it).getUserWeight() == 0.0)
+                continue;
+            if ( mesh.data(v_it).getUserWeight() >= +1.0)
+                glColor3f(1.0f, 0.5f, 0.0f);
+            if ( mesh.data(v_it).getUserWeight() <= -1.0)
+                glColor3f(0.0f, 0.5f, 1.0f);
+            glVertex3f(	mesh.point( v_it )[0],
+                        mesh.point( v_it )[1],
+                        mesh.point( v_it )[2]);
+        }
+    }
+    if (sampledVertices) {
+        for (int i=0; i<(int)sampledVertexQueue.size(); ++i){
+            glColor3f(0.80f, 0.6f, 0.80f);
+            glVertex3f(	mesh.point( sampledVertexQueue[i] )[0],
+                        mesh.point( sampledVertexQueue[i] )[1],
+                        mesh.point( sampledVertexQueue[i] )[2]);
+        }
+    }
 }
 
 
@@ -200,15 +208,16 @@ void TopStoc::drawDecimatedMesh (bool vertexWeights) {
 
 void TopStoc::drawMesh(bool vertexWeights, bool remeshedRegions) {
 
-    //debug later
-    remeshedRegions = true;
-
     for (MyMesh::FaceIter f_it=mesh.faces_begin(); f_it!=mesh.faces_end(); ++f_it) {
         // run along the face vertices and draw them
         for (MyMesh::FaceVertexIter fv_it=mesh.fv_iter(f_it.handle()); fv_it; ++fv_it) {
 
-            if (mesh.data(f_it.handle()).isSelected()) {
+            if (remeshedRegions && mesh.data(f_it.handle()).isSelected() && !vertexWeights) {
                 glColor3f(0.0f, 1.0f, 0.0f);
+            } else if (mesh.data(fv_it.handle()).getUserWeight() != 0.0f
+                       && remeshedRegions && !vertexWeights) {
+                float cv = (mesh.data(fv_it.handle()).getUserWeight())/2.0f;
+                glColor3f((0.5+cv),(0.5),(0.5-cv));
             } else if (vertexWeights) {
                 glColor3f( 	mesh.color(fv_it)[0],
                             mesh.color(fv_it)[1],
@@ -344,7 +353,7 @@ bool TopStoc::calculateWeights (const QString& mode) {
 		writeToConsole ("Problematic normals: "+ QString::number(skipped) ,3);
 
 	// histogramm and colors, for output set mode=1
-	colorizeMesh(1);
+    colorizeMesh();
 
 
 	QString consoleMessage = "- model mean weight value: " + QString::number(meanVertexWeight)
@@ -511,10 +520,11 @@ OpenMesh::FaceHandle TopStoc::rayIntersectsTriangle(int x, int y) {
         hits++;
     }
     //std::cout << "hits: " << hits << std::endl;
+    MyMesh::FaceHandle noHit; //somewhere the intersF. gets set, weird?!
     if (hits > 0)
-        mesh.data(intersectionFace).setSelected(true);
-
-    return intersectionFace;
+        return intersectionFace;
+    else
+        return noHit;
 }
 
 bool TopStoc::setUserWeights(MyMesh::FaceHandle selectedFace, float value) {
@@ -522,53 +532,90 @@ bool TopStoc::setUserWeights(MyMesh::FaceHandle selectedFace, float value) {
     if (!selectedFace.is_valid())
         return false;
     else {
-        MyMesh::ConstFaceVertexIter cfv_it = mesh.cfv_iter(selectedFace);
-        MyMesh::VertexHandle vha = cfv_it;
-        MyMesh::VertexHandle vhb = (++cfv_it);
-        MyMesh::VertexHandle vhc = (++cfv_it);
 
-        if ((value == +1.0) || (value == -1.0)) {
-            mesh.data(vha).setUserWeight(value);
-            mesh.data(vhb).setUserWeight(value);
-            mesh.data(vhc).setUserWeight(value);
-        } else {
-            mesh.data(vha).setUserWeight(mesh.data(vha).getUserWeight() + value);
-            mesh.data(vhb).setUserWeight(mesh.data(vhb).getUserWeight() + value);
-            mesh.data(vhc).setUserWeight(mesh.data(vhc).getUserWeight() + value);
+        if (value == 0.0f) {
+            bool selected = mesh.data(selectedFace).isSelected();
+            mesh.data(selectedFace).setSelected(!selected);
+            if (selected) {
+                --numberSelectedTriangles;
+            } else {
+                ++numberSelectedTriangles;
+            }
+            writeToConsole(QString::number(numberSelectedTriangles),9);
+            return true;
         }
 
+        MyMesh::ConstFaceVertexIter cfv_it = mesh.cfv_iter(selectedFace);
+
+        if ((value >= +1.0) || (value <= -1.0)) {
+            mesh.data(cfv_it).setUserWeight(value);
+            mesh.data(++cfv_it).setUserWeight(value);
+            mesh.data(++cfv_it).setUserWeight(value);
+        } else {
+            float setValue;
+            int i = 0;
+            do{
+                setValue = value + mesh.data(cfv_it).getUserWeight();
+                if (setValue > 1.0f) { setValue = +1.0f; }
+                if (setValue < -1.0f) { setValue = -1.0f; }
+                mesh.data(cfv_it).setUserWeight(setValue);
+                ++cfv_it;
+                ++i;
+            }while(i<3);
+        }
+        colorizeMesh();
         return true;
     }
 }
 
-bool TopStoc::setUserWeights(std::vector<MyMesh::FaceHandle> selectedFace, float value) {
+bool TopStoc::setUserWeights(float value) {
 
-    if (selectedFace.empty())
+    //das ginge alles besser mit einem set in der viewer Klasse aber wäre viel zum umschreiben
+    std::vector<MyMesh::FaceHandle> selectedFaces;
+    for (MyMesh::FaceIter f_it=mesh.faces_begin(); f_it!=mesh.faces_end(); ++f_it) {
+        bool selected = mesh.data(f_it.handle()).isSelected();
+        if (selected)
+            selectedFaces.push_back(f_it.handle());
+    }
+
+    if (selectedFaces.empty())
         return false;
 
-    while (!selectedFace.empty()) {
+    while (!selectedFaces.empty()) {
 
-        MyMesh::FaceHandle current = selectedFace.back();
-        selectedFace.pop_back();
-
+        MyMesh::FaceHandle current = selectedFaces.back();
+        selectedFaces.pop_back();
         MyMesh::ConstFaceVertexIter cfv_it = mesh.cfv_iter(current);
-        MyMesh::VertexHandle vha = cfv_it;
-        MyMesh::VertexHandle vhb = (++cfv_it);
-        MyMesh::VertexHandle vhc = (++cfv_it);
 
         if ((value == +1.0) || (value == -1.0)) {
-            mesh.data(vha).setUserWeight(value);
-            mesh.data(vhb).setUserWeight(value);
-            mesh.data(vhc).setUserWeight(value);
+            mesh.data(cfv_it).setUserWeight(value);
+            mesh.data(++cfv_it).setUserWeight(value);
+            mesh.data(++cfv_it).setUserWeight(value);
         } else {
-            mesh.data(vha).setUserWeight(mesh.data(vha).getUserWeight() + value);
-            mesh.data(vhb).setUserWeight(mesh.data(vhb).getUserWeight() + value);
-            mesh.data(vhc).setUserWeight(mesh.data(vhc).getUserWeight() + value);
+            float setValue;
+            int i = 0;
+            do{
+                setValue = value + mesh.data(cfv_it).getUserWeight();
+                if (setValue > 1.0f) { setValue = +1.0f; }
+                if (setValue < -1.0f) { setValue = -1.0f; }
+                mesh.data(cfv_it).setUserWeight(setValue);
+                ++cfv_it;
+                ++i;
+            }while(i<3);
         }
     }
+    colorizeMesh();
     return true;
 }
 
+void TopStoc::clearSelection() {
+
+    for (MyMesh::FaceIter f_it=mesh.faces_begin(); f_it!=mesh.faces_end(); ++f_it) {
+        mesh.data(f_it).setSelected(false);
+    }
+    numberSelectedTriangles = 0;
+    writeToConsole("0", 9);
+}
 
 bool TopStoc::runTopReMeshing (const QString &mode) {
 
@@ -737,7 +784,7 @@ bool TopStoc::runTopReMeshing (const QString &mode) {
 }
 
 
-void TopStoc::colorizeMesh (int mode) {
+void TopStoc::colorizeMesh () {
 
 	// calculate histogramm and color the vertices
 	int quantile[6] = {0,0,0,0,0,0};
@@ -748,7 +795,7 @@ void TopStoc::colorizeMesh (int mode) {
 
 	MyMesh::VertexIter v_it = mesh.vertices_begin();
 	for (; 	v_it != mesh.vertices_end(); ++v_it){
-		float value = mesh.data(v_it).getWeight();
+        float value = mesh.data(v_it).getWeight() + mesh.data(v_it).getUserWeight();
 		if(value <= (minVertexWeight+lowerDelta)) {
 			mesh.set_color(v_it, MyMesh::Color(0.5,0.5,0.5));
 			++quantile[0];
@@ -779,22 +826,20 @@ void TopStoc::colorizeMesh (int mode) {
 	meshStatus = 1;
 
 	// debug information
-	if(mode == 1) {
-		float sum = mesh.n_vertices();
-		std::cout	<< "   1Q [ 0.0-12.5): " << quantile[0]
-				<< " - " << (quantile[0]/sum) << std::endl;
-		std::cout	<< "   2Q [12.5-25.0): " << quantile[1]
-				<< " - " << (quantile[1]/sum) << std::endl;
-		std::cout	<< "   3Q [25.0-37.5): " << quantile[2]
-				<< " - " << (quantile[2]/sum) << std::endl;
-		std::cout	<< "   4Q [37.5-50.0): " << quantile[3]
-				<< " - " << (quantile[3]/sum) << std::endl;
-		std::cout	<< "   5Q [50.0-62.5): " << quantile[4]
-				<< " - " << (quantile[4]/sum) << std::endl;
-		std::cout	<< "   6Q [62.5-100.]: " << quantile[5]
-				<< " - " << (quantile[5]/sum) << std::endl;
-		std::cout << "   total vertices: " << sum << std::endl;
-	}
+//    float sum = mesh.n_vertices();
+//    std::cout	<< "   1Q [ 0.0-12.5): " << quantile[0]
+//                << " - " << (quantile[0]/sum) << std::endl;
+//    std::cout	<< "   2Q [12.5-25.0): " << quantile[1]
+//                << " - " << (quantile[1]/sum) << std::endl;
+//    std::cout	<< "   3Q [25.0-37.5): " << quantile[2]
+//                << " - " << (quantile[2]/sum) << std::endl;
+//    std::cout	<< "   4Q [37.5-50.0): " << quantile[3]
+//                << " - " << (quantile[3]/sum) << std::endl;
+//    std::cout	<< "   5Q [50.0-62.5): " << quantile[4]
+//                << " - " << (quantile[4]/sum) << std::endl;
+//    std::cout	<< "   6Q [62.5-100.]: " << quantile[5]
+//                << " - " << (quantile[5]/sum) << std::endl;
+//    std::cout << "   total vertices: " << sum << std::endl;
 }
 
 void TopStoc::invertNormals () {

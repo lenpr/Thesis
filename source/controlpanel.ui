@@ -293,24 +293,45 @@
        <x>0</x>
        <y>0</y>
        <width>291</width>
-       <height>154</height>
+       <height>169</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="verticalLayoutHausdorffMultiView">
       <item>
        <layout class="QHBoxLayout" name="horizontalLayoutHausdorff">
         <item>
-         <widget class="QPushButton" name="buttonHausdorff">
-          <property name="minimumSize">
-           <size>
-            <width>100</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>Hausdorff</string>
-          </property>
-         </widget>
+         <layout class="QVBoxLayout" name="verticalLayout_7">
+          <item>
+           <widget class="QPushButton" name="buttonHausdorff">
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Hausdorff</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_7">
+            <item>
+             <widget class="QCheckBox" name="checkBoxVisualizeHausdorff">
+              <property name="maximumSize">
+               <size>
+                <width>80</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Visualize</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
         </item>
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -646,7 +667,7 @@
         <item>
          <widget class="QComboBox" name="visualDrawingMethod">
           <property name="currentIndex">
-           <number>2</number>
+           <number>0</number>
           </property>
           <item>
            <property name="text">
@@ -671,11 +692,6 @@
           <item>
            <property name="text">
             <string>texture</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>hausdorff</string>
            </property>
           </item>
          </widget>
@@ -726,24 +742,24 @@
              <string>control points</string>
             </property>
             <property name="checked">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QCheckBox" name="visualRemeshedRegions">
             <property name="text">
-             <string>remeshed regions</string>
+             <string>show selection</string>
             </property>
             <property name="checked">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QCheckBox" name="visualDisplayUpdate">
             <property name="text">
-             <string>auto uptade</string>
+             <string>screen update</string>
             </property>
             <property name="checked">
              <bool>true</bool>
@@ -962,56 +978,43 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>291</width>
-       <height>251</height>
+       <width>301</width>
+       <height>253</height>
       </rect>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayoutInteraction">
       <item>
        <layout class="QVBoxLayout" name="verticalLayoutInteraction">
         <item>
-         <widget class="QLabel" name="labelMouseAction">
+         <widget class="QLabel" name="labelElementInformation">
           <property name="text">
-           <string>Mouse Action</string>
+           <string>Elements</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QComboBox" name="comboBoxMouseAction">
+         <layout class="QHBoxLayout" name="horizontalLayoutElementInfo1">
           <item>
-           <property name="text">
-            <string>-</string>
-           </property>
+           <widget class="QLabel" name="labelElementNr1">
+            <property name="text">
+             <string>Nr.</string>
+            </property>
+           </widget>
           </item>
           <item>
-           <property name="text">
-            <string>Select</string>
-           </property>
+           <widget class="QLabel" name="labelElementNr2">
+            <property name="text">
+             <string>-</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
           </item>
-          <item>
-           <property name="text">
-            <string>Fix</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Increase Weight</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Decrease Weight</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Dismiss</string>
-           </property>
-          </item>
-         </widget>
+         </layout>
         </item>
         <item>
-         <widget class="Line" name="line_10">
+         <widget class="Line" name="line">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
@@ -1086,31 +1089,25 @@
          </layout>
         </item>
         <item>
-         <widget class="Line" name="line_11">
+         <widget class="Line" name="line_6">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QCheckBox" name="checkBoxUVBoarders">
+         <widget class="QCheckBox" name="checkBoxBoundingBoxes">
           <property name="text">
-           <string>Keep UV Boarders</string>
+           <string>Bounding Boxes</string>
           </property>
          </widget>
         </item>
         <item>
-         <spacer name="verticalSpacer_2">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
+         <widget class="QCheckBox" name="checkBoxMaterials">
+          <property name="text">
+           <string>Use Materials</string>
           </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
+         </widget>
         </item>
        </layout>
       </item>
@@ -1124,23 +1121,42 @@
       <item>
        <layout class="QVBoxLayout" name="verticalLayoutElementInformation">
         <item>
-         <widget class="QLabel" name="labelElementInformation">
+         <widget class="QLabel" name="labelMouseAction">
           <property name="text">
-           <string>Element Info</string>
+           <string>Mouse Effect</string>
           </property>
          </widget>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayoutElementInfo1">
+         <widget class="QComboBox" name="comboBoxMouseAction">
           <item>
-           <widget class="QLabel" name="labelElementNr1">
+           <property name="text">
+            <string>-</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Select</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Draw</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_5">
+          <item>
+           <widget class="QLabel" name="labelSliderDescription">
             <property name="text">
-             <string>Nr.</string>
+             <string>Intensity:</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="labelElementNr2">
+           <widget class="QLabel" name="labelSliderIntensity">
             <property name="text">
              <string>-</string>
             </property>
@@ -1152,45 +1168,61 @@
          </layout>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayoutElementInfo2">
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
           <item>
-           <widget class="QLabel" name="labelElementWeight1">
-            <property name="text">
-             <string>Weight</string>
+           <widget class="QSlider" name="sliderIntensity">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
             </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="labelElementWeight2">
-            <property name="text">
-             <string>-</string>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>90</height>
+             </size>
             </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            <property name="minimum">
+             <number>-100</number>
+            </property>
+            <property name="maximum">
+             <number>100</number>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
             </property>
            </widget>
           </item>
          </layout>
         </item>
         <item>
-         <widget class="Line" name="line_6">
+         <widget class="Line" name="line_5">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
          </widget>
         </item>
         <item>
-         <spacer name="verticalSpacer">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
+         <widget class="QCheckBox" name="checkBoxUVBoarders">
+          <property name="text">
+           <string>Keep UV Boarders</string>
           </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_6">
+          <item>
+           <widget class="QLabel" name="labelUVBoarder">
+            <property name="text">
+             <string>Boarder</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QDoubleSpinBox" name="spinBoxUVBoarder"/>
+          </item>
+         </layout>
         </item>
        </layout>
       </item>
@@ -1204,11 +1236,11 @@
      <x>0</x>
      <y>690</y>
      <width>300</width>
-     <height>200</height>
+     <height>112</height>
     </rect>
    </property>
    <property name="sizePolicy">
-    <sizepolicy hsizetype="Fixed" vsizetype="MinimumExpanding">
+    <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
      <horstretch>0</horstretch>
      <verstretch>1</verstretch>
     </sizepolicy>
@@ -1216,13 +1248,13 @@
    <property name="minimumSize">
     <size>
      <width>300</width>
-     <height>0</height>
+     <height>100</height>
     </size>
    </property>
    <property name="maximumSize">
     <size>
-     <width>260</width>
-     <height>10000</height>
+     <width>300</width>
+     <height>1000</height>
     </size>
    </property>
    <property name="html">

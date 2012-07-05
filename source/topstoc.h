@@ -42,7 +42,9 @@ public:
     bool runStocSampling(const float& adaptivity, const float& subsetTargetSize);
     MyMesh::FaceHandle rayIntersectsTriangle(int x, int y);
     bool setUserWeights(MyMesh::FaceHandle selectedFace, float value);
-    bool setUserWeights(std::vector<MyMesh::FaceHandle> selectedFace, float value);
+    bool setUserWeights(float value); // for all selected faces
+    void clearSelection();
+
     bool runTopReMeshing(const QString& mode);
     void calculateHausdorff(double sampling_density_user);
 
@@ -64,7 +66,7 @@ signals:
     void writeToConsole(const QString, int mode);
 
 private:
-	void colorizeMesh(int mode);
+    void colorizeMesh();
 	float adaptivityCalculation();
 
 	MyMesh mesh;
@@ -74,6 +76,7 @@ private:
 
 	float minVertexWeight, maxVertexWeight, meanVertexWeight;
 	int meshStatus;
+    int numberSelectedTriangles;
 };
 
 #endif // TOPSTOC_H

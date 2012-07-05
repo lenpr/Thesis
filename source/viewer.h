@@ -22,8 +22,6 @@ public:
 protected:
     virtual void init();
     virtual void draw();
-    //test
-    //    virtual void fastDraw();
 
 private:
     TopStoc topstoc;
@@ -34,7 +32,9 @@ private:
     bool vertexWeights, sampledVertices, controlPoints, remeshedRegions, decimatedMesh, displayUpdate;
 
     bool pickingEvent;
+
     void mouseReleaseEvent(QMouseEvent* e);
+    void mouseMoveEvent(QMouseEvent *e);
     void keyPressEvent(QKeyEvent *k);
 
     void updateDisplay();
