@@ -7,11 +7,12 @@
 QT       += core gui xml opengl
 
 CONFIG += x86_64\
-					qtestlib # wäre besser ohne, aber wie?
+          qtestlib # wäre besser ohne, aber wie?
 
 TARGET = TopStoc
 TEMPLATE = app
 
+DEFINES += TETLIBRARY # notwendig damit tetgen nicht eigene mein baut
 
 SOURCES += main.cpp\
         mainwidget.cpp \
@@ -22,7 +23,11 @@ SOURCES += main.cpp\
     reporting.c \
     geomutils.c \
     compute_error.c \
-    boundingbox.cpp
+    boundingbox.cpp \
+    topological_loops.cpp \
+    triangulate.cpp \
+    tetgen.cxx \
+    predicates.cxx
 
 HEADERS  += mainwidget.h \
     viewer.h \
@@ -35,7 +40,10 @@ HEADERS  += mainwidget.h \
     geomutils.h \
     compute_error.h \
     model_analysis.h \
-    mymesh.h
+    mymesh.h \
+    topological_loops.h \
+    triangulate.h \
+    tetgen.h
 
 
 FORMS += \

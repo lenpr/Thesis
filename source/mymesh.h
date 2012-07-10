@@ -9,6 +9,12 @@
 
 
 struct MyTraits : public OpenMesh::DefaultTraits {
+
+    // to be able to delete stuff
+    VertexAttributes(OpenMesh::Attributes::Status);
+    FaceAttributes(OpenMesh::Attributes::Status);
+    EdgeAttributes(OpenMesh::Attributes::Status);
+
     FaceTraits {
     private:
         // face color RGB
@@ -39,9 +45,10 @@ struct MyTraits : public OpenMesh::DefaultTraits {
         float weightUserValue;
         OpenMesh::VertexHandle seedVector;
         bool conquered;
+        int loop;
 
     public:
-        VertexT() : weightValue(0.0), weightUserValue(0.0), seedVector(), conquered(false) { }
+        VertexT() : weightValue(0.0), weightUserValue(0.0), seedVector(), conquered(false), loop(-1) { }
 
         const float& getWeight() const { return weightValue; }
         void setWeight(const float& passedValue) { weightValue=passedValue;}
@@ -54,6 +61,9 @@ struct MyTraits : public OpenMesh::DefaultTraits {
         bool isConquered() const { return conquered;}
         void setToConquered() { conquered = true; }
         void setToUnconquered() { conquered = false; }
+
+        void setLoop(const int passedValue) { loop = passedValue; }
+        int isLoop() { return loop; }
     };
 };
 

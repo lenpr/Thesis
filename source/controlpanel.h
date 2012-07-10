@@ -65,8 +65,16 @@ private slots:
 	void commitVisualOptions(int mode);
 	void on_visualInvertNormals_stateChanged(int mode);
     void commitSliderValues();
+    void on_buttonTurntable_clicked();
     //--- interaction
     void commitInteractionOptions();
+    //--- topology
+    void on_buttonFiltration_clicked();
+    void on_buttonFindLoops_clicked();
+    void on_buttonKillLoop_clicked();
+    void on_buttonNextLoop_clicked();
+    void on_buttonLastLoop_clicked();
+
     // testerei
 	void on_buttonTest_clicked();
 
@@ -85,10 +93,16 @@ signals:
 
 	void runremeshing (const QString& mode);
 
-    void visualization(	int drawingMode, bool vertexWeights, bool sampledVertices, bool controlPoints, bool remeshedRegions, bool decimatedMesh, bool displayUpdate);
+    void visualization(	int drawingMode, bool vertexWeights, bool sampledVertices, bool controlPoints, bool remeshedRegions, bool decimatedMesh, bool displayUpdate, int showBoundaries, bool showHausdroff);
     void interaction( interactionVariables options );
     void invertNormals();
     void hausdorff( double samplingDensityUser);
+    void turntable();
+
+    void filtration();
+    void findLoops();
+    void killLoop();
+
 	void test();
 
 private:
@@ -97,6 +111,8 @@ private:
     float cutDecimal (float myNumber, int decimal);
 	int consoleLineNumber;
     interactionVariables options;
+    int showLoopNr;
+    int loops;
 };
 
 #endif // CONTROLPANEL_H

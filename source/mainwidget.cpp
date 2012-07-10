@@ -42,8 +42,8 @@ MainWidget::MainWidget(QWidget *parent)
              viewer, SLOT(stocSampling(float, float)));
     connect (controlpanel, SIGNAL(runremeshing(QString)),
              viewer, SLOT(topReMeshing(QString)));
-    connect (controlpanel, SIGNAL(visualization(int,bool,bool,bool,bool,bool,bool)),
-             viewer, SLOT(visualization(int,bool,bool,bool,bool,bool,bool)));
+    connect (controlpanel, SIGNAL(visualization(int,bool,bool,bool,bool,bool,bool,int,bool)),
+             viewer, SLOT(visualization(int,bool,bool,bool,bool,bool,bool,int,bool)));
     connect (controlpanel, SIGNAL(invertNormals()),
              viewer, SLOT(invertNormals()));
     connect (controlpanel, SIGNAL(hausdorff(double)),
@@ -52,6 +52,14 @@ MainWidget::MainWidget(QWidget *parent)
              viewer, SLOT(test()));
     connect (controlpanel, SIGNAL(interaction(interactionVariables)),
              viewer, SLOT(interaction(interactionVariables)));
+    connect (controlpanel, SIGNAL(filtration()),
+             viewer, SLOT(filtrate()));
+    connect (controlpanel, SIGNAL(findLoops()),
+             viewer, SLOT(findloops()));
+    connect (controlpanel, SIGNAL(killLoop()),
+             viewer, SLOT(killLoop()));
+    connect (controlpanel, SIGNAL(turntable()),
+             viewer, SLOT(turntable()));
 
 	//--- viewer to console
     connect (viewer, SIGNAL(writeToConsole(QString,int)),

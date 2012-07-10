@@ -20,6 +20,7 @@ ControlPanel::ControlPanel(QWidget *parent) :
     ui->visualControlPoints->setEnabled(false);
     ui->visualRemeshedRegions->setEnabled(true);
     ui->visualDecimatedMesh->setEnabled(false);
+    ui->visualShowBoundaries->setEnabled(true);
 	//--- console default is deactivated
 	//QFont font; font.setBold(true);
 	//ui->consoleSwitch->setFont (font);
@@ -31,6 +32,8 @@ ControlPanel::ControlPanel(QWidget *parent) :
 	//ui->ConsoleOutput->setVisible (false);
 	//---
     consoleLineNumber = 0;
+    showLoopNr = 1;
+    loops = 0;
 
     // signals/slots connect
     connect( ui->consoleSwitch,	SIGNAL(clicked()),
@@ -65,6 +68,10 @@ ControlPanel::ControlPanel(QWidget *parent) :
              this, SLOT(commitVisualOptions(int)));
     connect( ui->visualDisplayUpdate, SIGNAL(stateChanged(int)),
              this, SLOT(commitVisualOptions(int)));
+    connect( ui->visualShowBoundaries, SIGNAL(stateChanged(int)),
+             this, SLOT(commitVisualOptions(int)));
+    connect( ui->checkBoxVisualizeHausdorff, SIGNAL(stateChanged(int)),
+             this, SLOT(commitVisualOptions(int)) );
     // interaction
     connect( ui->comboBoxMouseAction, SIGNAL(currentIndexChanged(int)),
              this, SLOT(commitInteractionOptions()));
@@ -93,13 +100,14 @@ void ControlPanel::on_buttonLoad_clicked () {
 
 	int mode = ui->visualDrawingMethod->currentIndex();
 
-    emit visualization ( mode, false, false, false, false, false, true );
+    emit visualization ( mode, false, false, false, false, false, true, 1, false );
 	ui->visualVertexWeights->setChecked (false);
 	ui->visualSampledVertices->setChecked (false);
 	ui->visualControlPoints->setChecked (false);
-	ui->visualRemeshedRegions->setChecked (false);
+    ui->visualRemeshedRegions->setChecked (true);
 	ui->visualDecimatedMesh->setChecked (false);
     ui->visualDisplayUpdate->setChecked (true);
+    ui->visualShowBoundaries->setChecked (true);
 
 	// Bedingungen sollten nicht hart gecoded werden
 	// OpenMesh::IO::_IOManager_::qt_read_filters ();
@@ -128,6 +136,8 @@ void ControlPanel::on_buttonLoad_clicked () {
 		QTest::qWait (1);
 	}
 	ui->ProgressBar->setVisible (false);
+
+    showLoopNr = 0;
 }
 
 void ControlPanel::on_buttonSave_clicked () {
@@ -247,10 +257,45 @@ void ControlPanel::writeToConsole (QString msg, int mod) {
         ui->comboBoxMouseAction->setCurrentIndex(cIdx);
         writeToConsole(msg, 3);
         return;
-    case 12:
+    case 12: { // explicit because defining a new variable
         int intensityValue = msg.toFloat()*100;
         ui->sliderIntensity->setValue(intensityValue);
-        std::cout << "T: " << intensityValue << std::endl;
+        return;}
+    case 13: {
+        QStringList list = msg.split(",");
+        ui->topInfoBetti0->setText(list.at(0));
+        ui->topInfoBetti1->setText(list.at(1));
+        ui->topInfoBetti2->setText(list.at(2));
+        if (list.at(0) != "-"){
+            int chi = (list.at(0)).toInt() - (list.at(1)).toInt() + (list.at(2)).toInt();
+            ui->topInfoEuler->setText( QString::number(chi) );
+        } else {
+            ui->topInfoEuler->setText( "-" );
+        }
+        return; }
+    case 14: {
+        QStringList list = msg.split(",");
+        ui->topInfoV->setText(list.at(0));
+        ui->topInfoE->setText(list.at(1));
+        ui->topInfoF->setText(list.at(2));
+        return; }
+    case 15:
+        if ( msg == "-" )
+            ui->topInfoGenus->setText(msg);
+        else if ( msg == "-1" )
+            ui->topInfoGenus->setText("Bd.");
+        else
+            ui->topInfoGenus->setText(msg);
+        return;
+    case 16:
+        if (msg == "-") {
+            loops = 0;
+        } else {
+            loops = msg.toInt();
+        }
+        ui->topInfoLoops->setText(msg);
+        commitVisualOptions(1);
+        return;
     }
 	// ---
 
@@ -368,13 +413,19 @@ void ControlPanel::commitVisualOptions (int mode) {
 	if (mode != ui->visualDrawingMethod->currentIndex())
 		mode = ui->visualDrawingMethod->currentIndex();
 
+    int value = ui->visualShowBoundaries->isChecked();
+    if (showLoopNr > 1)
+        value = showLoopNr;
+
 	emit visualization ( mode,
 				ui->visualVertexWeights->isChecked(),
 				ui->visualSampledVertices->isChecked(),
 				ui->visualControlPoints->isChecked(),
 				ui->visualRemeshedRegions->isChecked(),
                 ui->visualDecimatedMesh->isChecked(),
-                ui->visualDisplayUpdate->isChecked() );
+                ui->visualDisplayUpdate->isChecked(),
+                value,
+                ui->checkBoxVisualizeHausdorff->isChecked() );
 }
 
 void ControlPanel::commitInteractionOptions() {
@@ -481,6 +532,35 @@ float ControlPanel::cutDecimal(float myNumber, int decimal) {
 }
 
 void ControlPanel::on_buttonTest_clicked () {
-
 	emit test();
+}
+
+void ControlPanel::on_buttonFiltration_clicked () {
+    emit filtration();
+}
+
+void ControlPanel::on_buttonFindLoops_clicked () {
+    emit findLoops();
+}
+
+void ControlPanel::on_buttonKillLoop_clicked () {
+    emit killLoop();
+}
+
+void ControlPanel::on_buttonLastLoop_clicked() {
+    --showLoopNr;
+    if (showLoopNr < 1)
+        showLoopNr = 1+loops;
+    emit commitVisualOptions(2);
+}
+
+void ControlPanel::on_buttonNextLoop_clicked() {
+    ++showLoopNr;
+    if ( showLoopNr > (1+loops) )
+        showLoopNr = 1;
+    emit commitVisualOptions(2);
+}
+
+void ControlPanel::on_buttonTurntable_clicked() {
+    turntable();
 }

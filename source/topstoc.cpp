@@ -1,9 +1,8 @@
 #include "topstoc.h"
-#include <GLUT/glut.h>
-
 
 TopStoc::TopStoc() :
     bbox(),
+    loops(),
     options(),
     mesh(),
     sampledVertexQueue(),
@@ -100,16 +99,28 @@ void TopStoc::setModelBounds () {
 
 
 
-void TopStoc::drawSamplAndControlPoints (bool sampledVertices, bool controlPoints) {
+void TopStoc::drawSamplAndControlPoints (bool sampledVertices, bool controlPoints, int boundaries) {
 
-    if (controlPoints) {
+    if (controlPoints || (boundaries>0) ) {
         for (MyMesh::VertexIter v_it=mesh.vertices_begin(); v_it!=mesh.vertices_end(); ++v_it) {
-            if ( mesh.data(v_it).getUserWeight() == 0.0)
-                continue;
-            if ( mesh.data(v_it).getUserWeight() >= +1.0)
-                glColor3f(1.0f, 0.5f, 0.0f);
-            if ( mesh.data(v_it).getUserWeight() <= -1.0)
-                glColor3f(0.0f, 0.5f, 1.0f);
+            if (boundaries>0) {
+                if ( mesh.is_boundary( v_it.handle() ) ) {
+                    if ( mesh.data(v_it.handle()).isLoop()==boundaries-1 )
+                        glColor3f(1.0f, 1.0f, 0.0f);
+                    else
+                        glColor3f(1.0f, 0.0f, 0.0f);
+                } else {
+                    continue;
+                }
+            }
+            if (controlPoints) {
+                if ( mesh.data(v_it).getUserWeight() == 0.0)
+                    continue;
+                if ( mesh.data(v_it).getUserWeight() >= +1.0)
+                    glColor3f(1.0f, 0.5f, 0.0f);
+                if ( mesh.data(v_it).getUserWeight() <= -1.0)
+                    glColor3f(0.0f, 0.5f, 1.0f);
+            }
             glVertex3f(	mesh.point( v_it )[0],
                         mesh.point( v_it )[1],
                         mesh.point( v_it )[2]);
@@ -121,6 +132,15 @@ void TopStoc::drawSamplAndControlPoints (bool sampledVertices, bool controlPoint
             glVertex3f(	mesh.point( sampledVertexQueue[i] )[0],
                         mesh.point( sampledVertexQueue[i] )[1],
                         mesh.point( sampledVertexQueue[i] )[2]);
+        }
+    }
+
+    for (MyMesh::VertexIter v_it=mesh.vertices_begin(); v_it!=mesh.vertices_end(); ++v_it) {
+        if ( mesh.is_boundary( v_it.handle() ) ) {
+
+        glVertex3f(	mesh.point( v_it )[0],
+                    mesh.point( v_it )[1],
+                    mesh.point( v_it )[2]);
         }
     }
 }
@@ -297,6 +317,16 @@ void TopStoc::initMesh (){
 	// set sampled and ratio to "-"
 	writeToConsole ("-", 5);
 	writeToConsole ("-", 6);
+
+    QString msg =   QString::number(mesh.n_vertices()) + "," +
+                    QString::number(mesh.n_edges()) + "," +
+                    QString::number(mesh.n_faces());
+    writeToConsole ( msg, 14);
+    msg = "-,-,-";
+    writeToConsole ( msg, 13);
+    msg = "-";
+    writeToConsole ( msg, 15);
+    writeToConsole ( "-", 16);
 }
 
 
@@ -527,13 +557,13 @@ OpenMesh::FaceHandle TopStoc::rayIntersectsTriangle(int x, int y) {
         return noHit;
 }
 
-bool TopStoc::setUserWeights(MyMesh::FaceHandle selectedFace, float value) {
+bool TopStoc::setUserWeights(MyMesh::FaceHandle selectedFace, float value, int mode) {
 
     if (!selectedFace.is_valid())
         return false;
     else {
 
-        if (value == 0.0f) {
+        if (mode == 1) {
             bool selected = mesh.data(selectedFace).isSelected();
             mesh.data(selectedFace).setSelected(!selected);
             if (selected) {
@@ -543,28 +573,28 @@ bool TopStoc::setUserWeights(MyMesh::FaceHandle selectedFace, float value) {
             }
             writeToConsole(QString::number(numberSelectedTriangles),9);
             return true;
-        }
-
-        MyMesh::ConstFaceVertexIter cfv_it = mesh.cfv_iter(selectedFace);
-
-        if ((value >= +1.0) || (value <= -1.0)) {
-            mesh.data(cfv_it).setUserWeight(value);
-            mesh.data(++cfv_it).setUserWeight(value);
-            mesh.data(++cfv_it).setUserWeight(value);
         } else {
-            float setValue;
-            int i = 0;
-            do{
-                setValue = value + mesh.data(cfv_it).getUserWeight();
-                if (setValue > 1.0f) { setValue = +1.0f; }
-                if (setValue < -1.0f) { setValue = -1.0f; }
-                mesh.data(cfv_it).setUserWeight(setValue);
-                ++cfv_it;
-                ++i;
-            }while(i<3);
+            MyMesh::ConstFaceVertexIter cfv_it = mesh.cfv_iter(selectedFace);
+
+            if ((value >= +1.0f) || (value <= -1.0f) || (value == 0.0f)) {
+                mesh.data(cfv_it).setUserWeight(value);
+                mesh.data(++cfv_it).setUserWeight(value);
+                mesh.data(++cfv_it).setUserWeight(value);
+            } else {
+                float setValue;
+                int i = 0;
+                do{
+                    setValue = value + mesh.data(cfv_it).getUserWeight();
+                    if (setValue > 1.0f) { setValue = +1.0f; }
+                    if (setValue < -1.0f) { setValue = -1.0f; }
+                    mesh.data(cfv_it).setUserWeight(setValue);
+                    ++cfv_it;
+                    ++i;
+                }while(i<3);
+            }
+            colorizeMesh();
+            return true;
         }
-        colorizeMesh();
-        return true;
     }
 }
 
@@ -991,14 +1021,110 @@ void TopStoc::calculateHausdorff(double sampling_density_user) {
     // ToDo Output the results
 }
 
+void TopStoc::filtrate() {
+    loops.init(mesh);
+    loops.pairing(this->mesh);
+
+    QString msg =   QString::number(loops.getBetti(0)) + ","
+                  + QString::number(loops.getBetti(1)) + ","
+                  + QString::number(loops.getBetti(2));
+    writeToConsole(msg, 13);
+    writeToConsole( QString::number(loops.getGenus()), 15);
+}
+
+void TopStoc::findLoops() {
+    loops.findBoundaries(this->mesh);
+    writeToConsole( QString::number(loops.getGenus()), 15);
+    writeToConsole( QString::number(loops.n_boundaries()), 16);
+
+}
+
+void TopStoc::killLoop(int loopIdx) {
+
+//    std::cout << "idx:" << (loopIdx) << std::endl;
+    if( loopIdx < loops.n_boundaries() ) {
+        loops.triangulateBd(this->mesh, loopIdx);
+
+        QString msg =   QString::number(mesh.n_vertices()) + "," +
+                QString::number(mesh.n_edges()) + "," +
+                QString::number(mesh.n_faces());
+        writeToConsole ( msg, 14);
+        msg = "-,-,-";
+        writeToConsole ( msg, 13);
+        msg = "-";
+        writeToConsole ( msg, 15);
+        writeToConsole ( msg, 16);
+        loops.init(mesh);
+    }
+}
+
+void TopStoc::deleteFaces() {
+
+    //das ginge alles besser mit einem set in der viewer Klasse aber wäre viel zum umschreiben
+    std::vector<MyMesh::FaceHandle> selectedFaces;
+    for (MyMesh::FaceIter f_it=mesh.faces_begin(); f_it!=mesh.faces_end(); ++f_it) {
+        bool selected = mesh.data(f_it.handle()).isSelected();
+        if (selected)
+            selectedFaces.push_back(f_it.handle());
+    }
+
+    if (selectedFaces.empty())
+        return;
+
+    while (!selectedFaces.empty()) {
+        MyMesh::FaceHandle currentFace = selectedFaces.back();
+        selectedFaces.pop_back();
+        std::cout << "deleting Face: " << currentFace << std::endl;
+        mesh.delete_face(currentFace, true);
+
+    }
+    mesh.garbage_collection();
+
+    QString msg =   QString::number(mesh.n_vertices()) + "," +
+            QString::number(mesh.n_edges()) + "," +
+            QString::number(mesh.n_faces());
+    writeToConsole ( msg, 14);
+    msg = "-,-,-";
+    writeToConsole ( msg, 13);
+    msg = "-";
+    writeToConsole ( msg, 15);
+    writeToConsole ( msg, 16);
+    loops.init(this->mesh);
+}
+
 void TopStoc::test () {
 
-    std::cout << "Testbutton " << std::endl;
+    std::cout << "\n-Test Button-" << std::endl;
 
-    BoundingBox bb;
-    bb.setMinPoint( 0.0f, 0.0f, 0.0f );
-    bb.setMaxPoint( 1.1f, 1.2f, 1.3f );
-    std::cout << "Dinstance: " << bb.getDiagonal() << std::endl;
-    std::cout << "Center: " << bb.getCenterPoint() << std::endl;
+//    BoundingBox bb;
+//    bb.setMinPoint( 0.0f, 0.0f, 0.0f );
+//    bb.setMaxPoint( 1.1f, 1.2f, 1.3f );
+//    std::cout << "Dinstance: " << bb.getDiagonal() << std::endl;
+//    std::cout << "Center: " << bb.getCenterPoint() << std::endl;
 
+//    time_t timeToken0, timeToken1;
+//    double difTime;
+
+//    timeToken0 = clock();
+//    // function
+//    timeToken1 = clock();
+//    difTime = difftime(timeToken0, timeToken1)/CLOCKS_PER_SEC;
+//    std::cout << "t3: " << difTime << "\n" << std::endl;
+
+    OpenMesh::IO::write_mesh(this->mesh, "tmp.off");
+
+    tetgenio tetin;
+    bool tetin_okay = tetin.load_off((char *)"tmp.off");
+
+    std::cout << "loading mesh into tetgen: " << tetin_okay << std::endl;
+
+    tetgenbehavior b;
+    b.parse_commandline((char *)"p");
+    strcpy(b.outfilename, "tet");
+    b.geomview = 1;
+    b.quiet = 0;
+    b.verbose = 5;
+
+//    tetgenio tetout;
+//    tetrahedralize(&b, &tetin, &tetout);
 }

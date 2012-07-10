@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>300</width>
+    <width>329</width>
     <height>800</height>
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+   <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -24,7 +24,7 @@
   </property>
   <property name="maximumSize">
    <size>
-    <width>300</width>
+    <width>329</width>
     <height>2000</height>
    </size>
   </property>
@@ -35,9 +35,9 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>174</y>
-     <width>270</width>
-     <height>12</height>
+     <y>172</y>
+     <width>301</width>
+     <height>15</height>
     </rect>
    </property>
    <property name="value">
@@ -47,9 +47,9 @@
   <widget class="QGroupBox" name="boxFileHandling">
    <property name="geometry">
     <rect>
-     <x>0</x>
+     <x>2</x>
      <y>0</y>
-     <width>145</width>
+     <width>161</width>
      <height>171</height>
     </rect>
    </property>
@@ -64,7 +64,7 @@
      <rect>
       <x>0</x>
       <y>20</y>
-      <width>141</width>
+      <width>161</width>
       <height>151</height>
      </rect>
     </property>
@@ -110,31 +110,337 @@
   <widget class="QTabWidget" name="tabWidgetFunctions">
    <property name="geometry">
     <rect>
-     <x>0</x>
+     <x>2</x>
      <y>190</y>
-     <width>300</width>
-     <height>181</height>
+     <width>325</width>
+     <height>201</height>
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="TabTopology">
     <attribute name="title">
      <string>Topology</string>
     </attribute>
-    <widget class="QPushButton" name="buttonTest">
+    <widget class="QWidget" name="verticalLayoutWidget">
      <property name="geometry">
       <rect>
-       <x>90</x>
-       <y>50</y>
-       <width>114</width>
-       <height>32</height>
+       <x>10</x>
+       <y>70</y>
+       <width>301</width>
+       <height>101</height>
       </rect>
      </property>
-     <property name="text">
-      <string>Test</string>
+     <layout class="QVBoxLayout" name="verticalLayout_8">
+      <item>
+       <layout class="QGridLayout" name="gridLayout_2">
+        <item row="0" column="0">
+         <widget class="QLabel" name="topDescritionV">
+          <property name="text">
+           <string>V</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="topInfoV">
+          <property name="text">
+           <string>-</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLabel" name="topDescritionE">
+          <property name="text">
+           <string>E</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="QLabel" name="topDescritionF">
+          <property name="text">
+           <string>F</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="QLabel" name="topInfoF">
+          <property name="text">
+           <string>-</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLabel" name="topInfoE">
+          <property name="text">
+           <string>-</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="3">
+         <widget class="QLabel" name="topDescriptionLoops">
+          <property name="minimumSize">
+           <size>
+            <width>50</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>50</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>loops</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="3">
+         <widget class="QLabel" name="topInfoLoops">
+          <property name="minimumSize">
+           <size>
+            <width>50</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>50</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>-</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QGridLayout" name="gridLayout">
+        <item row="1" column="2">
+         <widget class="QLabel" name="topInfoBetti2">
+          <property name="text">
+           <string>-</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLabel" name="topInfoBetti1">
+          <property name="text">
+           <string>-</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLabel" name="topDescriptionBetti1">
+          <property name="minimumSize">
+           <size>
+            <width>30</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>β[1]</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="topDescriptionBetti0">
+          <property name="minimumSize">
+           <size>
+            <width>30</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>β[0]</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="topInfoBetti0">
+          <property name="text">
+           <string>-</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="3">
+         <widget class="QLabel" name="topDescriptionGenus">
+          <property name="maximumSize">
+           <size>
+            <width>50</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>g</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="4">
+         <widget class="QLabel" name="topDescriptionEuler">
+          <property name="maximumSize">
+           <size>
+            <width>50</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>χ</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="3">
+         <widget class="QLabel" name="topInfoGenus">
+          <property name="text">
+           <string>-</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="4">
+         <widget class="QLabel" name="topInfoEuler">
+          <property name="text">
+           <string>-</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="QLabel" name="topDescriptionBetti2">
+          <property name="minimumSize">
+           <size>
+            <width>30</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>β[2]</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="horizontalLayoutWidget_2">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>0</y>
+       <width>301</width>
+       <height>73</height>
+      </rect>
      </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_8">
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout_10">
+        <item>
+         <widget class="QPushButton" name="buttonFiltration">
+          <property name="text">
+           <string>Filtrate</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="buttonFindLoops">
+          <property name="text">
+           <string>Find Loops</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout_9">
+        <item>
+         <widget class="QPushButton" name="buttonKillLoop">
+          <property name="maximumSize">
+           <size>
+            <width>144</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Kill Loop</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_9">
+          <item>
+           <widget class="QPushButton" name="buttonLastLoop">
+            <property name="text">
+             <string>&lt;</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="buttonNextLoop">
+            <property name="text">
+             <string>&gt;</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+     </layout>
     </widget>
    </widget>
    <widget class="QWidget" name="TabDecimation">
@@ -475,8 +781,8 @@
   <widget class="QLabel" name="LabelConsoleOutput">
    <property name="geometry">
     <rect>
-     <x>0</x>
-     <y>670</y>
+     <x>5</x>
+     <y>700</y>
      <width>111</width>
      <height>16</height>
     </rect>
@@ -488,10 +794,10 @@
   <widget class="QTabWidget" name="tabWidgetInput">
    <property name="geometry">
     <rect>
-     <x>0</x>
-     <y>380</y>
-     <width>300</width>
-     <height>281</height>
+     <x>2</x>
+     <y>400</y>
+     <width>325</width>
+     <height>291</height>
     </rect>
    </property>
    <property name="minimumSize">
@@ -647,8 +953,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>297</width>
-       <height>251</height>
+       <width>321</width>
+       <height>261</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -667,7 +973,7 @@
         <item>
          <widget class="QComboBox" name="visualDrawingMethod">
           <property name="currentIndex">
-           <number>0</number>
+           <number>2</number>
           </property>
           <item>
            <property name="text">
@@ -710,6 +1016,26 @@
         <item>
          <layout class="QVBoxLayout" name="verticalLayoutSampling">
           <item>
+           <widget class="QCheckBox" name="visualDisplayUpdate">
+            <property name="text">
+             <string>screen update</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="visualShowBoundaries">
+            <property name="text">
+             <string>boundaries/loops</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QCheckBox" name="visualInvertNormals">
             <property name="text">
              <string>invert normals</string>
@@ -742,7 +1068,7 @@
              <string>control points</string>
             </property>
             <property name="checked">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
            </widget>
           </item>
@@ -750,16 +1076,6 @@
            <widget class="QCheckBox" name="visualRemeshedRegions">
             <property name="text">
              <string>show selection</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="visualDisplayUpdate">
-            <property name="text">
-             <string>screen update</string>
             </property>
             <property name="checked">
              <bool>true</bool>
@@ -978,8 +1294,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>301</width>
-       <height>253</height>
+       <width>321</width>
+       <height>261</height>
       </rect>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayoutInteraction">
@@ -1233,10 +1549,10 @@
   <widget class="QTextEdit" name="ConsoleOutput">
    <property name="geometry">
     <rect>
-     <x>0</x>
-     <y>690</y>
-     <width>300</width>
-     <height>112</height>
+     <x>2</x>
+     <y>720</y>
+     <width>325</width>
+     <height>75</height>
     </rect>
    </property>
    <property name="sizePolicy">
@@ -1248,12 +1564,12 @@
    <property name="minimumSize">
     <size>
      <width>300</width>
-     <height>100</height>
+     <height>75</height>
     </size>
    </property>
    <property name="maximumSize">
     <size>
-     <width>300</width>
+     <width>325</width>
      <height>1000</height>
     </size>
    </property>
@@ -1268,9 +1584,9 @@ p, li { white-space: pre-wrap; }
   <widget class="QGroupBox" name="boxMeshInfo">
    <property name="geometry">
     <rect>
-     <x>155</x>
+     <x>167</x>
      <y>0</y>
-     <width>145</width>
+     <width>160</width>
      <height>171</height>
     </rect>
    </property>
@@ -1351,6 +1667,19 @@ p, li { white-space: pre-wrap; }
      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
     </property>
    </widget>
+  </widget>
+  <widget class="QPushButton" name="buttonTest">
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>690</y>
+     <width>144</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Test</string>
+   </property>
   </widget>
  </widget>
  <resources/>

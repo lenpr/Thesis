@@ -29,7 +29,8 @@ private:
     // for visualization settings
     int drawingMode;
     GLuint drawList;
-    bool vertexWeights, sampledVertices, controlPoints, remeshedRegions, decimatedMesh, displayUpdate;
+    bool vertexWeights, sampledVertices, controlPoints, remeshedRegions, decimatedMesh, displayUpdate, showHausdorff;
+    int showBoundaries;
 
     bool pickingEvent;
 
@@ -45,7 +46,7 @@ public slots:
     void loadModel(const QString& fileName);
     void saveModel(const QString& fileName);
     void visualization(	int drawingMode, bool vertexWeights, bool sampledVertices,
-                        bool controlPoints, bool remeshedRegions,	bool decimatedMesh, bool displayUpdate);
+                        bool controlPoints, bool remeshedRegions,	bool decimatedMesh, bool displayUpdate, int showBoundaries, bool showHausdorff);
     void interaction(interactionVariables currentOptions);
     void invertNormals();
 
@@ -55,6 +56,11 @@ public slots:
     void topReMeshing (const QString& mode);
 
     void hausdorff(double sampling_density_user);
+    void turntable();
+
+    void filtrate();
+    void findloops();
+    void killLoop();
 
     void passToConsole(const QString& msg, int mode);
 

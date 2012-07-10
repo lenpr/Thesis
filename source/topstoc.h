@@ -4,8 +4,10 @@
 #include <cmath>
 #ifdef LINUX
     #include <GL/gl.h>
+    #include <GL/glut.h>
 #else
     #include <OpenGL/gl.h>
+    #include <GLUT/glut.h>
 #endif
 
 #include <deque>		// double ended queue
@@ -18,11 +20,15 @@
 #include "controlpanel.h"
 #include "boundingbox.h"
 
+// Tetrahedral creation
+#include "tetgen.h"
+
 // Housdorff distance
 #include "compute_error.h"
 #include "xalloc.h"
 
-
+// topology
+#include "topological_loops.h"
 
 using std::string;
 
@@ -41,7 +47,7 @@ public:
     bool calculateWeights(const QString& mode);
     bool runStocSampling(const float& adaptivity, const float& subsetTargetSize);
     MyMesh::FaceHandle rayIntersectsTriangle(int x, int y);
-    bool setUserWeights(MyMesh::FaceHandle selectedFace, float value);
+    bool setUserWeights(MyMesh::FaceHandle selectedFace, float value, int mode);
     bool setUserWeights(float value); // for all selected faces
     void clearSelection();
 
@@ -53,10 +59,17 @@ public:
 
     void drawMesh(bool vertexWeights, bool remeshedRegions);
     void drawDecimatedMesh(bool vertexWeights);
-    void drawSamplAndControlPoints (bool sampledVertices, bool controlPoints);
+    void drawSamplAndControlPoints (bool sampledVertices, bool controlPoints, int boundaries);
+
+    void filtrate();
+    void findLoops();
+    void killLoop(int loopIdx);
+    void deleteFaces();
+
     void test();
 
     BoundingBox bbox;
+    topological_loops loops;
     interactionVariables options;
 
     void gl_select(int x, int y);

@@ -7,7 +7,7 @@ using namespace qglviewer;
 Viewer::Viewer() :
     topstoc(), drawingMode(0), drawList(0), vertexWeights(false), sampledVertices(false),
     controlPoints(false), remeshedRegions(false), decimatedMesh(false), displayUpdate(true),
-    pickingEvent(false)
+    showBoundaries(1), pickingEvent(false)
 {
     connect(&topstoc, SIGNAL(writeToConsole(QString, int)),
             this, SLOT(passToConsole(QString, int)));
@@ -108,8 +108,12 @@ void Viewer::keyPressEvent(QKeyEvent *k) {
             topstoc.setUserWeights(topstoc.options.intensity);
             break;
         // delete seletion
-        case 16777219:
+        case 88:
             topstoc.clearSelection();
+            this->updateDisplay(); return;
+        // delete faces
+        case 16777219:
+            topstoc.deleteFaces();
             this->updateDisplay(); return;
         // change mouse action
         case 74:
@@ -176,19 +180,10 @@ void Viewer::selectVertex(int x, int y, int mode) {
 
     MyMesh::FaceHandle intersectionFace;
     intersectionFace = topstoc.rayIntersectsTriangle(x, y);
-//    std::cout << "Mode: " << mode << std::endl;
-//    std::cout << "Tri: " << intersectionFace << " - " << noHit << std::endl;
+    //    std::cout << "Mode: " << mode << std::endl;
+    //    std::cout << "Tri: " << intersectionFace << " - " << noHit << std::endl;
     if (intersectionFace.is_valid()) {
-
-        switch (mode) {
-        case 1:
-            topstoc.setUserWeights(intersectionFace, 0.0f);
-            break;
-        case 2:
-            topstoc.setUserWeights(intersectionFace, topstoc.options.intensity);
-            break;
-        default: break;
-        }
+        topstoc.setUserWeights(intersectionFace, topstoc.options.intensity, mode);
     } else {
         passToConsole("no triangle hit", 3);
     }
@@ -317,12 +312,12 @@ void Viewer::updateDisplay() {
         break;
     }
 
-    if (sampledVertices || controlPoints) {
+    if (sampledVertices || controlPoints || (showBoundaries > 0)) {
         glDisable(GL_LIGHTING);
         glPointSize(3.0f);
         glBegin(GL_POINTS);
 
-        topstoc.drawSamplAndControlPoints (sampledVertices, controlPoints);
+        topstoc.drawSamplAndControlPoints (sampledVertices, controlPoints, showBoundaries);
 
         glEnd();
         glEnable (GL_LIGHTING);
@@ -344,7 +339,7 @@ void Viewer::updateDisplay() {
 
 void Viewer::visualization (	int drawingMode, bool vertexWeights, bool sampledVertices,
                                 bool controlPoints, bool remeshedRegions, bool decimatedMesh,
-                                bool displayUpdate) {
+                                bool displayUpdate, int showBoundaries, bool showHausdroff) {
 
 	this->drawingMode = drawingMode;
 	this->vertexWeights = vertexWeights;
@@ -353,6 +348,8 @@ void Viewer::visualization (	int drawingMode, bool vertexWeights, bool sampledVe
 	this->remeshedRegions = remeshedRegions;
 	this->decimatedMesh = decimatedMesh;
     this->displayUpdate = displayUpdate;
+    this->showBoundaries = showBoundaries;
+    this->showHausdorff = showHausdroff;
 
 	emit writeToConsole ("new visualization options set", 3);
 
@@ -360,8 +357,17 @@ void Viewer::visualization (	int drawingMode, bool vertexWeights, bool sampledVe
 }
 
 void Viewer::interaction(interactionVariables currentOptions) {
-
     topstoc.options = currentOptions;
+}
+
+void Viewer::turntable() {
+
+    std::cout << "Turntable" << std::endl;
+
+    // Hier muss der turntable-code rein
+    // camera zur Position der ersten Initialisierung und dann die Boundingbox noch oben hochgleiten
+
+    std::cout << "Hier steht drin ob Hausdorff visualisiert werden soll: " << this->showHausdorff << std::endl;
 }
 
 void Viewer::invertNormals () {
@@ -384,6 +390,24 @@ void Viewer::sendCameraPosition() {
     Vec viewVec(m[8], m[9], m[10]);
     //qDebug() << "x " << m[8] << " - y " << m[9] << " - z " << m[10] << endl;
     emit updateViewVec(viewVec);
+}
+
+void Viewer::filtrate() {
+    topstoc.filtrate();
+}
+
+void Viewer::findloops() {
+    topstoc.findLoops();
+}
+
+void Viewer::killLoop() {
+    if (showBoundaries > 1) {
+        topstoc.killLoop(showBoundaries-2);
+        this->updateDisplay();
+    } else {
+        writeToConsole("Select Loop First", 3);
+        return;
+    }
 }
 
 void Viewer::test () {
