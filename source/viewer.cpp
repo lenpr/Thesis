@@ -7,10 +7,11 @@ using namespace qglviewer;
 Viewer::Viewer() :
     topstoc(), drawingMode(0), drawList(0), vertexWeights(false), sampledVertices(false),
     controlPoints(false), remeshedRegions(false), decimatedMesh(false), displayUpdate(true),
-    showBoundaries(1), pickingEvent(false)
+    showBoundaries(1), currentTri(-1), pickingEvent(false)
 {
     connect(&topstoc, SIGNAL(writeToConsole(QString, int)),
             this, SLOT(passToConsole(QString, int)));
+
 }
 
 void Viewer::init() {
@@ -111,7 +112,11 @@ void Viewer::keyPressEvent(QKeyEvent *k) {
         case 88:
             topstoc.clearSelection();
             this->updateDisplay(); return;
-        // delete faces
+        // these cases are the numbers, hence we select % faces - 1 selects all, with 0 the last half
+        case 48: case 49:case 50:case 51:case 52:case 53: case 54: case 55: case 56: case 57:
+            topstoc.selectAll(keyboardcharIdx);
+            this->updateDisplay();
+            return;
         case 16777219:
             topstoc.deleteFaces();
             this->updateDisplay(); return;
@@ -166,6 +171,12 @@ void Viewer::keyPressEvent(QKeyEvent *k) {
             topstoc.options.intensity = currentValue;
             writeToConsole( QString::number(currentValue), 12);
             return;
+        case 16777236:
+            ++currentTri; break;
+        case 16777234:
+            if (currentTri!=0)
+                --currentTri;
+            break;
         // ---
         default : break;
     }
@@ -316,9 +327,7 @@ void Viewer::updateDisplay() {
         glDisable(GL_LIGHTING);
         glPointSize(3.0f);
         glBegin(GL_POINTS);
-
-        topstoc.drawSamplAndControlPoints (sampledVertices, controlPoints, showBoundaries);
-
+        topstoc.drawSamplAndControlPoints (sampledVertices, controlPoints, showBoundaries, currentTri);
         glEnd();
         glEnable (GL_LIGHTING);
     }

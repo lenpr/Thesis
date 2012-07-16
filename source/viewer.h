@@ -31,6 +31,7 @@ private:
     GLuint drawList;
     bool vertexWeights, sampledVertices, controlPoints, remeshedRegions, decimatedMesh, displayUpdate, showHausdorff;
     int showBoundaries;
+    int currentTri;
 
     bool pickingEvent;
 

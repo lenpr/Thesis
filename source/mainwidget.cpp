@@ -21,11 +21,12 @@ MainWidget::MainWidget(QWidget *parent)
     // place widget in the middle of the screen
 	screenWidth = desktop->width(); // get width of screen
 	screenHeight = desktop->height(); // get height of screen
-	windowSize = size(); // size of our application window
+    windowSize = size(); // size of our application window
+
 	width = windowSize.width();
 	height = windowSize.height();
-	x = (screenWidth - width)/2;
-	y = (screenHeight - height)/2;
+    x = (screenWidth - width)/2 - 160;
+    y = (screenHeight - height)/2 - 200;
     move (x, y); // move window to desired coordinates
 
     setWindowTitle(tr("Fast User-Guided Mesh Simplification with Topology Control"));

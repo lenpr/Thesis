@@ -920,7 +920,7 @@ bool tetgenio::load_off(char* filebasename)
     printf("File I/O Error:  Unable to open file %s\n", infilename);
     return false;
   }
-  printf("Opening %s.\n", infilename);
+//  printf("Opening %s.\n", infilename);
 
   // OFF requires the index starts from '0'.
   firstnumber = 0;

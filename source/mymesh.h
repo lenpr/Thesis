@@ -36,6 +36,15 @@ struct MyTraits : public OpenMesh::DefaultTraits {
         void setSelected(bool newSelected) { selected = newSelected; }
     };
 
+    EdgeTraits {
+    private:
+        int edgeCircle;
+    public:
+        EdgeT() : edgeCircle(0) {}
+        void setEdgeCircle(const int nr) { edgeCircle = nr; }
+        int getEdgeCircle() { return edgeCircle; }
+    };
+
     VertexTraits {
         // changing the std property does not work for me
         //typedef OpenMesh::Vec3f Color;

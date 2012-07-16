@@ -20,9 +20,6 @@
 #include "controlpanel.h"
 #include "boundingbox.h"
 
-// Tetrahedral creation
-#include "tetgen.h"
-
 // Housdorff distance
 #include "compute_error.h"
 #include "xalloc.h"
@@ -50,6 +47,7 @@ public:
     bool setUserWeights(MyMesh::FaceHandle selectedFace, float value, int mode);
     bool setUserWeights(float value); // for all selected faces
     void clearSelection();
+    void selectAll(int keyboardcharIdx);
 
     bool runTopReMeshing(const QString& mode);
     void calculateHausdorff(double sampling_density_user);
@@ -59,7 +57,7 @@ public:
 
     void drawMesh(bool vertexWeights, bool remeshedRegions);
     void drawDecimatedMesh(bool vertexWeights);
-    void drawSamplAndControlPoints (bool sampledVertices, bool controlPoints, int boundaries);
+    void drawSamplAndControlPoints (bool sampledVertices, bool controlPoints, int boundaries, int loops);
 
     void filtrate();
     void findLoops();
@@ -90,6 +88,9 @@ private:
 	float minVertexWeight, maxVertexWeight, meanVertexWeight;
 	int meshStatus;
     int numberSelectedTriangles;
+
+    // Debug
+    std::vector< std::set<int> > tetrahedrsTris;
 };
 
 #endif // TOPSTOC_H
