@@ -11,13 +11,20 @@ TopStoc::TopStoc() :
     maxVertexWeight(0.0),
     meanVertexWeight(0.0),
     meshStatus(0),
-    numberSelectedTriangles(0) {}
+    numberSelectedTriangles(0),
+    fe(0),
+    tetrahedrsTris() {}
 
 bool TopStoc::loadMeshFromFile (const string &fileName) {
     minVertexWeight = 1.0;
     maxVertexWeight = 0.0;
     meanVertexWeight = 0.0;
     meshStatus = 0;
+
+    if (fe != NULL) {
+        free_face_error(fe);
+        fe = NULL;
+    }
 
 	return OpenMesh::IO::read_mesh(mesh, fileName, opt);
 }
@@ -178,35 +185,62 @@ void TopStoc::drawSamplAndControlPoints (bool sampledVertices, bool controlPoint
     // Debug to draw specific tris
     if (!tetrahedrsTris.empty() && loops<(int)tetrahedrsTris.size() && loops>=0 ){
 
-        glEnd();
-        glBegin(GL_TRIANGLES);
-
         std::set<int> tris;
         std::set<int>::iterator it;
         tris = tetrahedrsTris.at(loops);
         std::vector< MyMesh::VertexHandle > vhVector;
-        std::cout << "Selected Triangle (tetgen Handles):";
+        std::cout << "Selected PLC (tetgen Handles):";
         for (it = tris.begin(); it!=tris.end(); ++it) {
             vhVector.push_back( MyMesh::VertexHandle(*it) );
             std::cout << " " << (*it);
         }
         std::cout << std::endl;
+        glEnd();
 
-        MyMesh::VertexHandle vh0 = vhVector.at(0);
-        MyMesh::VertexHandle vh1 = vhVector.at(1);
-        MyMesh::VertexHandle vh2 = vhVector.at(2);
+        MyMesh::VertexHandle vh0, vh1, vh2;
 
-        if (vh0.is_valid() && vh1.is_valid() && vh2.is_valid()) {
-            glColor3f(1.0f, 1.0f, 1.0f);
-            glNormal3f(	mesh.normal(vh0)[0], mesh.normal(vh0)[1], mesh.normal(vh0)[2] );
-            glVertex3f(	mesh.point( vh0)[0], mesh.point( vh0)[1], mesh.point( vh0)[2] );
-            glNormal3f(	mesh.normal(vh1)[0], mesh.normal(vh1)[1], mesh.normal(vh1)[2] );
-            glVertex3f(	mesh.point( vh1)[0], mesh.point( vh1)[1], mesh.point( vh1)[2] );
-            glNormal3f(	mesh.normal(vh2)[0], mesh.normal(vh2)[1], mesh.normal(vh2)[2] );
-            glVertex3f(	mesh.point( vh2)[0], mesh.point( vh2)[1], mesh.point( vh2)[2] );
+        switch ( vhVector.size() ) {
+        case 3:
+            glBegin(GL_TRIANGLES);
+            vh0 = vhVector.at(0);
+            vh1 = vhVector.at(1);
+            vh2 = vhVector.at(2);
+            if (vh0.is_valid() && vh1.is_valid() && vh2.is_valid()) {
+                glColor3f(1.0f, 1.0f, 1.0f);
+                glNormal3f(	mesh.normal(vh0)[0], mesh.normal(vh0)[1], mesh.normal(vh0)[2] );
+                glVertex3f(	mesh.point( vh0)[0], mesh.point( vh0)[1], mesh.point( vh0)[2] );
+                glNormal3f(	mesh.normal(vh1)[0], mesh.normal(vh1)[1], mesh.normal(vh1)[2] );
+                glVertex3f(	mesh.point( vh1)[0], mesh.point( vh1)[1], mesh.point( vh1)[2] );
+                glNormal3f(	mesh.normal(vh2)[0], mesh.normal(vh2)[1], mesh.normal(vh2)[2] );
+                glVertex3f(	mesh.point( vh2)[0], mesh.point( vh2)[1], mesh.point( vh2)[2] );
+            }
+            glEnd();
+            break;
+        case 2:
+            glBegin(GL_LINE);
+            vh0 = vhVector.at(0);
+            vh1 = vhVector.at(1);
+            if (vh0.is_valid() && vh1.is_valid() ) {
+                glColor3f(1.0f, 1.0f, 1.0f);
+                glNormal3f(	mesh.normal(vh0)[0], mesh.normal(vh0)[1], mesh.normal(vh0)[2] );
+                glVertex3f(	mesh.point( vh0)[0], mesh.point( vh0)[1], mesh.point( vh0)[2] );
+                glNormal3f(	mesh.normal(vh1)[0], mesh.normal(vh1)[1], mesh.normal(vh1)[2] );
+                glVertex3f(	mesh.point( vh1)[0], mesh.point( vh1)[1], mesh.point( vh1)[2] );
+            }
+            glEnd();
+            break;
+        case 1:
+            glBegin(GL_POINTS);
+            vh0 = vhVector.at(0);
+            if (vh0.is_valid()) {
+                glColor3f(1.0f, 1.0f, 1.0f);
+                glNormal3f(	mesh.normal(vh0)[0], mesh.normal(vh0)[1], mesh.normal(vh0)[2] );
+                glVertex3f(	mesh.point( vh0)[0], mesh.point( vh0)[1], mesh.point( vh0)[2] );
+            }
+            glEnd();
+            break;
         }
 
-        glEnd();
         glBegin(GL_POINTS);
     }
 }
@@ -274,21 +308,29 @@ glMatrixMode(GL_PROJECTION);
 
 */
 
-void TopStoc::drawDecimatedMesh (bool vertexWeights) {
+void TopStoc::drawDecimatedMesh (bool vertexWeights, bool hausdorffDistance) {
+
+    glColor3f(0.64, 0.70, 0.80);
+
 	for (int i=0; i< (int)decimatedMesh.size(); ++i){
 		if (vertexWeights) {
-			glColor3f( 	mesh.color( decimatedMesh[i] )[0],
-									mesh.color( decimatedMesh[i] )[1],
-									mesh.color( decimatedMesh[i] )[2]);
-		} else {
-			glColor3f(0.64, 0.70, 0.80);
-		}
+            glColor3f( mesh.color( decimatedMesh[i] )[0],
+                       mesh.color( decimatedMesh[i] )[1],
+                       mesh.color( decimatedMesh[i] )[2]);
+        } else if (hausdorffDistance && fe != NULL && i % 3 == 0) {
+            double error = fe[i / 3].max_error;
+            error = error / maxError;
+            error = std::sqrt(error);
+            error = error/2;
+            glColor3f(0.83, 0.68 - error, 0.21);
+
+        }
 		glNormal3f(	mesh.normal( decimatedMesh[i] )[0],
-								mesh.normal( decimatedMesh[i] )[1],
-								mesh.normal( decimatedMesh[i] )[2]);
+                    mesh.normal( decimatedMesh[i] )[1],
+                    mesh.normal( decimatedMesh[i] )[2]);
 		glVertex3f(	mesh.point( decimatedMesh[i] )[0],
-								mesh.point( decimatedMesh[i] )[1],
-								mesh.point( decimatedMesh[i] )[2]);
+                    mesh.point( decimatedMesh[i] )[1],
+                    mesh.point( decimatedMesh[i] )[2]);
 	}
 }
 
@@ -878,13 +920,11 @@ bool TopStoc::runTopReMeshing (const QString &mode) {
 	}
 		std::cout << "difMarks: " << difMarks.size () << std::endl;
 */
-	std::cout << "Flood filled: " << conquered << " of " << mesh.n_vertices() << std::endl;
-
 
 	MyMesh::VertexHandle seedA, seedB, seedC;
 	MyMesh::VertexHandle vhA, vhB, vhC;
 
-	std::cout << "Savings: " << facesToCheck.size() << "/" << mesh.n_faces() << std::endl;
+//	std::cout << "Savings: " << facesToCheck.size() << "/" << mesh.n_faces() << std::endl;
 
 	int count1 = 0;
 	int count2 = 0;
@@ -936,15 +976,13 @@ bool TopStoc::runTopReMeshing (const QString &mode) {
 		}
 	}
 
-	std::cout << "blau: " << count1 << std::endl;
-	std::cout << "grün: " << count2 << std::endl;
-	std::cout << "grau: " << count3 << std::endl;
-	std::cout << "check: " << count1+count2+count3 << std::endl;
-	std::cout << "faces: " << mesh.n_faces() << std::endl;
-
-	QString consoleMessage = "finished remashing, new mesh is "
-													 + QString::number((float)((float)decimatedMesh.size()/3)/mesh.n_faces())
-													 + "% of base the mesh";
+    QString consoleMessage = "blau : "+QString::number(count1)
+        +"gruen: "+QString::number(count2) +"grau : "+QString::number(count3)
+        +" - check: "+QString::number(count1+count2+count3)+" / "+QString::number(mesh.n_faces());
+    writeToConsole (consoleMessage, 2);
+    consoleMessage = "finished remashing, new mesh is "
+        + QString::number((float)((float)decimatedMesh.size()/3)/mesh.n_faces())
+        + "% of base the mesh";
 	writeToConsole (consoleMessage, 2);
     // if the meshes changes, updated panel
     writeToConsole ("-", 7);
@@ -1126,11 +1164,11 @@ void TopStoc::calculateHausdorff(double sampling_density_user) {
         m1.normals[i].y = n1[1];
         m1.normals[i].z = n1[2];
 
-        if (i%3 == 0) {
-            int face_number = (i/3);
-            m1.faces[face_number].f0 = decimatedMesh[(i+0)].idx();
-            m1.faces[face_number].f1 = decimatedMesh[(i+1)].idx();
-            m1.faces[face_number].f2 = decimatedMesh[(i+2)].idx();
+        if (i % 3 == 0) {
+            int face_number = (i / 3);
+            m1.faces[face_number].f0 = i;
+            m1.faces[face_number].f1 = i+1;
+            m1.faces[face_number].f2 = i+2;
 
             MyMesh::Normal n2 = mesh.normal(decimatedMesh[(i+1)]);
             MyMesh::Normal n3 = mesh.normal(decimatedMesh[(i+2)]);
@@ -1148,6 +1186,14 @@ void TopStoc::calculateHausdorff(double sampling_density_user) {
 
     writeToConsole (QString::number( stats.mean_dist ), 7);
     writeToConsole (QString::number( stats.max_dist ), 8);
+
+    minError = me1.min_error;
+    maxError = me1.max_error;
+    meanError = me1.mean_error;
+    if (fe != NULL) {
+        free_face_error(fe);
+    }
+    fe = me1.fe;
 
     free(m1.vertices);
     free(m1.normals);
@@ -1235,7 +1281,7 @@ void TopStoc::deleteFaces() {
 
 void TopStoc::test () {
 
-    std::cout << "\n-Test Button START-" << std::endl;
+    std::cout << "\n-Test Button START-\n" << std::endl;
 
     time_t timeToken0, timeToken1;
     double difTime;
@@ -1245,19 +1291,25 @@ void TopStoc::test () {
     loops.pairing(this->mesh);
     loops.findBoundaries(this->mesh);
 
-    loops.meshInside(this->mesh);
-    loops.test(this->mesh);
-    tetrahedrsTris = loops.test2(this->mesh);
+    tetrahedrsTris = loops.meshInsideAndConvexHull(this->mesh);
+//    tetrahedrsTris = loops.test_function(this->mesh);
 
     timeToken1 = clock();
     difTime = difftime(timeToken0, timeToken1)/CLOCKS_PER_SEC;
-    std::cout << "t: " << difTime << "\n" << std::endl;
 
     std::cout << "\n-Test Button END-" << std::endl;
+    std::cout << "Time: " << difTime << "\n" << std::endl;
 }
 
 /* Random Stuff
 
+//    loops.findHandleLoops(this->mesh);
+//    loops.findTunnelLoops(this->mesh);
+
+//    std::cout << "g :" << loops.getGenus() << std::endl;
+//    std::cout << "b0:" << loops.getBetti(0) << std::endl;
+//    std::cout << "b1:" << loops.getBetti(1) << std::endl;
+//    std::cout << "b2:" << loops.getBetti(2) << std::endl;
 
 //    BoundingBox bb;
 //    bb.setMinPoint( 0.0f, 0.0f, 0.0f );

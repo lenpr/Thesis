@@ -56,7 +56,7 @@ public:
     void invertNormals();
 
     void drawMesh(bool vertexWeights, bool remeshedRegions);
-    void drawDecimatedMesh(bool vertexWeights);
+    void drawDecimatedMesh(bool vertexWeights, bool hausdorffDistance);
     void drawSamplAndControlPoints (bool sampledVertices, bool controlPoints, int boundaries, int loops);
 
     void filtrate();
@@ -89,7 +89,8 @@ private:
 	int meshStatus;
     int numberSelectedTriangles;
 
-    // Debug
+    face_error *fe;
+    double minError, maxError, meanError;
     std::vector< std::set<int> > tetrahedrsTris;
 };
 

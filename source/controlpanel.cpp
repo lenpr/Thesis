@@ -5,7 +5,8 @@
 ControlPanel::ControlPanel(QWidget *parent) :
     QWidget(parent),
 		ui(new Ui::ControlPanel) {
-	ui->setupUi(this);
+
+    ui->setupUi(this);
 
 	// init of ControlPanel
 	//---
@@ -179,6 +180,11 @@ void ControlPanel::on_buttonRunSampling_clicked () {
 	if ( ui->checkBoxAdaptivity->isChecked() )
 		adaptivity = ui->spinBoxAdaptivity->value();
 	emit runsampling (adaptivity, subsetTargetSize);
+}
+
+void ControlPanel::on_buttonTurntable_clicked()
+{
+    emit turntable();
 }
 
 void ControlPanel::startConsole () {
@@ -559,8 +565,4 @@ void ControlPanel::on_buttonNextLoop_clicked() {
     if ( showLoopNr > (1+loops) )
         showLoopNr = 1;
     emit commitVisualOptions(2);
-}
-
-void ControlPanel::on_buttonTurntable_clicked() {
-    turntable();
 }

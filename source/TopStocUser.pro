@@ -14,6 +14,8 @@ TEMPLATE = app
 
 DEFINES += TETLIBRARY # notwendig damit tetgen nicht eigene mein baut
 
+#ICON = icons.icns # kann benutzt werden wenn mit qmake, ansonsten händisch
+
 SOURCES += main.cpp\
         mainwidget.cpp \
     viewer.cpp \

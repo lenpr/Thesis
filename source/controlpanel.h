@@ -94,7 +94,7 @@ signals:
 
 	void runremeshing (const QString& mode);
 
-    void visualization(	int drawingMode, bool vertexWeights, bool sampledVertices, bool controlPoints, bool remeshedRegions, bool decimatedMesh, bool displayUpdate, int showBoundaries, bool showHausdroff);
+    void visualization(	int drawingMode, bool vertexWeights, bool sampledVertices, bool controlPoints, bool remeshedRegions, bool decimatedMesh, bool displayUpdate, int showBoundaries, bool showHausdorff);
     void interaction( interactionVariables options );
     void invertNormals();
     void hausdorff( double samplingDensityUser);

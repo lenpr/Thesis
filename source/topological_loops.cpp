@@ -433,7 +433,7 @@ void topological_loops::triangulateBd(MyMesh &mesh, int bdIdx) {
     }
 }
 
-void topological_loops::meshInside(MyMesh &mesh) {
+std::vector< std::set<int> > topological_loops::meshInsideAndConvexHull(MyMesh &mesh) {
 
     OpenMesh::IO::write_mesh(mesh, "tetrahedra_surface.off");
 
@@ -443,29 +443,26 @@ void topological_loops::meshInside(MyMesh &mesh) {
     if (!tetin_okay)
         std::cout << "Couldn't load surface mesh into tetgen!" << std::endl;
 
-    tetrahedralize("Y", &tetin, NULL);
 
-    tetgenbehavior b;
     // the Y forces the programm to respect the original edges, p specifies input as PLC
     // the M prohibits coplanar merging of facets
-    b.parse_commandline((char *)"pYM");
-//    b.parse_commandline((char *)"Y");
-    strcpy(b.outfilename, "tet");
-    //    b.quiet = 0;
-    //    b.verbose = 5;
-    b.quiet = 1;
-    b.verbose = 0;
-    b.facesout = 1;
-    b.edgesout = 2; // 0: don't output edges, 1: output subsegments only, >1: output all edges
+    tetgenbehavior bInside, bOutside;
+    bInside.parse_commandline((char *)"pYM");
+    strcpy(bInside.outfilename, "tetrahedra_inside");
+    bInside.quiet = 1;      // b.quiet = 0;
+    bInside.verbose = 0;    // b.verbose = 5;
+    bInside.facesout = 1;
+    bInside.edgesout = 2;   // 0: don't output edges, 1: output subsegments only, >1: output all edges
+    tetrahedralize(&bInside, &tetin, &meshI);
+//    tetrahedralize(&bInside, &tetin, NULL); // for writing to disk
 
-    std::cout << "AA" << std::endl;
-    tetrahedralize(&b, &tetin, &meshI);
-//    tetrahedralize("Y", &tetin, NULL);
-    std::cout << "1: " << meshI.numberoffacets << std::endl;
-    std::cout << "1: " << meshI.numberofpoints << std::endl;
-    std::cout << "1: " << meshI.numberoftetrahedra << std::endl;
-    std::cout << "1: " << meshI.numberoftrifaces << std::endl;
-    return;
+    bOutside.parse_commandline((char *)"Y");
+    strcpy(bOutside.outfilename, "tetrahedra_convexhull");
+    bOutside.quiet = 1;
+    bOutside.verbose = 0;
+    bOutside.facesout = 1;
+    tetrahedralize(&bOutside, &tetin, &meshO);
+//    tetrahedralize(&bOutside, &tetin, NULL); // for writing to disk
 
     // if the surface is not ready, put it through the gears
     if ( bettiNumber[1] == 0 && bettiNumber[2] == 0) {
@@ -473,31 +470,31 @@ void topological_loops::meshInside(MyMesh &mesh) {
         init(mesh);
         pairing(mesh);
         findBoundaries(mesh);
-        meshInside(mesh);
-        return;
+        meshInsideAndConvexHull(mesh);
+//        return;
     } else if ( bettiNumber[1] == 0 ) {
         std::cout << "Mesh has no handles or tunnels!" << std::endl;
 //        return;
     } else if ( hasBoundary ) {
         std::cout << "Mesh still has Boundaries!" << std::endl;
-        return;
+//        return;
     }
 
     // Sanity check, although I am not sure this has to hold for every simplicial complex.
-    int eulerChNew, eulerChOld, eulerChDiff;
-    eulerChOld = mesh.n_vertices() - mesh.n_edges() + mesh.n_faces();
-    eulerChNew = meshI.numberofpoints - meshI.numberofedges + meshI.numberoftrifaces - meshI.numberoftetrahedra;
-    eulerChDiff = eulerChNew - eulerChOld;
-    if ( eulerChNew != 0 ) {
-        std::cout << "\n---\nEuler Characteristic Changed: " << eulerChDiff << std::endl;
-        std::cout << "|V| = " << meshI.numberofpoints << " - " << mesh.n_vertices() << std::endl
-                  << "|E| = " << meshI.numberofedges << " - " << mesh.n_edges() << std::endl
-                  << "|F| = " << meshI.numberoftrifaces << " - " << mesh.n_faces() << std::endl
-                  << "|T| = " << meshI.numberoftetrahedra << std::endl;
-        std::cout << "Euler old:" << eulerChOld << std::endl;
-        std::cout << "Euler new:" << eulerChNew << std::endl;
-        std::cout << "---\n" << std::endl;
-    }
+//    int eulerChNew, eulerChOld, eulerChDiff;
+//    eulerChOld = mesh.n_vertices() - mesh.n_edges() + mesh.n_faces();
+//    eulerChNew = meshI.numberofpoints - meshI.numberofedges + meshI.numberoftrifaces - meshI.numberoftetrahedra;
+//    eulerChDiff = eulerChNew - eulerChOld;
+//    if ( eulerChNew != 0 ) {
+//        std::cout << "\n---\nEuler Characteristic Changed: " << eulerChDiff << std::endl;
+//        std::cout << "|V| = " << meshI.numberofpoints << " - " << mesh.n_vertices() << std::endl
+//                  << "|E| = " << meshI.numberofedges << " - " << mesh.n_edges() << std::endl
+//                  << "|F| = " << meshI.numberoftrifaces << " - " << mesh.n_faces() << std::endl
+//                  << "|T| = " << meshI.numberoftetrahedra << std::endl;
+//        std::cout << "Euler old:" << eulerChOld << std::endl;
+//        std::cout << "Euler new:" << eulerChNew << std::endl;
+//        std::cout << "---\n" << std::endl;
+//    }
 
     bettiNumberInside[0] = bettiNumber[0];
     bettiNumberInside[1] = bettiNumber[1];
@@ -509,15 +506,16 @@ void topological_loops::meshInside(MyMesh &mesh) {
     const int tetrahedraVertices = meshI.numberofpoints;
     const int tetrahedraEdges = meshI.numberofedges;
     const int tetrahedraFaces = meshI.numberoftrifaces;
+    const int tetrahedraElements = meshI.numberoftetrahedra;
     const MyMesh::VertexHandle vhNone;
     const MyMesh::EdgeHandle ehNone;
     const MyMesh::FaceHandle fhNone;
 
     // init inside mesh
     // set vertices in accordance to OpenMesh
-    vertices.clear();
-    verticesUnpaired.clear();
-    verticesNew.clear();
+    verticesIn.clear();
+    verticesUnpairedIn.clear();
+    verticesNewIn.clear();
 
     for (int i = 0; i < surfaceVertices; ++i) {
         tgV currentVertex;
@@ -531,12 +529,12 @@ void topological_loops::meshInside(MyMesh &mesh) {
         if ( !eh.is_valid() ) {
             //  these ones will not get paired
             currentVertex.isPaired = false;
-            verticesUnpaired.push_back( currentVertex );
+            verticesUnpairedIn.push_back( currentVertex );
         } else {
             currentVertex.isPaired = true;
             currentVertex.eh_om = eh;
         }
-        vertices.push_back( currentVertex );
+        verticesIn.push_back( currentVertex );
     }
     for (int i = surfaceVertices; i < tetrahedraVertices; ++i) {
         tgV currentVertex;
@@ -549,17 +547,17 @@ void topological_loops::meshInside(MyMesh &mesh) {
         currentVertex.vh_om = vhNone;
 
 //        cout_tg( currentVertex );
-        vertices.push_back( currentVertex );
-        verticesUnpaired.push_back( currentVertex );
-        verticesNew.push_back( currentVertex );
+        verticesIn.push_back( currentVertex );
+        verticesUnpairedIn.push_back( currentVertex );
+        verticesNewIn.push_back( currentVertex );
     }
     // sanity check
-    if ( (int)verticesUnpaired.size()-bettiNumber[0] != tetrahedraVertices-surfaceVertices ) {
-        std::cout << "Vertices got lost, difference: " << verticesUnpaired.size()-bettiNumber[0]-tetrahedraVertices-surfaceVertices << std::endl;
-        std::cout << "Found Vertices: " << vertices.size() << std::endl;
+    if ( (int)verticesUnpairedIn.size()-bettiNumber[0] != tetrahedraVertices-surfaceVertices ) {
+        std::cout << "Vertices got lost, difference: " << verticesUnpairedIn.size()-bettiNumber[0]-tetrahedraVertices-surfaceVertices << std::endl;
+        std::cout << "Found Vertices: " << verticesIn.size() << std::endl;
         std::cout << "Tetrahedra |V|: " << meshI.numberofpoints << std::endl;
         std::cout << "Old vertices  : " << surfaceVertices << std::endl;
-        std::cout << "New vertices  : " << verticesUnpaired.size() << " - " << bettiNumber[0] << std::endl;
+        std::cout << "New vertices  : " << verticesUnpairedIn.size() << " - " << bettiNumber[0] << std::endl;
     }
     // Debug
 //    for (int i=0; i<mesh.n_vertices(); ++i) {
@@ -580,9 +578,9 @@ void topological_loops::meshInside(MyMesh &mesh) {
     // set vertices in accordance to OpenMesh
     int edgesInside = 0;
     int edgesSurface = 0;
-    edges.clear();
+    edgesIn.clear();
     edgesUnpaired.clear();
-    edgesNew.clear();
+    edgesNewIn.clear();
     // to find edges later on and translate them
     eh_OMtoTG ehDictionary;
     int oldEdgesIdx = 0;
@@ -609,7 +607,7 @@ void topological_loops::meshInside(MyMesh &mesh) {
             ++newEdgesIdx;
 
             edgesUnpaired.push_back( currentEdge );
-            edgesNew.push_back( currentEdge );
+            edgesNewIn.push_back( currentEdge );
             ++edgesInside;
         } else {
             // check if old or new
@@ -630,7 +628,7 @@ void topological_loops::meshInside(MyMesh &mesh) {
                 ++newEdgesIdx;
 
                 edgesUnpaired.push_back( currentEdge );
-                edgesNew.push_back( currentEdge );
+                edgesNewIn.push_back( currentEdge );
                 ++edgesInside;
             } else {
                 // old edge on the surface
@@ -669,7 +667,7 @@ void topological_loops::meshInside(MyMesh &mesh) {
                 }
             }
         }
-        edges.push_back( currentEdge );
+        edgesIn.push_back( currentEdge );
     }
     // Sanity check
     if ((oldEdgesIdx!=surfaceEdges) || (newEdgesIdx-tetrahedraEdges!=tetrahedraEdges-surfaceEdges) ) {
@@ -693,10 +691,10 @@ void topological_loops::meshInside(MyMesh &mesh) {
         std::cout << "Edges in base mesh : " << surfaceEdges << std::endl;
         std::cout << "Edges in dictionary: " << ehDictionary.size() << std::endl;
     }
-    if ( edgesUnpaired.size() != (edgesNew.size()+bettiNumber[1]) ) {
-        std::cout << "Unpaired edges got lost, dif.: " << edgesUnpaired.size()-(edgesNew.size()+bettiNumber[1]) << std::endl;
+    if ( edgesUnpaired.size() != (edgesNewIn.size()+bettiNumber[1]) ) {
+        std::cout << "Unpaired edges got lost, dif.: " << edgesUnpaired.size()-(edgesNewIn.size()+bettiNumber[1]) << std::endl;
         std::cout << "Found unpaired edges: " << edgesUnpaired.size() << std::endl;
-        std::cout << "New (inside) edges  : " << edgesNew.size() << std::endl;
+        std::cout << "New (inside) edges  : " << edgesNewIn.size() << std::endl;
         std::cout << "Old unpaired edges  : " << bettiNumber[1] << std::endl;
     }
     // Debug
@@ -713,9 +711,9 @@ void topological_loops::meshInside(MyMesh &mesh) {
     int missed = 0;
     int notPaired = 0;
 
-    for (int i=0; i<(int)vertices.size(); ++i) {
+    for (int i=0; i<(int)verticesIn.size(); ++i) {
 
-        tgV currentVertex = vertices.at(i);
+        tgV currentVertex = verticesIn.at(i);
         if (currentVertex.isPaired == true) {
 
             MyMesh::EdgeHandle partner = currentVertex.eh_om;
@@ -724,7 +722,7 @@ void topological_loops::meshInside(MyMesh &mesh) {
 
             if ( dictionary_it != ehNotFound ) {
                 tgIdx = dictionary_it->second;
-                (vertices.at(i)).eh_tg = tgIdx;
+                (verticesIn.at(i)).eh_tg = tgIdx;
                 ++pairSet;
             } else {
                 ++missed;
@@ -746,15 +744,15 @@ void topological_loops::meshInside(MyMesh &mesh) {
     // faces
     // set faces in accordance to OpenMesh
     // edgesNew would be way faster but leads to problems with some meshes
-    std::vector<tgE> edgeList = edgesNew;
+    std::vector<tgE> edgeList = edgesNewIn;
     bool noMoreFallBack = false;
     FallBackCase:
     int facesInside = 0;
     int facesSurface = 0;
     int oldUnpaired = 0;
-    faces.clear();
+    facesIn.clear();
     facesUnpaired.clear();
-    facesNew.clear();
+    facesNewIn.clear();
     fh_OMtoTG fhDictionary;
 
     for (int i = 0; i < tetrahedraFaces; ++i) {
@@ -811,13 +809,13 @@ void topological_loops::meshInside(MyMesh &mesh) {
             }
             if ( !(e0 && e1 && e2) && !noMoreFallBack ) {
                 std::cout << "Bad geometry, fallback (will take longer)!" << std::endl;
-                edgeList = edges;
+                edgeList = edgesIn;
                 noMoreFallBack = true;
                 goto FallBackCase;
             }
 
             facesUnpaired.push_back( currentFace );
-            facesNew.push_back( currentFace );
+            facesNewIn.push_back( currentFace );
             ++facesInside;
         } else {
             // could be a new face with existing vertices or partially inside
@@ -970,17 +968,17 @@ void topological_loops::meshInside(MyMesh &mesh) {
                 }
                 if ( !(e0 && e1 && e2) && !noMoreFallBack ) {
                     std::cout << "Bad geometry, fallback (will take longer)!" << std::endl;
-                    edgeList = edges;
+                    edgeList = edgesIn;
                     noMoreFallBack = true;
                     goto FallBackCase;
                 }
 
                 facesUnpaired.push_back( currentFace );
-                facesNew.push_back( currentFace );
+                facesNewIn.push_back( currentFace );
                 ++facesInside;
             }
         }
-        faces.push_back( currentFace );
+        facesIn.push_back( currentFace );
     }
     // Debug
 //    for (int i=0; i<surfaceFaces; ++i) {
@@ -1006,9 +1004,9 @@ void topological_loops::meshInside(MyMesh &mesh) {
         std::cout << "Old unpaired: " << oldUnpaired << std::endl;
         std::cout << "Betti[2]    : " << bettiNumber[2] << std::endl;
     }
-    if ( facesInside-facesNew.size() != 0 ) {
+    if ( facesInside-facesNewIn.size() != 0 ) {
         std::cout << "Faces inside   : " << facesInside << std::endl;
-        std::cout << "New faces found: " << facesNew.size() << std::endl;
+        std::cout << "New faces found: " << facesNewIn.size() << std::endl;
     }
 
     // assign paired partners to the edges
@@ -1018,9 +1016,9 @@ void topological_loops::meshInside(MyMesh &mesh) {
     missed = 0;
     int negEdgesOld = 0;
 
-    for (int i=0; i<(int)edges.size(); ++i) {
+    for (int i=0; i<(int)edgesIn.size(); ++i) {
 
-        tgE currentEdge = edges.at(i);
+        tgE currentEdge = edgesIn.at(i);
         if ( (currentEdge.isPaired == true) && currentEdge.positive ) {
 
             MyMesh::FaceHandle partner = currentEdge.fh_om;
@@ -1029,7 +1027,7 @@ void topological_loops::meshInside(MyMesh &mesh) {
 
             if ( dictionary_it != fhNotFound ) {
                 tgIdx = (*dictionary_it).second;
-                (edges.at(i)).fh_tg = tgIdx;
+                (edgesIn.at(i)).fh_tg = tgIdx;
                 ++pairSet;
             } else {
                 ++missed;
@@ -1044,18 +1042,98 @@ void topological_loops::meshInside(MyMesh &mesh) {
         }
     }
     // Sanity check
-    if ((missed!=0) || (bettiNumber[1]+(int)edgesNew.size() != notPaired)) {
+    if ((missed!=0) || (bettiNumber[1]+(int)edgesNewIn.size() != notPaired)) {
         std::cout << "Unable to pair edges: " << missed << std::endl;
         std::cout << "Paired edges found  : " << pairSet << std::endl;
-        std::cout << "Betti[1] + new edges: " << bettiNumber[1]+edgesNew.size() << std::endl;
+        std::cout << "Betti[1] + new edges: " << bettiNumber[1]+edgesNewIn.size() << std::endl;
         std::cout << "Not paired          : " << notPaired << std::endl;
         std::cout << "Negative edges: " << negEdgesOld << std::endl;
         std::cout << "Tetrahedra: " << tetrahedraEdges << std::endl;
         std::cout << "Base mesh : " << surfaceEdges << std::endl;
     }
+
+    // --- match the elements of the convex hull
+    std::cout << "... creating convex hull data." << std::endl;
+
+    // Debug
+    std::cout << "Simplicials of the Tetrahedrization: " << std::endl;
+    std::cout << "Vertices In   : " << meshI.numberofpoints << std::endl;
+    std::cout << "Tetrahedra In : " << meshI.numberoftetrahedra << std::endl;
+    std::cout << "Faces In      : " << meshI.numberoftrifaces << std::endl;
+    std::cout << "Edges In      : " << meshI.numberofedges << std::endl;
+    std::cout << "Vertices Out  : " << meshO.numberofpoints << std::endl;
+    std::cout << "Tetrahedra Out: " << meshO.numberoftetrahedra << std::endl;
+    std::cout << "Faces Out     : " << meshO.numberoftrifaces << std::endl;
+    std::cout << "Edges Out     : " << meshO.numberofedges << std::endl;
+
+    const int convexHullFaces = meshO.numberoftrifaces;
+
+    std::set< std::set<int> > setInsideFaces;
+    for (int i = 0; i < tetrahedraElements; ++i) {
+
+        std::set<int> tetFace;
+        int face[3];
+        face[0] = meshI.tetrahedronlist[4*i+0];
+        face[1] = meshI.tetrahedronlist[4*i+1];
+        face[2] = meshI.tetrahedronlist[4*i+2];
+        tetFace.insert(face, face+3);
+        setInsideFaces.insert( tetFace );
+        tetFace.clear();
+        face[0] = meshI.tetrahedronlist[4*i+0];
+        face[1] = meshI.tetrahedronlist[4*i+1];
+        face[2] = meshI.tetrahedronlist[4*i+3];
+        tetFace.insert(face, face+3);
+        setInsideFaces.insert( tetFace );
+        tetFace.clear();
+        face[0] = meshI.tetrahedronlist[4*i+0];
+        face[1] = meshI.tetrahedronlist[4*i+2];
+        face[2] = meshI.tetrahedronlist[4*i+3];
+        tetFace.insert(face, face+3);
+        setInsideFaces.insert( tetFace );
+        tetFace.clear();
+        face[0] = meshI.tetrahedronlist[4*i+1];
+        face[1] = meshI.tetrahedronlist[4*i+2];
+        face[2] = meshI.tetrahedronlist[4*i+3];
+        tetFace.insert(face, face+3);
+        setInsideFaces.insert( tetFace );
+    }
+    const std::set< std::set<int> >::iterator fhInsideNotFound = setInsideFaces.end();
+    std::set< std::set<int> >::iterator tetFaces_it;
+    int newface = 0;
+    int oldface = 0;
+    std::vector< std::set<int> > tris;
+    tris.clear();
+
+    for (int i = 0; i < convexHullFaces; ++i) {
+
+        std::set<int> chFace;
+        int face[3];
+        face[0] = meshO.trifacelist[3*i+0];
+        face[1] = meshO.trifacelist[3*i+1];
+        face[2] = meshO.trifacelist[3*i+2];
+        chFace.insert(face, face+3);
+
+        tetFaces_it = setInsideFaces.find( chFace );
+        if (tetFaces_it != fhInsideNotFound) {
+            ++newface;
+        } else {
+            ++oldface;
+        }
+
+        tris.push_back( chFace );
+        chFace.clear();
+    }
+
+    std::cout << "Tetrahedra faces: " << setInsideFaces.size() << std::endl;
+    std::cout << "Faces surface   : " << surfaceFaces << std::endl;
+    std::cout << "Faces inside    : " << facesNewIn.size()  << std::endl;
+    std::cout << "Old faces: " << oldface << std::endl;
+    std::cout << "New faces: " << newface << std::endl;
+
+    return tris;
 }
 
-void topological_loops::test(MyMesh &mesh) {
+void topological_loops::findHandleLoops(MyMesh &mesh) {
 
     std::cout << "-> start searching handle loops" << std::endl;
 
@@ -1065,14 +1143,14 @@ void topological_loops::test(MyMesh &mesh) {
         std::cout << "B0: " << bettiNumber[0] << std::endl;
         std::cout << "B1: " << bettiNumber[1] << std::endl;
         std::cout << "B2: " << bettiNumber[2] << std::endl;
-        std::cout << "new Vertices: " << verticesNew.size() << " / "<< vertices.size()-mesh.n_vertices() << std::endl;
-        std::cout << "new Edges   : " << edgesNew.size() << " / "<< edges.size()-mesh.n_edges() << std::endl;
-        std::cout << "new Faces   : " << facesNew.size() << " / "<< faces.size()-mesh.n_faces() << std::endl;
+        std::cout << "new Vertices: " << verticesNewIn.size() << " / "<< verticesIn.size()-mesh.n_vertices() << std::endl;
+        std::cout << "new Edges   : " << edgesNewIn.size() << " / "<< edgesIn.size()-mesh.n_edges() << std::endl;
+        std::cout << "new Faces   : " << facesNewIn.size() << " / "<< facesIn.size()-mesh.n_faces() << std::endl;
     }
 
     // Filtration of the inside, the vertices have been set in the tetrahedrization phase    
-    for (int i=0; i<(int)edgesNew.size(); ++i) {
-        tgE currentEdge = edgesNew.at(i);
+    for (int i=0; i<(int)edgesNewIn.size(); ++i) {
+        tgE currentEdge = edgesNewIn.at(i);
         int vh0 = currentEdge.vh0_tg;
         int vh1 = currentEdge.vh1_tg;
 
@@ -1094,8 +1172,8 @@ void topological_loops::test(MyMesh &mesh) {
         chainBoundary.insert(vh0);
         chainBoundary.insert(vh1);
 
-        int maxCountVertices = mesh.n_vertices()+verticesNew.size();
-        tgV youngestVertex = vertices.at(youngest);
+        int maxCountVertices = mesh.n_vertices()+verticesNewIn.size();
+        tgV youngestVertex = verticesIn.at(youngest);
 //        cout_tg(youngestVertex);
 
         while ( (youngestVertex.isPaired) && !chainBoundary.empty() ) {
@@ -1106,7 +1184,7 @@ void topological_loops::test(MyMesh &mesh) {
                 return;
             }
 
-            tgE pairedEdge = edges.at(eh);
+            tgE pairedEdge = edgesIn.at(eh);
 
             int vhPair0 = pairedEdge.vh0_tg;
             int vhPair1 = pairedEdge.vh1_tg;
@@ -1136,7 +1214,7 @@ void topological_loops::test(MyMesh &mesh) {
                 if (youngest == -1)
                     std::cout << "Couldn't find a younger simplex in the chain." << std::endl;
                 else
-                    youngestVertex = vertices.at(youngest);
+                    youngestVertex = verticesIn.at(youngest);
 
                 --maxCountVertices;
                 if (maxCountVertices==0) {                      
@@ -1146,15 +1224,15 @@ void topological_loops::test(MyMesh &mesh) {
             }
         }
         if ( !chainBoundary.empty() ) {
-            (edges.at(currentEdge.eh_tg)).positive = false;
-            (edges.at(currentEdge.eh_tg)).isPaired = false;
+            (edgesIn.at(currentEdge.eh_tg)).positive = false;
+            (edgesIn.at(currentEdge.eh_tg)).isPaired = false;
 
-            (vertices.at(youngestVertex.vh_tg)).eh_tg = currentEdge.eh_tg;
-            (vertices.at(youngestVertex.vh_tg)).isPaired = true;
+            (verticesIn.at(youngestVertex.vh_tg)).eh_tg = currentEdge.eh_tg;
+            (verticesIn.at(youngestVertex.vh_tg)).isPaired = true;
             --bettiNumberInside[0];
         } else {
-            (edges.at(currentEdge.eh_tg)).positive = true;
-            (edges.at(currentEdge.eh_tg)).isPaired = false;
+            (edgesIn.at(currentEdge.eh_tg)).positive = true;
+            (edgesIn.at(currentEdge.eh_tg)).isPaired = false;
             ++bettiNumberInside[1];
         }
     }
@@ -1182,11 +1260,11 @@ void topological_loops::test(MyMesh &mesh) {
     int maxHandles = bettiNumber[1]/2;
     std::cout << "Max. number of handle loops: " << maxHandles << std::endl;
 
-    for (int i=0; i<(int)facesNew.size(); ++i) {
+    for (int i=0; i<(int)facesNewIn.size(); ++i) {
         // fallback for problems due to the mesh
         prob:
 
-        tgF currentFace = facesNew.at(i);
+        tgF currentFace = facesNewIn.at(i);
         int eh0 = currentFace.eh0_tg;
         int eh1 = currentFace.eh1_tg;
         int eh2 = currentFace.eh2_tg;
@@ -1201,22 +1279,22 @@ void topological_loops::test(MyMesh &mesh) {
         int youngest = -1;
         // the offset tackles a really bad bug were I didn't realize that because of the mix-up
         // edge order (some new before old) the filtration pairs surface edges too soon!
-        int eh0Age = (edges.at(eh0)).age;
-        int eh1Age = (edges.at(eh1)).age;
-        int eh2Age = (edges.at(eh2)).age;
+        int eh0Age = (edgesIn.at(eh0)).age;
+        int eh1Age = (edgesIn.at(eh1)).age;
+        int eh2Age = (edgesIn.at(eh2)).age;
 
-        if ( (eh0Age>eh1Age) && (eh0Age>eh2Age) && (edges.at(eh0)).positive)
+        if ( (eh0Age>eh1Age) && (eh0Age>eh2Age) && (edgesIn.at(eh0)).positive)
             youngest = eh0;
-        else if ( (eh1Age>eh2Age) && (edges.at(eh1)).positive )
+        else if ( (eh1Age>eh2Age) && (edgesIn.at(eh1)).positive )
             youngest = eh1;
-        else if (edges.at(eh2).positive)
+        else if (edgesIn.at(eh2).positive)
             youngest = eh2;
         else {
             std::cout << "No youngest positive edge at face: "<< currentFace.fh_tg << std::endl;
             ++i; goto prob;
         }
 
-        youngestEdge = edges.at(youngest);
+        youngestEdge = edgesIn.at(youngest);
 
         std::set<int> chainBoundary;
         std::set<int> handleLoops;
@@ -1231,13 +1309,13 @@ void topological_loops::test(MyMesh &mesh) {
         handleLoops.insert(eh1);
         handleLoops.insert(eh2);
 
-        int maxCountEdges = mesh.n_edges()+edgesNew.size();
+        int maxCountEdges = mesh.n_edges()+edgesNewIn.size();
 
         // Debug
         int unpaired = 0;
         int unpairedSurface = 0;
-        for (int j=0; j<(int)edges.size(); ++j) {
-            tgE current = edges.at(j);
+        for (int j=0; j<(int)edgesIn.size(); ++j) {
+            tgE current = edgesIn.at(j);
             if (current.positive && !current.isPaired) {
                 ++unpaired;
                 if (current.surfaceEdge)
@@ -1257,7 +1335,7 @@ void topological_loops::test(MyMesh &mesh) {
                 return;
             }
 
-            tgF pairedFace = faces.at(fh);
+            tgF pairedFace = facesIn.at(fh);
             int ehPair0 = pairedFace.eh0_tg;
             int ehPair1 = pairedFace.eh1_tg;
             int ehPair2 = pairedFace.eh2_tg;
@@ -1292,11 +1370,11 @@ void topological_loops::test(MyMesh &mesh) {
                 youngest = -1;
                 int youngestAge = -1;
                 for (set_it = chainBoundary.begin(); set_it != chainBoundary.end(); ++set_it) {
-                    if ( (( (edges.at(*set_it)).age )>youngestAge) && (edges.at(*set_it)).positive ) {
-                        youngestAge = (edges.at(*set_it)).age;
+                    if ( (( (edgesIn.at(*set_it)).age )>youngestAge) && (edgesIn.at(*set_it)).positive ) {
+                        youngestAge = (edgesIn.at(*set_it)).age;
                         youngest = (*set_it);
                     }
-                    tgE e = edges.at( (*set_it) );
+                    tgE e = edgesIn.at( (*set_it) );
                     if (!e.surfaceEdge)
                         allSurfaceEdges = false;
                 }
@@ -1312,7 +1390,7 @@ void topological_loops::test(MyMesh &mesh) {
                 if (youngest == -1)
                     std::cout << "Couldn't find a younger simplex in the chain." << std::endl;
                 else
-                    youngestEdge = edges.at(youngest);
+                    youngestEdge = edgesIn.at(youngest);
 
                 // Debug, if there are cyclic dependencies in the filtration
 //                if (maxCountEdges<6) {
@@ -1344,23 +1422,23 @@ void topological_loops::test(MyMesh &mesh) {
 //            cout_tg( currentFace );
 //            cout_tg( edges.at(youngestEdge.eh_tg) );
 
-            (facesNew.at(i)).positive = false;
-            (facesNew.at(i)).isPaired = false;
-            faces.at(currentFace.fh_tg).positive = false;
-            faces.at(currentFace.fh_tg).isPaired = false;
+            (facesNewIn.at(i)).positive = false;
+            (facesNewIn.at(i)).isPaired = false;
+            facesIn.at(currentFace.fh_tg).positive = false;
+            facesIn.at(currentFace.fh_tg).isPaired = false;
 
-            (edges.at(youngestEdge.eh_tg)).fh_tg = currentFace.fh_tg;
-            (edges.at(youngestEdge.eh_tg)).isPaired = true;
+            (edgesIn.at(youngestEdge.eh_tg)).fh_tg = currentFace.fh_tg;
+            (edgesIn.at(youngestEdge.eh_tg)).isPaired = true;
             --bettiNumberInside[1];
 
-            if ((edges.at(youngestEdge.eh_tg)).surfaceEdge) {
+            if ((edgesIn.at(youngestEdge.eh_tg)).surfaceEdge) {
                 std::cout << "--> Found a surface loop: "<< maxHandles <<", of size: " << handleLoopsShortest.size() << std::endl;
                 std::set<int>::iterator set_it;
                 // set the edge to handle loop generating
                 mesh.data(youngestEdge.eh_om).setEdgeCircle(-2);
                 for (set_it = handleLoopsShortest.begin(); set_it != handleLoopsShortest.end(); ++set_it) {
                     // Visualize them
-                    tgE ce = edges.at((*set_it));
+                    tgE ce = edgesIn.at((*set_it));
                     MyMesh::EdgeHandle eh = MyMesh::EdgeHandle(ce.eh_om);
                     if ( eh.is_valid() ) {
                         mesh.data(eh).setEdgeCircle(2);
@@ -1368,25 +1446,53 @@ void topological_loops::test(MyMesh &mesh) {
                 }
                 --maxHandles;
                 if (maxHandles == 0) {
-                    i = facesNew.size();
+                    i = facesNewIn.size();
                     std::cout << "All handles found!" << std::endl;
                 }
             }
         } else {
             // positive face
-            (facesNew.at(i)).positive = true;
-            (facesNew.at(i)).isPaired = false;
-            faces.at(currentFace.fh_tg).positive = true;
-            faces.at(currentFace.fh_tg).isPaired = false;
+            (facesNewIn.at(i)).positive = true;
+            (facesNewIn.at(i)).isPaired = false;
+            facesIn.at(currentFace.fh_tg).positive = true;
+            facesIn.at(currentFace.fh_tg).isPaired = false;
             ++bettiNumberInside[2];
         }
     }
     // end of filtration
 }
 
-std::vector< std::set<int> > topological_loops::test2(MyMesh &mesh){
+void topological_loops::findTunnelLoops(MyMesh &mesh) {
+
+    const MyMesh::VertexHandle vhNone;
+    const MyMesh::EdgeHandle ehNone;
+    const MyMesh::FaceHandle fhNone;
+
+    tgV currentVertex;
+
+
+}
+
+std::vector< std::set<int> > topological_loops::test_function(MyMesh &mesh){
+
+    // Output the found generating edges
+    for (MyMesh::EdgeIter e_it=mesh.edges_begin(); e_it!=mesh.edges_end(); ++e_it) {
+        if (mesh.data(e_it.handle()).getEdgeCircle() == -1) {
+
+            MyMesh::HalfedgeHandle heh = mesh.halfedge_handle(e_it.handle(),0);
+            MyMesh::VertexHandle vh0 = mesh.to_vertex_handle(heh);
+            MyMesh::VertexHandle vh1 = mesh.from_vertex_handle(heh);
+
+            std::cout << "Generating edge: " << vh0 << " - " << vh1 << std::endl;
+        }
+    }
+
+
 
     std::set< std::set<int> > setInsideFaces;
+    std::vector< std::set<int> > tris;
+//    return tris;
+    // Debug - only output if necessary
 
     std::cout << "- Tetrahedra faces -" << std::endl;
     for (int i = 0; i < meshI.numberoftetrahedra; i++) {
@@ -1424,16 +1530,15 @@ std::vector< std::set<int> > topological_loops::test2(MyMesh &mesh){
     std::cout << "Total: " << setInsideFaces.size() << std::endl;
     std::cout << "---\nSorted:" << std::endl;
 
-    int i=0;
-    std::vector< std::set<int> > tris;
+    int idx=0;
     for (std::set< std::set<int> >::iterator itIF = setInsideFaces.begin(); itIF!=setInsideFaces.end(); ++itIF) {
         std::set<int> currentFace = *itIF;
-        std::cout << i << ".f:";
+        std::cout << idx << ".f:";
         for(std::set<int>::iterator it=currentFace.begin(); it!=currentFace.end(); ++it){
             std::cout << " " << *it;
         }
         std::cout << std::endl;
-        ++i;
+        ++idx;
 
         tris.push_back( *itIF );
     }

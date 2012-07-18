@@ -7,7 +7,7 @@ using namespace qglviewer;
 Viewer::Viewer() :
     topstoc(), drawingMode(0), drawList(0), vertexWeights(false), sampledVertices(false),
     controlPoints(false), remeshedRegions(false), decimatedMesh(false), displayUpdate(true),
-    showBoundaries(1), currentTri(-1), pickingEvent(false)
+    showHausdorff(false), showBoundaries(1), currentTri(-1), pickingEvent(false)
 {
     connect(&topstoc, SIGNAL(writeToConsole(QString, int)),
             this, SLOT(passToConsole(QString, int)));
@@ -83,7 +83,7 @@ void Viewer::keyPressEvent(QKeyEvent *k) {
 
     int keyboardcharIdx = k->key();
 //    QString keyboardchar = k->text();
-//    qDebug() << "Keyboard: " << keyboardchar << " - " << keyboardcharIdx;
+//    std::cout << "Keyboard: " << keyboardchar.toStdString() << " - " << keyboardcharIdx << std::endl;
     /* Numbers
         Reserved by libqglviewer: a, g, f, ?, s, h, esc, space, ent, c, arrows
         j = 74    + = 43    < = 60    ↑ = 16777235    del = 16777219
@@ -172,9 +172,10 @@ void Viewer::keyPressEvent(QKeyEvent *k) {
             writeToConsole( QString::number(currentValue), 12);
             return;
         case 16777236:
-            ++currentTri; break;
+            ++currentTri;
+            break;
         case 16777234:
-            if (currentTri!=0)
+            if (currentTri>0)
                 --currentTri;
             break;
         // ---
@@ -201,9 +202,6 @@ void Viewer::selectVertex(int x, int y, int mode) {
 }
 
 
-
-/* slots */
-
 void Viewer::loadModel (const QString& fileName) {
 
 	if (!topstoc.loadMeshFromFile (fileName.toStdString ())) {
@@ -219,6 +217,8 @@ void Viewer::loadModel (const QString& fileName) {
     Vec sceneMax = topstoc.bbox.getMaxPoint();
     setSceneBoundingBox(sceneMin, sceneMax);
 	camera()->showEntireScene();
+    defaultCameraPosition = camera()->position();
+    defaultCameraOrientation = camera()->orientation();
 
 	// generat vertex/face normals if needed
 	topstoc.initMesh();
@@ -277,6 +277,10 @@ void Viewer::updateDisplay() {
         return;
     }
 
+    // Points and Lines are not affected thus the highlighted stuff gets seen
+    glEnable(GL_POLYGON_OFFSET_FILL);
+    glPolygonOffset(1.0, 1.0);
+
     switch (drawingMode) {
 
     case DRAW_MODE_POINT:
@@ -306,7 +310,7 @@ void Viewer::updateDisplay() {
     }
 
     if (decimatedMesh)
-        topstoc.drawDecimatedMesh(vertexWeights);
+        topstoc.drawDecimatedMesh(vertexWeights, showHausdorff);
     else
         topstoc.drawMesh(vertexWeights, remeshedRegions);
     glEnd();
@@ -327,7 +331,9 @@ void Viewer::updateDisplay() {
         glDisable(GL_LIGHTING);
         glPointSize(3.0f);
         glBegin(GL_POINTS);
+
         topstoc.drawSamplAndControlPoints (sampledVertices, controlPoints, showBoundaries, currentTri);
+
         glEnd();
         glEnable (GL_LIGHTING);
     }
@@ -341,6 +347,8 @@ void Viewer::updateDisplay() {
         glDisable(GL_LIGHT0);
         break;
     }
+
+    glDisable(GL_POLYGON_OFFSET_FILL);
 
     glEndList();
     updateGL ();
@@ -369,14 +377,33 @@ void Viewer::interaction(interactionVariables currentOptions) {
     topstoc.options = currentOptions;
 }
 
-void Viewer::turntable() {
+void Viewer::turntable()
+{
+    if (camera()->frame()->isSpinning()) {
+        camera()->frame()->stopSpinning();
+        disconnect(camera()->frame(), SIGNAL(spun()), this, SLOT(turntableSpun()));
+    } else {
+        camera()->setOrientation(defaultCameraOrientation);
+        Vec p = defaultCameraPosition;
+        p[1] = topstoc.bbox.getMaxPoint()[1];
+        camera()->setPosition(p);
 
-    std::cout << "Turntable" << std::endl;
+        connect(camera()->frame(), SIGNAL(spun()), this, SLOT(turntableSpun()));
+        camera()->frame()->setSpinningQuaternion(Quaternion(Vec(0.0, 1.0, 0.0), -0.01));
+        camera()->frame()->startSpinning(5);
+    }
+}
 
-    // Hier muss der turntable-code rein
-    // camera zur Position der ersten Initialisierung und dann die Boundingbox noch oben hochgleiten
+void Viewer::turntableSpun()
+{
+    Vec p = camera()->position();
+    p[1] += (topstoc.bbox.getMinPoint()[1] - topstoc.bbox.getMaxPoint()[1]) / (12.6 * 100); // == 4pi * Anzahl Spinschritte
+    camera()->setPosition(p);
 
-    std::cout << "Hier steht drin ob Hausdorff visualisiert werden soll: " << this->showHausdorff << std::endl;
+    if (p[1] <= topstoc.bbox.getMinPoint()[1]) {
+        camera()->frame()->stopSpinning();
+        disconnect(camera()->frame(), SIGNAL(spun()), this, SLOT(turntableSpun()));
+    }
 }
 
 void Viewer::invertNormals () {
@@ -394,8 +421,8 @@ void Viewer::hausdorff (double sampling_density_user) {
 
 void Viewer::sendCameraPosition() {
 
-    GLfloat m[16];
-    glGetFloatv (GL_MODELVIEW_MATRIX, m);
+    GLdouble m[16];
+    camera()->getModelViewMatrix(m);
     Vec viewVec(m[8], m[9], m[10]);
     //qDebug() << "x " << m[8] << " - y " << m[9] << " - z " << m[10] << endl;
     emit updateViewVec(viewVec);

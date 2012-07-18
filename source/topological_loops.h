@@ -65,14 +65,15 @@ public:
     void findBoundaries(MyMesh &mesh);
     void triangulateBd(MyMesh &mesh, int bdIdx);
 
-    void meshInside(MyMesh &mesh);
+    std::vector< std::set<int> > meshInsideAndConvexHull(MyMesh &mesh);
 
     int getGenus() { return genus; }
     int n_boundaries() { return boundaries; }
     int getBetti(int idx);
 
-    void test(MyMesh &mesh);
-    std::vector< std::set<int> > test2(MyMesh &mesh);
+    void findHandleLoops(MyMesh &mesh);
+    void findTunnelLoops(MyMesh &mesh);
+    std::vector< std::set<int> > test_function(MyMesh &mesh);
 //    int getLoops;
 
 private:
@@ -99,9 +100,12 @@ private:
     std::set<MyMesh::VertexHandle> boundaryVertices;
 
     tetgenio meshI, meshO;
-    std::vector<tgV> vertices, verticesUnpaired, verticesNew;
-    std::vector<tgE> edges, edgesUnpaired, edgesNew;
-    std::vector<tgF> faces, facesUnpaired, facesNew;
+    std::vector<tgV> verticesIn, verticesUnpairedIn, verticesNewIn;
+    std::vector<tgV> verticesOut, verticesUnpairedOut, verticesNewOut;
+    std::vector<tgE> edgesIn, edgesUnpaired, edgesNewIn;
+    std::vector<tgE> edgesOut, edgesUnpairedOut, edgesNewOut;
+    std::vector<tgF> facesIn, facesUnpaired, facesNewIn;
+    std::vector<tgF> facesOut, facesUnpairedOut, facesNewOut;
 };
 
 #endif // TOPOLOGICAL_LOOPS_H

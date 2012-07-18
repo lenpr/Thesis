@@ -4,6 +4,8 @@
 #include <QGLViewer/qglviewer.h>
 #include "topstoc.h"
 
+using namespace qglviewer;
+
 #define DRAW_MODE_POINT 0
 #define DRAW_MODE_WIREFRAME 1
 #define DRAW_MODE_FLAT 2
@@ -32,6 +34,8 @@ private:
     bool vertexWeights, sampledVertices, controlPoints, remeshedRegions, decimatedMesh, displayUpdate, showHausdorff;
     int showBoundaries;
     int currentTri;
+    Vec defaultCameraPosition;
+    Quaternion defaultCameraOrientation;
 
     bool pickingEvent;
 
@@ -58,6 +62,7 @@ public slots:
 
     void hausdorff(double sampling_density_user);
     void turntable();
+    void turntableSpun();
 
     void filtrate();
     void findloops();
