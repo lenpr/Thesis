@@ -13,7 +13,9 @@ typedef std::map<MyMesh::FaceHandle, int> fh_OMtoTG;
 
 // for the filtration of the inside and outside volume Meshes
 struct tgF{
-    tgF() : isPaired(false), positive(), surfaceFace(false), fh_tg(-1), fh_om(-1), eh0_tg(-1), eh1_tg(-1), eh2_tg(-1) {}
+    tgF() : isPaired(false), positive(), surfaceFace(false),
+            fh_tg(-1), fh_om(-1), eh0_tg(-1), eh1_tg(-1), eh2_tg(-1),
+            killedEdges() {}
 
     bool isPaired;
     bool positive;
@@ -23,10 +25,13 @@ struct tgF{
     int eh0_tg;
     int eh1_tg;
     int eh2_tg;
+    std::set<int> killedEdges;
 };
 
 struct tgE{
-    tgE() : age(-1), isPaired(false), positive(false), surfaceEdge(false), fh_tg(-1), fh_om(), eh_tg(-1), vh0_tg(-1), vh1_tg(-1), eh_om() {}
+    tgE() : age(-1), isPaired(false), positive(false), surfaceEdge(false),
+            fh_tg(-1), fh_om(), eh_tg(-1), vh0_tg(-1), vh1_tg(-1), eh_om(),
+            killedVertices() {}
 
     int age;
     bool isPaired;
@@ -38,13 +43,16 @@ struct tgE{
     int vh0_tg;
     int vh1_tg;
     MyMesh::EdgeHandle eh_om;
+    std::set<int> killedVertices;
 };
 
 struct tgV{
-    tgV() : isPaired(false), positive(true), eh_tg(-1), eh_om(), vh_tg(-1), vh_om() {}
+    tgV() : isPaired(false), positive(true), eh_tg(-1), eh_om(),
+            vh_tg(-1), vh_om() {}
 
     bool isPaired;
     bool positive;
+    bool surfaceVertex;
     int eh_tg;
     MyMesh::EdgeHandle eh_om;
     int vh_tg;
@@ -55,7 +63,6 @@ struct loops {
     std::vector<MyMesh::VertexHandle> bdVertices;
 };
 
-
 class topological_loops
 {
 public:
@@ -65,7 +72,7 @@ public:
     void findBoundaries(MyMesh &mesh);
     void triangulateBd(MyMesh &mesh, int bdIdx);
 
-    std::vector< std::set<int> > meshInsideAndConvexHull(MyMesh &mesh);
+    void meshInsideAndConvexHull(MyMesh &mesh);
 
     int getGenus() { return genus; }
     int n_boundaries() { return boundaries; }
@@ -96,6 +103,9 @@ private:
 
     OpenMesh::VPropHandleT<MyMesh::EdgeHandle> vPair;
     OpenMesh::EPropHandleT<MyMesh::FaceHandle> ePair;
+
+    OpenMesh::EPropHandleT< std::set<int> > killedVertices;
+    OpenMesh::FPropHandleT< std::set<int> > killedEdges;
 
     std::set<MyMesh::VertexHandle> boundaryVertices;
 

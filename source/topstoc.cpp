@@ -1291,7 +1291,9 @@ void TopStoc::test () {
     loops.pairing(this->mesh);
     loops.findBoundaries(this->mesh);
 
-    tetrahedrsTris = loops.meshInsideAndConvexHull(this->mesh);
+    loops.meshInsideAndConvexHull(this->mesh);
+    loops.findHandleLoops(this->mesh);
+//    loops.findTunnelLoops(this->mesh);
 //    tetrahedrsTris = loops.test_function(this->mesh);
 
     timeToken1 = clock();
@@ -1301,15 +1303,8 @@ void TopStoc::test () {
     std::cout << "Time: " << difTime << "\n" << std::endl;
 }
 
-/* Random Stuff
 
-//    loops.findHandleLoops(this->mesh);
-//    loops.findTunnelLoops(this->mesh);
-
-//    std::cout << "g :" << loops.getGenus() << std::endl;
-//    std::cout << "b0:" << loops.getBetti(0) << std::endl;
-//    std::cout << "b1:" << loops.getBetti(1) << std::endl;
-//    std::cout << "b2:" << loops.getBetti(2) << std::endl;
+/* Random code stuff
 
 //    BoundingBox bb;
 //    bb.setMinPoint( 0.0f, 0.0f, 0.0f );
