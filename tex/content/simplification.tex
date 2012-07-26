@@ -1,7 +1,7 @@
 \chapter{The Concept and History of Mesh Simplification}
 \label{simplification0}
 
-\section{Problem statement}
+\section{Problem Statement}
 \label{simplification1}
 
 \begin{flushright}
@@ -12,7 +12,7 @@
 Before considering any concrete approaches or talking about historical developments of mesh simplification, we want to give a formal definition of the problem.
 For a given mesh $\mathcal{M} = \{\mathcal{V},\mathcal{F}\}$ where $\mathcal{V}$ is the list of vertices and $\mathcal{F}$ the list of faces indexed over $\mathcal{V}$, we search for $\mathcal{M'=\{\mathcal{V'},\mathcal{F'}\} \subset M}$ so that either:
 $|\mathcal{V'}|<|\mathcal{V}| \text{ with } |\mathcal{V'}| \in [n_{min}, n_{max}] \text{, and } \|\mathcal{M}-\mathcal{M'}\| \text{ is minimal -- the so called budget-based approach, or } \|\mathcal{M}-\mathcal{M'}\| < \epsilon \text{ and } |\mathcal{V'}| $ is minimal -- a fidelity-based simplification, led by some measure of difference $\epsilon$.
-Most of the time this is done together with further constraints like globally enforced fairness criteria\footnote{ Typically use geometrical analogies of the first and second fundamental form of  differential geometry, transferred to the discrete setting of triangle meshes. Some examples \citep[cf.][]{Schroder2003}:
+Most of the time this is done together with further constraints like globally enforced fairness criteria\footnote{ What is typically used, are geometrical analogies of the first and second fundamental form of differential geometry, transferred to the discrete setting of triangle meshes. For example \citep[cf.][]{Schroder2003}:
 \begin{itemize}
 {\setlength\itemindent{14pt} \item[Order 0: ] distance vertex and plane, parametric or geometric distance}
 {\setlength\itemindent{14pt} \item[Order 1: ] local distortion, triangle shape or inradius}
@@ -27,14 +27,14 @@ The decimation process is usually aimed at a specific target size and controlled
 
 %\newpage
 %\vspace*{1ex}
-\section{Chronology of Mesh Simplification Designs}
+\section{Chronology of Simplification Designs}
 \label{simplification2}
 
 The idea to use different resolutions of the same model can be traced back, as far as 1976 \citep[cf.][]{Clark1976}\footnote{ Clark's 
 paper ``Hierarchical Geometric Models for Visible Surface Algorithms'' also described hierarchical scene graph structures and by todays standards mundane techniques, such as view-frustum culling and out-of-core simplification. Nevertheless it is interesting to read for its value as a foundational paper of Computer Graphics.} but at the time all low-resolution proxies of models were created manually.
 Only in the early 1990s the first algorithms to automate this process appeared.
 The new field instantly spiked interest in the research community and a flurry of papers were published in the following years.
-Some of those first algorithms, such as vertex decimation \citep[][]{Schroeder1992} and vertex clustering \citep[][]{Rossignac1993}, remain viable and useful solutions until today \citep[][cf. pp.7-8]{Luebke2002}.\\
+Some of those first algorithms, such as vertex decimation \citep[][]{Schroeder1992} and vertex clustering \citep[][]{Rossignac1993}, remain viable and useful solutions until today.\\
 Today there is an abundance of designs for algorithms to choose from, literally hundreds of different solutions for mesh decimation.
 Therefore we can not and do not want to discuss every single algorithm ever conceived, but instead we give a chronology of very influential works with a short description of the idea behind it.
 Thereby showing the numerous ways in which decimation can be done.
@@ -72,7 +72,7 @@ Is done by merging vertices based on their spatial proximity. All vertices withi
 \caption{Overview of the simplification process \citep[][p.458]{Rossignac1993}.}
 \label{fig:dec_rossignac}
 \end{figure}
-The algorithm is very robust as for it can deal with degenerated models and can also be implemented efficiently, but it is sensitive to the orientation of the clustering grid. Also, since topology is not preserved, it is very hard to give guaranteed explicit error bounds (also see figure \ref{fig:dec_rossignac}).
+The algorithm is very robust as it can handle degenerated models, but it is sensitive to the orientation of the clustering grid. It can be implemented quite efficiently. Unfortunately topology is not preserved, and it is very hard to give guaranteed explicit error bounds (also see figure \ref{fig:dec_rossignac}).
 
     \item Merging nearly coplanar polygons \citep[cf.][]{Hinker1993}.\\
 This method obtains impressive reductions for large models with nearly flat surfaces. It identifying coplanar or nearly coplanar polygons, merging them together into a larger complex polygon and finally re-triangulating them into fewer polygons than the original description. However, this approach offers only small gains
@@ -92,14 +92,14 @@ These curvature values are pre-computed based on a parametric representation of 
 A triangle is associated with a surface region of low curvature if the sum of the absolute curvatures at its vertices is low.
 The lower the curvature value at the vertices of a triangle the lower its weight.
 The triangle with lowest weight is removed.
+The region affected by the removal is re-triangulated and new weights are computed for all affected triangles (also see figure \ref{fig:dec_hamann}).
 %Bild
 \begin{figure}[ht]
 \centering
-\includegraphics[width=0.75\textwidth]{dec_hamann.jpg}
+\includegraphics[width=0.70\textwidth]{dec_hamann.jpg}
 \caption{The different cases for a triangle platelet $P_{i}$, i.e. the data stencil in the surface triangulation affected by the removal of triangle $T_{i}$ --  platelets with cyclic, disconnected and connected corona \citep[][p.200]{Hamann1994}.}
 \label{fig:dec_hamann}
 \end{figure}
-The region affected by the removal is re-triangulated and new weights are computed for all affected triangles (also see figure \ref{fig:dec_hamann}).
 
     \item Using Wavelet theory \citep[cf.][]{Eck1995}.\\
 A mesh is converted into a sample mesh together with a sequence of local correction terms, i.e. wavelet coefficients that capture the detail present in the model at various resolutions. The algorithm uses enough wavelet coefficients to meet a user specified error
@@ -127,7 +127,7 @@ All edges to be collapsed are evaluated according to the energy function and sor
 This techniques has been widely used for view-dependent simplifications, as well as progressive transmissions \citep[cf.][]{Bajaj1999}.
 
     \item Using bounding surfaces \citep[cf.][]{Cohen1996}.\\
-A proposed method called “Simplification envelopes”.
+A proposed method called 'Simplification envelopes'.
 The approach guarantees an error bound so that all points of an approximation are within a user-specifiable distance from the original model, also it enforces global and local topology preservation.
 Simplification envelopes of a surface consists of two offset surfaces.
 The outer and inner envelope are generated by displacing each vertex of the original mesh along its normal by a defined distance $\pm\epsilon$, which then guides the process.
@@ -142,40 +142,52 @@ A strong suit of this method is that it can gracefully deal with sharp edges (al
 
     \item Quadric Error Metrics \citep[cf.][]{Garland1997}.\\
 The algorithm uses iterative contractions of vertex pairs to simplify models and maintains surface error approximations using quadric matrices.
-By contracting arbitrary vertex pairs and not just edges, the algorithm can change the topology of the mesh and does it need a manifold mesh to begin with.
+By contracting arbitrary vertex pairs and not just edges, the algorithm can change the topology of the mesh and does not need a manifold mesh to begin with.
 As the algorithm proceeds, a geometric error approximation is maintained at each vertex $\mathbf{v}$ of the decimated model: $\Delta(\mathbf{v})= \mathbf{v}^{T}\mathbf{Q}\mathbf{v}$, for a given contraction $(\mathbf{v_{1}},\mathbf{v_{2}}) \rightarrow \mathbf{v_{12}}$ the new matrix $\mathbf{Q_{12}}$ can be easily derived by simply adding $\mathbf{Q}_{1} + \mathbf{Q}_{2} = \mathbf{Q_{12}}$.
 Simplification with quadric error metrics possesses much of the generality of vertex clustering as well as the quality and control of iterative contraction algorithms.
-The only downside is its relative slowness compared to vertex clustering (also see figure \ref{fig:dec_garland}).
+The only major downside is its relative slowness compared to vertex clustering (also see figure \ref{fig:dec_garland}).
 %Bild
 \begin{figure}[ht]
 \centering
-\includegraphics[width=0.50\textwidth]{dec_garland.jpg}
+\includegraphics[width=0.35\textwidth]{dec_garland.jpg}
 \caption{98,5\% decimation of the stanford bunny. The error ellipsoids for each vertex are shown in green \citep[][p.215]{Garland1997}.}
 \label{fig:dec_garland}
 \end{figure}
 
     \item Vertex placement for collapsed edges \citep[cf.][]{Lindstrom1998}.\\
 Using edge collapse as the method for simplifying, edges are incrementally replaced with a single vertex.
-The new vertex is placed so it preserves the location and shape, and does not require the retriangulation.
-%Bild
-\begin{figure}[ht]
-\centering
-\includegraphics[width=0.50\textwidth]{dec_lindstrom.jpg}
-\caption{The optimal vertex position $v$ expressed as the intersection of three planes that ensure volume preservation \citep[][p.284]{Lindstrom1998}.}
-\label{fig:dec_lindstrom}
-\end{figure}
+The new vertex is placed so it preserves the location and shape, and does not require a retriangulation.
 The decision of how to position and order the edges builds upon volume and surface information.
 Since these conditions do not fully determine the decimation process, an optimization stage is added.
 Per triangle volume and area differences are used to create the priority queue (also see figure \ref{fig:dec_lindstrom}).
-
-    \item Using image compression for geometry \citep[cf.][]{Gu2002}.\\
-Most of the time surface geometry is modeled with irregular triangle meshes, i.e. not constant valency. In their paper, the authors devise a method to remesh an arbitrary surface onto a completely regular structure they call a geometry image. By this enabling them to represent geometry as a simple 2D array of quantized points. Surface signals like normals and colors are stored in similar 2D arrays using the same implicit surface parametrization. To create this geometry image, the mesh is cut along a network of edge paths, and the resulting single chart is parametrized onto a square\footnote{ More precisely the geometry is mapped onto a torus, since it is the only 3D manifold that can be a completely regular quad mesh and accordingly a regular triangle mesh with valence 6. With two cuts the torus then is equivalent to a 2D array (for a proof of this statement see Appendix \ref{appendix4}).}. The ingenious twist is, that in this form geometry images can be encoded using traditional lossy image compression algorithms, such as JPEG.
-This is not so much a practical solution for mesh decimation as it is a striking example of how lifting one problem into another domain can lead to unexpected discoveries and new ideas (also see figure \ref{fig:dec_gu}).
 %Bild
 \begin{figure}[ht]
 \centering
-\includegraphics[width=1.0\textwidth]{dec_gu.jpg}
-\caption{Left: Original mesh and its geometry image. Right: Reconstruction of original and a 1,5kB compressed mesh \citep[][p.356]{Gu2002}.}
+\includegraphics[width=0.45\textwidth]{dec_lindstrom.jpg}
+\caption{The optimal vertex position $v$ expressed as the intersection of three planes that ensure volume preservation \citep[][p.284]{Lindstrom1998}.}
+\label{fig:dec_lindstrom}
+\end{figure}
+
+    \item User-assistance for mesh simplifiaction \citep[cf.][]{Cignoni1998a}.\\
+The first system that takes advantage of users-guidance for simplification.
+``Zeta: A Resolution Modeling System'', takes a precomputed sequence of simplifications as input, and utilizes an layer of abstraction to work with different local mesh reduction schemes.
+Especially noteworthy is that the paper explicitly mentions response times and the role of interactivity (also see figure \ref{fig:dec_cignoni}).
+%Bild
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.65\textwidth]{dec_cignoni.jpg}
+\caption{Explicit deletion of a vertex on the mesh \citep[][p.312]{Cignoni1998a}.}
+\label{fig:dec_cignoni}
+\end{figure}
+
+    \item Using image compression for geometry \citep[cf.][]{Gu2002}.\\
+Most of the time surface geometry is modeled with irregular triangle meshes, i.e. not constant valency. In their paper, the authors devise a method to remesh an arbitrary surface onto a completely regular structure they call a geometry image, by this enabling them to represent geometry as a simple 2D array of quantized points. Surface signals like normals and colors are stored in similar 2D arrays using the same implicit surface parametrization. To create this geometry image, the mesh is cut along a network of edge paths, and the resulting single chart is parametrized onto a square\footnote{ More precisely the geometry is mapped onto a torus, since it is the only 3D manifold that can be a completely regular quad mesh and accordingly a regular triangle mesh with valence 6. With two cuts the torus then is equivalent to a 2D array (for a proof of this statement see Appendix \ref{appendix4}).}. The ingenious twist is, that in this form geometry images can be encoded using traditional lossy image compression algorithms, such as JPEG.
+A compelling example of how lifting one problem into another domain can lead to unexpected connections and new ideas (also see figure \ref{fig:dec_gu}).
+%Bild
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.9\textwidth]{dec_gu.jpg}
+\caption{Left: Original mesh and its geometry image. Right: Reconstruction of the original and a 1,5kB compressed version mesh \citep[][p.356]{Gu2002}.}
 \label{fig:dec_gu}
 \end{figure}
 \end{itemize}
@@ -195,8 +207,8 @@ As it were, the prototypical taxonomy is as follows \citep[][cf. p.11]{Shene2005
 \begin{itemize}
   \setlength{\itemsep}{0cm}%
   \setlength{\parskip}{0cm}%
-    \item \textbf{Vertex Clustering} -- Usually very efficient, robust and the complexity is typically linear: $\mathbf{O}(|\mathcal{V}|)$, where $|\mathcal{V}|$ is the number of vertices. However, the quality of the resulting mesh is not always satisfactory.\\
-    \item \textbf{Incremental Decimation} -- Delivers higher quality meshes in most cases and can take arbitrary user-defined criteria into account, according to how the next removal operation is chosen. Though, complexity is normally higher: $\mathbf{O}(|\mathcal{V}| \log_{2} |\mathcal{V}|)$, and can go up to $\mathbf{O}(|\mathcal{V}|^{2})$ especially when a global threshold has to be met.\\
+    \item \textbf{Vertex Clustering} -- Usually very efficient, robust and typically with linear complexity: $\mathbf{O}(|\mathcal{V}|)$. However, the quality of the resulting mesh is not always satisfactory and it is hard to guarantee the preservation of topological features.\\
+    \item \textbf{Incremental Decimation} -- Delivers higher quality meshes in most cases and can take arbitrary user-defined criteria into account, according to how the next removal operation is chosen. Though, complexity is generally higher: $\mathbf{O}(|\mathcal{V}| \log_{2} |\mathcal{V}|)$, and can go up to $\mathbf{O}(|\mathcal{V}|^{2})$ especially when a global threshold has to be met.\\
     \item \textbf{Resampling} -- Most general approach. The major motivation for building a completely new mesh is to maintain a special connectivity structure like subdivision connectivity. Problematic is its higher proneness to alias errors.\\
 \end{itemize}
 The three cases are obviously very broad and each of them can be further characterized by classifying more details.
@@ -215,7 +227,7 @@ This is especially obvious when confronted with algorithms that overstep the tra
   \textbf{Deterministic} & Spatial clustering & Priority queue \\
   \textbf{Stochastic} & TopStoc & Multiple choice \\
 \end{tabular}
-   \label{tab:taxonomies} \medskip
+   \label{tab:taxonomies} \bigskip
    \caption{Taxonomy from Boubekeur \& Alexa \citep[p.2]{Boubekeur2009}.}
 \end{table}\\
 A more general classification can be set up when comparing mesh simplification to a method from signal processing, that is, vector quantization.
@@ -226,7 +238,7 @@ This is done by a so called quantizer function $\mathcal{Q}: \mathbb{R}^{n} \rig
 Where $\mathcal{T} = \{\vec{v}_{i} \in \mathbb{R}^{n} | 1 \leq i \leq N\}$ represents all vectors in $\mathcal{S} \subset \mathbb{R}^{n}$.
 The goal is to find the best $\mathcal{T}$ to represent all vectors in $\mathcal{S}$.
 When the distortion between an input vector is minimal for all $\vec{v} \in \mathcal{S}$, then $\mathcal{T}$ is called optimal.\\
-This definition looks familiar to the one given at the beginning of the chapter \ref{simplification1}, with: $\mathcal{S} \propto \mathcal{M}$ the base mesh, and $\mathcal{T} \propto \mathcal{M'}$ the decimated mesh, respectively $\mathcal{Q}$ representing a decimation algorithm.\\
+This definition looks familiar to the one given at the beginning of the chapter \ref{simplification1}, with: $\mathcal{S} \propto \mathcal{M}$ the base mesh, and $\mathcal{T} \propto \mathcal{M'}$ the decimated mesh, respectively $\mathcal{Q}$ representing a decimation algorithm.
 Gersho and Gray list the four basic types for vector quantization algorithms \citep[][cf. pp.358 ff.]{Gersho1991}:
 \begin{enumerate}
 	\item So called \textbf{'product code'} algorithms use scalar quantizers that are independently applied to each input vector element.
@@ -239,10 +251,11 @@ Gersho and Gray list the four basic types for vector quantization algorithms \ci
 	\item In \textbf{'splitting algorithms'}, $\mathcal{T}$ initially contains a single partition of $\mathcal{S}$. The partition with the most distortion is located and then split. Splitting continues until the required distortion or size is reached.\\
 	Only very few actual decimation techniques use this quasi inverse method of starting with a base primitive and then adaptively subdividing it until the desired decimation level is reached.
 \end{enumerate}
-In other words, the logic of the classification is to look at possible dynamics for partitioning, since there are just three principle ways to form $\mathcal{T}$: One can sets it statically (\textbf{'product code'}), or produce it step by step, either via a top-down (\textbf{'pruning algorithms'} and \textbf{'nearest neighbor'}) or bottom-up approach (\textbf{'splitting algorithms'}).
+In other words, the logic of the classification is to look at possible dynamics for partitioning, since there are just three principle ways to form $\mathcal{T}$: One can set it statically (\textbf{'product code'}), or produce it step by step, either via a top-down (\textbf{'pruning algorithms'} and \textbf{'nearest neighbor'}) or bottom-up approach (\textbf{'splitting algorithms'}).
 
 Besides having a complete taxonomy, the last point to discuss is, upon which differentiations any simplification algorithm should be distinguished and designed.
-We compiled the following checklist to lists the most important attributes to characterize any mesh decimation algorithm and thus are also the question one should answer before implementing any code:
+We compiled the following checklist to catalog the most important attributes to characterize any mesh decimation algorithm.
+Thereby representing the question one should answer before implementing code in order to ensure to end up with an effective and not only an efficient solution\footnote{ In economics the neglectance of tackling this issue is known under the name of: ``The efficiency trap''.}:
 \begin{table}[htb]
 \medskip
 \setlength{\tabcolsep}{10pt}
@@ -260,7 +273,7 @@ We compiled the following checklist to lists the most important attributes to ch
    \label{tab:check_list} \bigskip
    \caption{Checklist for simplification algorithms.}
 \end{table}\\
-We have ordered the checklist in so far, as the the work presented in this thesis, aims to meet the description on the right hand side of table \ref{tab:check_list}: We introduce a very fast, user-guided decimation algorithm with topology control, that can handle non-manifold triangle meshes.
-In addition to that, our approach addresses a number of problems that are pivotal for a practical solution: Texture handling, point of view decimation, reproducibility, etc. 
+We have ordered the checklist in so far, as the the work presented in this thesis, aims to meet the description on the right hand side of table \ref{tab:check_list}: We use a very fast, user-guided decimation technique with topology analyzation and control, that can handle any manifold triangle mesh.
+In addition to that, our approach addresses a number of problems that are pivotal for a practical solution: Texture handling, reproducibility, etc. 
 
 Before describing the details of our solution and discussing the results we achieved, the next chapter \ref{math0} will set a solid mathematical foundation for describing the topological challenges we encountered during our work.

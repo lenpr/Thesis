@@ -5,7 +5,7 @@
 \label{introduction1}
 
 \begin{flushright}
-\textit{``Reality is 80 million polygons per second''\,\footnote{ There used to be this quipped saying back in the early days of 3D rendering. It was a great catchphrase at the time because during those days, it was an obscene number -- ridiculously beyond the technology of the day. But nowadays, ... , even cheap console systems can crank out that kind of performance. More importantly, today's technology can render that many polygons in realtime with tons more features than was ever available before, such as programmability or multiple passes. And the high-end keeps getting higher. \citep[John Carmack, co-founder of id Software, cited in:][]{Kosak2005}}}\\
+\textit{``Reality is 80 million polygons per second''\,\footnote{ \textit{``There used to be this quipped saying back in the early days of 3D rendering. It was a great catchphrase at the time because during those days, it was an obscene number -- ridiculously beyond the technology of the day. But nowadays, ... , even cheap console systems can crank out that kind of performance. More importantly, today's technology can render that many polygons in realtime with tons more features than was ever available before, such as programmability or multiple passes. And the high-end keeps getting higher.''} \citep[John Carmack, co-founder of id Software, on that very quote, cited in:][]{Kosak2005}}}\\
 -- Alvey Ray Smith \citep[co-founder Pixar, cited in:][p.168]{Rheingold1991}
 \end{flushright}
 
@@ -16,10 +16,10 @@ Less widely understood, but even more remarkable is the fact that in most areas,
 In the field of numerical algorithms, however, the improvements can be quantified more straightforwardly.
 One example, provided by Prof. Martin Grötschel: A benchmark production planning model solved using linear programming improved by a factor of roughly 43 million between 1991 and 2008.
 Of this, a factor of roughly 1,000 was due to increased processor speed, whereas a factor of roughly 43,000 was due to improvements in algorithms \citep[][cf. p.71]{Holdren2010}.}.
-When asked about the significant advances over the last 20 years \textit{Ed Catmull} explained how sometimes \textit{``we felt it was at an impossible level''} what they were trying to reach in terms of quality, but now years later \textit{``we have exceeded that level in terms of scene and render complexity -- we have gone beyond impossible''}\,\footnote{ See Appendix \ref{appendix2} for a timeline of important technological advances of RednerMan.} \citep[Edwin „Ed“ Catmull, president of Walt Disney \& Pixar Animation Studios, citet in:][]{Seymour2008}.\\
+When asked about the significant advances over the last 20 years \textit{Ed Catmull} explained how sometimes \textit{``we felt it was at an impossible level''} what they were trying to reach in terms of quality, but now years later \textit{``we have exceeded that level in terms of scene and render complexity -- we have gone beyond impossible''}\,\footnote{ See Appendix \ref{appendix2} for a timeline of important technological advances of RednerMan\textsuperscript{\textregistered}.} \citep[Edwin „Ed“ Catmull, president of Walt Disney \& Pixar Animation Studios, citet in:][]{Seymour2008}.\\
 Despite the industries incredible success, \textit{Catmulls} remark about the complexity as being \textit{“beyond impossible”} appears to contradict the notion of super-exponential technology growth in the field of Computer Graphics.
 For instance, rendering times have been constant\footnote{ For Industrial Light \& Magic’s visual effects work on the 1993 film Jurassic Park, typical overnight render times were 4 hours per frame. When the same company worked on the 1997 movie sequel, using both faster computers and more advanced software, frame times were typically an identical 4 hours. Each small speed-up, tends to be used for greater input complexity rather than greater interactivity.\\ While the precise value of the “threshold of pain” for render time varies by institution, this effect has been widely observed. Jim Blinn famously remarked, “All frames take 45 minutes,” hence the effect is known as Blinn’s Law \citep[][cf. Chapter 3]{Enderton2011}.}  for animation films over the last two decades, although algorithms and hardware got so much better during the same time.
-If the movie business holds as an example\footnote{ I personally think that animation and special effects driven movies are vibrant examples for the tremendous progress, that the field of Computer Graphics has seen over the last decades. Although I am sure, other interesting references could be made, most of the examples I will give are related to the \textit{VFX-Industry}. For one because I find them to be compelling and vivid, but more so because it is the one field I have personal experience in, due to my internship at \textit{Weta Digital} in 2011.}, it begs the question: How is this possible?
+If the movie business holds as an example\footnote{ Personally, I think that animation and special effects driven movies are vibrant examples for the tremendous progress, that the field of Computer Graphics has seen over the last decades. Although I am sure, other interesting references can be made, most of the examples I will give are related to the \textit{VFX-Industry}. For one because I find them to be compelling and vivid, but more so because it is the one field I have personal experience in, due to my internship at \textit{Weta Digital} in 2011.}, it begs the question: How is this possible?
 % Bild
 \begin{figure}[ht]
 \begin{minipage}[b]{0.475\linewidth} \centering
@@ -41,12 +41,12 @@ Every studio struggles with heavier and heavier assets, i.e. the sheer size in g
 \textit{``Our typical rendered scenes [for work on Marvels 'The Avengers' (2012)] contain over 140 million triangles across thousands of objects though we have pushed over 1 billion polygons''} \citep[Votch Levi, CTO Whiskytree, cited in:][]{Seymour2012}.
 
 To illustrate this hasty evolution, one simply has to look at the stark contrast between the models used for the top-of-the-line renderings of 1975, namely the 'Teapot scene' and a scene from the 2009 movie 'UP', as shown in the pictures \ref{fig:utah_teapot_model} and \ref{fig:micropolys}.
-Whereas all the information needed to describe the models in the 'Teapot scene' could be fit on one page of paper\footnote{  For more information about the original Teapot renderings and a facsimile of the model description, see Appendix \ref{appendix3}.}, the models currently in production regularly max out in the domain of several giga-bytes of raw data per asset.
+Whereas all the information needed to describe the models in the 'Teapot scene' could be literally fit on one page of paper\footnote{  For more information about the original Teapot renderings and a facsimile of the model description, see Appendix \ref{appendix3}.}, the models currently in production regularly max out in the domain of several giga-bytes of raw data per asset.
 % Bild
 \begin{figure}[ht]
 \begin{minipage}[b]{0.475\linewidth} \centering
 \includegraphics[scale=0.72]{screenshot_up.jpg}
-\caption{Example of highly detailed surface -- the houndstooth pattern of the jacket is genuine geometric data {[}Credit: Pixar 2009{]}.}
+\caption{Example of highly detailed surface -- note that the houndstooth pattern of the jacket is genuine geometric data {[}Credit: Pixar 2009{]}.}
 \label{fig:screenshot_up}
 \end{minipage}
 \hspace{0.35cm}
@@ -83,12 +83,11 @@ Especially along the house’s silhouettes, artifacts are spotted easily.
 Shadows are rendered but on close examination they also give away the flat nature of the low resolution stand-in.
 Similarly, the roof tiles and windows on the left side of the image appear distorted.
 These artifacts become even more noticeable when objects move \citep[cf.][p.2-4]{Fatahalian2011}.\\
-Undoubtedly the industry will continue to push polygon counts for the next years, on its pursuit for visual brilliance and high fidelity\footnote{ During my internship I personally asked a modeler, at what point they would normally stop adding geometric detail? He noted that everyones biggest fear is to get ones' work rejected because it does not hold up to a supervisors expectations. So what they will do is to work until their tools -- their computers and software -- give in and make it unbearable to work any further.}.
-Together with the scaling of complexity also scales the need for tools that facilitate the work with the created data.
-Whether you believe that the artist or the tools at his disposal are the principal or the agent, it is for sure, that without robust and capable techniques no creation would be possible.
-And at the forefront of fundamental techniques for geometry processing is mesh simplification.
+The industry will not cease its pursuit for visual brilliance and together with the growing trend for more physically correct rendering, the polygon counts will be constantly pushed for the next years to come.
+With this scaling of complexity also scales the need for tools that facilitate the work with the created data\footnote{ During my internship I personally asked a modeler, at what point they would normally stop adding geometric detail. He noted that everyones biggest fear is to get ones' work rejected because it does not hold up to a supervisors expectations. So what they typically will do is to work until their tools -- their computers and software -- give in and make it unbearable to work any further.}.
+Thus robust and capable techniques are essential and at the forefront of fundamental techniques for geometry processing is mesh simplification.
 
-\section{Mesh decimation}
+\section{Reducing Complexity}
 \label{introduction3}
 
 Mesh decimation or simplification is both, a very current, and a very old idea in computer graphics.
@@ -98,11 +97,11 @@ Even a number of excellent surveys reviewing the field of polygonal simplificati
 Yet, no algorithm today excels at simplifying all models equally good.
 Some approaches best suit curved organic forms, while others work best at preserving hard planar objects with sharp corners, flat faces, and regular curves.
 This is probably due to the fact that, we still have limited understanding about what really determines perceptual fidelity.
-We do have a good understand of geometric and volumetric fidelity but as it turns out, the supposedly easy question:  Does the simplification look like the original?
+We do have a good understand of geometric and volumetric fidelity but as it turns out, the supposedly easy question:  Does the simplification look good?
 Is hard to answer \citep[][cf. p.25]{Luebke2001}.\\
-At this point it seems that the research community tends to be of the opinion, that until the question of perceptual metrics is solved, the research area of mesh simplification is in a state of arrested development\footnote{ Only few ameliorations have been proposed, mostly at the cost of near-to prohibitively expense execution times, like Cohen’s ``Appearance-Preserving Simplification'' \citep[cf.][]{Cohen1998} and Lindstrom’s ``Image-Driven Simplification'' \citep[cf.][]{Lindstrom2000} -- both of which aiming at per-pixel comparisons of multiple rendered views as ``weights'' or upper bounds for the priority queue of an incremental decimation process.\\For an comprehensive discussion about the difficulties faced when trying to define perceptually salient descriptors see ``Perceptual metrics for static and dynamic triangle meshes'' \citep[cf.][]{Corsini2012}, respectively ``Perceptually Driven Simplification for Interactive Rendering'' for further information on psychophysical models of visual perception \citep[][]{Luebke2001a}.}. 
-As much as I agree that it would be fantastic to get a sound scientific grasp of human perception, I reject the notion that exciting research topics aren't to be found.\\
-At the beginning of most journal papers concerning mesh decimation, the same emblematic application examples are listed: meshes generated by marching-cubes, CAD/CAM models, oversampled 3D scan data, etc. -- but with the advent of image based automatic geometry capture techniques and their impressive results \citep[cf.][]{Pollefeys2004,Snavely2008}, arguably the scope of the field has changed\footnote{ Another branch of research that will affect the evolution of geometry processing tools in a profound way, is 3D printing and rapid prototyping -- if only for the scale, once with wide-spread adopted \citep[cf.][]{Vilbrandt2008,Bickel2010}.}.
+At this point it seems that the research community tends to be of the opinion, that until the question of perceptual metrics is solved, the research area of mesh simplification is in a state of arrested development\footnote{ Only few ameliorations have been proposed, mostly at the cost of near to prohibitively expense execution times, like Cohen’s ``Appearance-Preserving Simplification'' \citep[cf.][]{Cohen1998} and Lindstrom’s ``Image-Driven Simplification'' \citep[cf.][]{Lindstrom2000} -- both of which aiming at per-pixel comparisons of multiple rendered views as ``weights'' or upper bounds for the priority queue of an incremental decimation process.\\For an comprehensive discussion about the difficulties faced when trying to define perceptually salient descriptors see ``Perceptual metrics for static and dynamic triangle meshes'' \citep[cf.][]{Corsini2012}, respectively ``Perceptually Driven Simplification for Interactive Rendering'' for further information on psychophysical models of visual perception \citep[][]{Luebke2001a}.}. 
+As much as we agree that it would be fantastic to get a sound scientific grasp of human perception, we reject the notion that exciting research topics aren't to be found.\\
+At the beginning of most journal papers concerning mesh decimation, the same emblematic application examples are listed: meshes generated by marching-cubes, CAD/CAM models, oversampled 3D scan data, etc. -- but with the advent of image based automatic geometry capture techniques and their impressive results \citep[cf.][]{Pollefeys2004,Snavely2008}, arguably the scope of the field has changed\footnote{ Another branch of research that will affect the evolution of geometry processing tools in a profound way is 3D printing and rapid prototyping -- even if only for the scale of deployment, once 3D printing is widely adopted \citep[cf.][]{Vilbrandt2008,Bickel2010}.}.
 Not only is there a demand for highly detailed meshes but also a plethora of source material to work with.
 %Bild
 \begin{figure}[ht]
@@ -111,7 +110,7 @@ Not only is there a demand for highly detailed meshes but also a plethora of sou
 \caption{3D mesh reconstructions from Internet photo collections, that typically can have dozens of millions of triangles \citep[][p.6]{Snavely2008}.}
 \label{fig:image_synthesis}
 \end{figure}\\
-Still, the research community does not emphasis on mesh decimation as of lately.
+Still, as of lately, the research community does not emphasise on mesh decimation.
 One of the reason for this, is the set of expectations that govern academic zeitgeist.
 For example, ``good'' solutions are considered to be solutions that have been completely automated with little or none required input from the user.
 However there is much to be gained and researched, once the user is seen as integral part of the process.
@@ -122,25 +121,25 @@ Bringing together the arguments of the last pages, the important question to ask
 \label{introduction4}
 
 The first step in deciding upon the design features of an application that simplifies meshes, is to acknowledge that there will never be one perfect solution to fit all possible scenarios.
-Not only because there are always trade offs to be made in engineering, but because there are conflicts of objectives that oppose each other diametrically.
-For instance, it is not possible to ensure quasi 'Delaunay-Triangulation' in order to cater for the needs of an finite elements simulation and at the same time aggressively reduce the vertex count without loosing geometric detail\footnote{ Arguably there will be always just two out of the following three: good triangle shape / high decimation / fidelity -- and many other examples for goal conflicts can be found.}.\\
-The route that shows more promise instead, is to put an emphasis on a few selected, crucial aspects.
+Not only because there are always trade-offs to be made in engineering, but because there are conflicts of objectives that oppose each other diametrically.
+For instance, it is not possible to ensure quasi 'Delaunay-Triangulation' in order to cater for the needs of an finite elements simulation and at the same time aggressively reduce the vertex count without loosing geometric detail\footnote{ Arguably it will be always a choice of just two out of the following three: good triangle shape / high decimation rates / optical fidelity -- and many other examples for such conflicts can be found.}.\\
+ Instead, it shows more promise to put emphasis on a few selected, crucial aspects.
 Thus our work focuses on two major principles that were decided beforehand:
 \begin{itemize}
-    \item Full topology control during the decimation process.
+    \item Topological control of the decimation process.
     \item Artistic freedom by the means of user-guidance.
 \end{itemize}
-As for the first aspect -- topology control -- most algorithms do ensure the preservation of the topological genus of a given model\footnote{ With the notably exception of the class of vertex clustering algorithms, that by design, are agnostic to topological changes \citep[cf. the original paper by][]{Rossignac1993}.}, but only rarely are topological features by themselves a criteria for decimation.
-Accounting for this poses some interesting research questions that have not yet been yet answered satisfactorily.
+As for the first aspect -- topology control -- most algorithms can ensure the preservation of the topological genus of a given model\footnote{ With the notably exception of the class of vertex clustering algorithms, that by design, are agnostic to topological changes \citep[cf. the original paper by][]{Rossignac1993}.}, but normally topological features by themselves are not driving criteria for decimation.
+Accounting for this poses some interesting research questions that have not yet been answered satisfactorily.
 It is also the more theoretical and abstract part of the thesis.\\
-The second aspect -- artistic freedom, i.e. user-guidance -- has some further ramifications that need to be discussed.
+The second aspect -- artistic freedom, i.e. user-guidance -- has some further ramifications that need to be pointed out.
 Unquestionably it appears to be a good thing to give additional control to the user.
 Not only can the hard problem of perceptual fidelity be handed over to the one instance best suited for the decision, but also there can be direct feedback incorporated to ensure the ideal outcome.
 \begin{quote} \textit{``Often researchers are biased towards a fully automated solution or assume the user interaction needs to be targeted to a novice user.''} \citep[p.195]{Sylwan2011} \end{quote}
 %Bild
 \begin{floatingfigure}[r]{0.40\textwidth}
 \centering
-\includegraphics[width=0.33\textwidth]{workflow_regimes.jpg}
+\includegraphics[width=0.30\textwidth]{workflow_regimes.jpg}
 \caption{Response time to user input vs. workflow.}
 \label{fig:workflow_regimes}
 \end{floatingfigure}
@@ -150,24 +149,30 @@ There is a balance between interaction and computation.\\
 If a process gives perfectly accurate results automatically, it is a candidate to run unsupervised in an multiply hour offline scenario.
 Whereas an algorithm that requires artist intervention, must run relatively quickly so artists get immediate feedback and iterate on it \citep[cf.][p.20]{Hillman2010}.
 This sounds like an obvious observation, but research has shown, that missing certain levels of interactivity, ultimately decides upon how a tool is viewed as a whole and thereby determines the success and adoption rate of this technology \citep[cf.][]{Enderton2011}.
+In summary, what we want is a very fast, hence smoothly interacting application that gives good results but invites the user to tweak any aspect of it until the best possible outcome is reached.
+This is in short is what this thesis' goal is!
 \begin{quote} \textit{``A workflow regime is defined as a range of system response times in which the artist’s relationship to the task is qualitatively similar ... technology is much more likely to succeed when it brings an artist’s workflow into a new regime ... we feel physically connected, albeit indirectly. This connection is critical for focused and rapid task achievement.''} \citep[p.2]{Enderton2011} \end{quote}
-
-In summary what we want is a very fast, hence smoothly interacting application that gives good results but invites the user to tweak any aspect of it until the best possible outcome is reached.
-This is in short is what this thesis' goal is!\\
 
 \section{The Outline of this Thesis}
 \label{introduction5}
 
 The introduction started with a general observations on trends:
-Complexity from the point of view of Computer Graphics has increased dramatically over the last decades and is still on the rise.
-This is also especially true for geometric complexity, since even the best short-cuts can leave one with undesired artifacts. 
+The complexity from the point of view of Computer Graphics has increased dramatically over the last decades and is still on the rise.
+This is especially true for geometric complexity, since even the best short-cuts suffer from undesired artifacts. 
 With models getting more and more detailed, the need for good tools that can simplify meshes likewise increases. 
-But instead of adding a new algorithm to the standard repertoire, we propose to focus on adopting techniques for user guidance and topology control.
-After this widely argument for our motivation, the rest of the thesis is structure pretty much straightforward.
+But instead of adding a new algorithm to the standard repertoire, we propose to focus on adopting techniques for user-guidance and topology control.
+After this widely argument for our motivation, the rest of the thesis is structured pretty much straightforward.
 
 The next section, chapter \ref{simplification0}, will very briefly discuss the historical development of the field of mesh decimation.
-Not so much in order to give an exact overall account, but rather to give an overview of the principle techniques and the ideas behind them.\\ 
-This is followed by chapter \ref{math0}, that functions as a primer for certain mathematical concepts which are crucial for the understanding of topology.
-Topology control is one of the key contributions of our work and although the comprehension of the involved mathematics is important, it is not a mandatory prerequisite for the remaining text.\\
-Chapter \ref{topstoc0} finally details and discusses the contribution of our work.\\
-The last part, chapter \ref{conclusion0}, tries to summarize the work and to give an outlook on further research topics.
+Not so much in order to give an exact overall account, but rather to give an overview of the principle techniques and the ideas behind them.
+Bringing these ideas together we will try to formulate a taxonomy that structures the known approaches.\\ 
+This is followed by chapter \ref{math0}, that functions as a primer for mathematical concepts which are crucial for the understanding and control of topology.
+Retrieving correct topology information of a mesh and controlling it, is one of the key contributions of our work and although the comprehension of the involved mathematics is important, we try to not make it a mandatory prerequisite for the results section of the text.\\
+Chapter \ref{topstoc0} finally details the contribution of our work in three sections.
+Firstly some minor adaptions to the``TopStoc'' algorithm that we used as the foundation in section \ref{topstoc1}.
+Then in \ref{topstoc2} we deal with the topological aspects, namely computing the precise Betti numbers for arbitrary meshes.
+Finding all topological relevant features such as handles and tunnels, which is achieved by the means of gathering special groups of homologous edge loops.
+And of course the ability to cut and delete parts of the mesh as well as mending boundaries.
+Section \ref{topstoc3} finally describes the tools that give artistic freedom to the artist.
+Among these are sketch tools to define resolution, point of view constraints for decimation plus visual feedback in form of Hausdorff visualizations and multiple instances of decimation results to easily make side-by-side comparisons.\\
+The last part, chapter \ref{conclusion0}, then summarizes the work and gives an outlook on further research topics.

@@ -2,7 +2,7 @@
 \section*{Used Notations}
 \label{notations}
 
-Definitions of mathematical terms are generally given within paragraphs of text, rather than displayed separately like theorems\footnote{ I follow the style recommendations used by \textit{Allen Hatcher} \citep[cf.][]{Hatcher2002}.}.
+Definitions of mathematical terms are generally given within paragraphs of text, rather than displayed separately like theorems\footnote[0]{ I follow the style recommendations used by \textit{Allen Hatcher} \citep[cf.][]{Hatcher2002}.}.
 \begin{table}[htpb] \medskip
 \setlength{\tabcolsep}{5pt}
 \renewcommand{\arraystretch}{1.25}
@@ -13,14 +13,14 @@ Definitions of mathematical terms are generally given within paragraphs of text,
 	$\mathcal{S}^{n}$: & the unit sphere in $\mathbb{R}^{n+1}$\\ & i.e. all points of distance: $|d|=1$, from the origin.\\
 	$\mathcal{D}^{n}$: & the unit disk or ball in $\mathbb{R}^{n}$\\ & i.e. all points of distance: $|d| \leq 1$, from the origin.\\
 	$\partial \mathcal{D}^{n} = \mathcal{S}^{n-1}$: & the boundary of the $n$-disk, respectively $\partial$ the boundary operator.\\
-	$\mathrm{e}^{n}$: & an $n$-cell, homeomorphic to the open $n$-disk: $\mathcal{D}^{n} - \partial \mathcal{D}^{n}$,\\ & for instance $e^{0}$ consists of a single point, but $\mathcal{S}^{0} = \partial \mathcal{D}^{1}$ of two.\\
-	$\mathcal{M}$: & orientable manifold mesh with $\mathcal{V}$ \& $\mathcal{F}$ the list of vertices \& faces \\ & and $|\mathcal{V}|$ the cardinality respectively $||\mathcal{M}_{A} - \mathcal{M}_{B}||$ the distance.\\
+	$\mathrm{e}^{n}$: & an $n$-cell, homeomorphic to the open $n$-disk: $\mathcal{D}^{n} - \partial \mathcal{D}^{n}$,\\ & for instance $e^{0}$ consists of a single point, whereas $\mathcal{S}^{0} = \partial \mathcal{D}^{1}$ of two.\\
+	$\mathcal{M}$: & orientable manifold mesh with $\mathcal{V}$ \& $\mathcal{F}$ being the list of vertices \& faces \\ & i.e. a PLC and $|\cdot|$ denoting the the cardinality of a subcomplex, \\ & respectively $||\mathcal{M}_{A} - \mathcal{M}_{B}||$ being the distance between to meshes.\\
 	$\cong, \approx, \simeq$: & isomorphism, homeomorphism and homotopy, \\ & with $\approx \, \Rightarrow \, \simeq$ but not the other way around.\\
 	$\mathbb{X}$: & topological space with sets $\mathrm{A}_{i}$.\\
-	$\pi_{n}(\mathbb{X})$: & the fundamental group of a topological space,\\ & $\pi_{n}(\mathbb{X}_{1}) = \pi_{n}(\mathbb{X}_{2})$ does not imply $\mathbb{X}_{1} \approx \mathbb{X}_{2}$.\\
+	$\pi_{n}(\mathbb{X})$: & the fundamental group of the topological space $\mathbb{X}$,\\ & note that $\pi_{n}(\mathbb{X}_{1}) = \pi_{n}(\mathbb{X}_{2})$ does not imply $\mathbb{X}_{1} \approx \mathbb{X}_{2}$.\\
 	$\equiv$: & congruence relation, i.e. equivalence relation on an algebraic structure.\\
-	$\mathrm{K}$: & simplicial complex built from a finite set of simplices: $\{ \sigma^{dim}_{nr} \}$\\ & with an associated filtration: $ \emptyset = \mathrm{K}_{-1} \subset \mathrm{K}_{0} \subset \mathrm{K}_{1} \subset \dots \subset \mathrm{K}_{n} = \mathrm{K}$.\\
+	$\mathrm{K}$: & simplicial complex built from a finite set of simplices: $\{ \sigma^{dim}_{nr} \}$\\ & $\sigma^{0}_{nr} \rightarrow$ vertices, $\sigma^{0}_{nr} \rightarrow$ edges and so forth, together with an associated \\ & filtration: $ \emptyset = \mathrm{K}_{-1} \subset \mathrm{K}_{0} \subset \mathrm{K}_{1} \subset \dots \subset \mathrm{K}_{n} = \mathrm{K}$.\\
 \end{tabular}
 \end{table}\\
-There are also a few notations used in this book that are not completely standard:
+There are also a few notations used in this thesis that are not completely standard but increase readability:
 The union of a set $\mathrm{A}$ with a family of sets $\mathrm{B}_{i}$, with $i$ ranging over some index set, is written simply as $\mathrm{A} \cup_{i} \mathrm{B}$ rather than something more elaborate such as $\mathrm{A} \cup (\cup_{i} \mathrm{B})$. Other similar operations are treated in the same way.

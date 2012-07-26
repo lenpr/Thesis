@@ -9,7 +9,7 @@
 Topology began with the study of curves, surfaces and other objects in the plane and 3D space.
 One of the central ideas in topology is that spatial objects like circles and spheres can be treated as objects in their own right, and knowledge of objects is independent of how they are embedded in space.
 Topology can be used to abstract the inherent connectivity of objects while ignoring their detailed form.\\
-For example, the figures shown in picture \ref{fig:topology_examples} illustrate the connectivity of a number of topologically distinct surfaces -- solid parallel edges join one another with the orientation indicated by arrows, dashed lines show edges that remain free \citep[][cf. p.1]{Weisstein2012}:
+For example, the figures shown in picture \ref{fig:topology_examples} illustrate the connectivity of a number of topologically distinct surfaces and at the same time links them to a common denominator -- solid parallel edges join one another with the orientation indicated by arrows, dashed lines show edges that remain free \citep[][cf. p.1]{Weisstein2012}:
 %Figure
 \begin{figure}[ht]
 \centering
@@ -97,7 +97,7 @@ Manifolds are generally the only topological spaces we are interested in.
 \caption{Complete homeomorphism list for compact, boundaryless 2-dim. manifolds.}
 \label{fig:manifolds}
 \end{figure}\\
-Another important attribute is compactness: A compact manifold can be embedded in $\mathbb{R}^{n}$ so that it has finite extent, i.e. it can be covered by finitely many charts $\varphi_{n}$ -- thus all compact surfaces are triangulable \citep[which was first shown by][]{Rado1925}.
+Another important attribute is compactness: A compact manifold can be embedded in $\mathbb{R}^{n}$ if it has finite extent, i.e. it can be covered by finitely many charts $\varphi_{n}$ -- thus all compact surfaces are triangulable \citep[which was first shown by][]{Rado1925}.
 Compact manifolds in two dimensions are completely classified by two further attributes, namely orientation and genus, see picture \ref{fig:manifolds} and table \ref{tab:manifolds}:
 \begin{table}[hbt]
 \medskip
@@ -117,14 +117,14 @@ The genus is maybe the best known invariant property, as it intuitively describe
 The genus can also be seen as the maximum number of cuttings along non-intersecting closed simple curves that can be drawn on the surface without disconnect the manifold into two.\\
 The second invariant, orientability, describes whether it is possible to give all local charts $\varphi_{n}$ an ordering of either right- or left-handedness, without any two neighboring charts disagreeing globally.
 Formally we will define this concept in the next section \ref{math_simplicalcomplexes}.\\
-Using the connected sum, the homeomorphism problem is fully resolved for 2-manifolds\footnote{ \textit{Grigori Perelman} showed that 3-manifolds can also be decomposed into pieces with uniform geometry, whereas the problem is proven to be undecidable for higher dimensions \citep[][]{Morgan2007}.}, as every compact surface is homeomorphic to a sphere, the connected sum of tori, or the connected sum of cross surfaces\footnote{ For any closed 2-manifold embedded in 3-dimensional space that can not be oriented, it follows that it must have at least one self-intersection and any orientable 2-manifold without boundary is homeomorphic to a sphere with n-handles, i.e. its genus.}!
+Using the connected sum, the homeomorphism problem is fully resolved for 2-manifolds\footnote{ \textit{Grigori Perelman} showed that 3-manifolds can also be decomposed into pieces with uniform geometry, whereas the problem is proven to be undecidable for higher dimensions \citep[][]{Morgan2007}.}, as every compact surface is homeomorphic to a sphere, the connected sum of tori, or the connected sum of cross surfaces\footnote{ Hence for any closed 2-manifold embedded in 3-dimensional space that can not be oriented, it follows, that it must have at least one self-intersection and any orientable 2-manifold without boundary is homeomorphic to a sphere with $n$-handles, i.e. its genus.}!
 
 \subsection{Simplical Complexes}
 \label{math_simplicalcomplexes}
 
 At the beginning of the chapter in picture \ref{fig:topology_examples} we have seen that a torus, like a projective plane\footnote{ A sphere with one cross-cap has traditionally been called a real projective plane. The cross-cap is one of the three possible surfaces obtained by sewing a Möbius strip to the edge of a disk -- the other two are the Boy surface and Roman surface, see picture \ref{fig:nonorientable_surfaces}. A sphere with two cross-caps having coinciding boundaries is topologically equivalent to a Klein bottle.} and a sphere, all can be obtained from a
 square by identifying the edges with certain directions and gluing them together accordingly.
-Cutting a square trivially along a diagonal produces two triangles, so each of these surfaces can also be built from two triangles.
+Cutting a square trivially along a diagonal produces two triangles that can be easily further subdivided, so each of these surfaces in turn can be reduced to triangles.
 Together with the result from the last section \ref{math_manifolds}, that all compact 2-manifolds can be assembled by combining spheres, tori and cross-caps, we have proven that in fact all closed surfaces can be constructed from triangles.\\
 Thus we have a single building block to construct a large class of 2-dimensional spaces and the idea now is to generalize this for any dimension:
 The $n$-dimensional analog of the triangle is the convex hull of $n$+1 affinely independent points $\mathcal{V} = \{v_{0}, v_{1}, \dots , v_{n}\}$, it is called the $n$-simplex: $\sigma^{n}_{i}$, with $n$ and $i$ denoting the dimension and index: $i,n \in \mathbb{N}$.
@@ -165,7 +165,7 @@ Note that in three dimensions, there is no unbounded non-orientable surface whic
 We can generalize the idea now for any dimension $n \geq 1$:
 Then an orientation of a $n$-simplex $\sigma^{n}$, is an equivalence class of orderings, written $[\sigma]$, of its vertices: $\sigma = \{v_{0}, v_{1}, \dots , v_{n}\}$, where: $(v_{0}, v_{1}, \dots , v_{n}) \sim (v_{\tau(0)}, v_{\tau(1)}, \dots , v_{\tau(n)})$, are equivalent orderings if the parity of the permutation $\tau$ is even\footnote{ For any finite set $\mathrm{X}$ with an ordering and at least two elements, the bijective mapping $\tau : \mathrm{X} \rightarrow \mathrm{X}$, falls into two classes of equal size, i.e. the even and odd permutations. The parity a permutation is then defined as the number of inversions for $\mathrm{N}(\tau)$, of pairs of elements $x_{i}, x_{j} \in X$, such that $x_{i} < x_{j}$ but $\tau(x_{i}) > \tau(x_{j})$, intuitively this denotes the number of occurred swaps.}.\\
 It is worth noting that simplicial complexes, by definition, are combinatorial objects with topology and don't necessarily have to utilize geometry.
-If the topology gets separated, $\mathrm{K}^{*}$ is called an abstract simplicial complex\footnote{ Actually written down for simplicial complex, the mathematical definition of this vertex scheme, strikingly resembles the connectivity list of an \textit{.obj}, \textit{.ply} or \textit{.off} file.}.
+If the topology gets separated, $\mathrm{K}^{*}$ is called an abstract simplicial complex\footnote{ Actually written down for simplicial complexes, the mathematical definition of this vertex scheme, strikingly resembles the connectivity list of an \textit{.obj}, \textit{.ply} or \textit{.off} file.}.
 %Figure
 \begin{figure}[ht]
 \centering
@@ -177,8 +177,8 @@ If the topology gets separated, $\mathrm{K}^{*}$ is called an abstract simplicia
 \subsection{General Euler Characteristic}
 \label{math_euler}
 
-Next to orientability the genus is the second most well known invariant for classifying $2$-manifolds.
-We already have a intuitive notion for it, as it represents the number of holes\footnote{ Even for non pathological cases it can be very hard to ``see'' the genus of an arbitrary surfaces embedded in $\mathbb{R}^{3}$. A famous example is the so called ``House with two rooms'', illustrated in appendix \ref{two_rooms}.}, but with simplicial complies at our disposal we can formulate this concept in a generalized and formal adequate way for any $n$-manifold.\\
+Next to orientability the genus is the second most well known invariant for classifying $2-$manifolds.
+We already have a intuitive notion for it, as it represents the number of holes\footnote{ Though even for non pathological cases it can be very hard to ``see'' the genus of a given surface. A famous example is the so called ``House with two rooms'', illustrated in appendix \ref{two_rooms}.}, but with simplicial complies at our disposal we can formulate this concept in a generalized and formal adequate way for any $n$-manifold.\\
 The Euler characteristic is defined for a simplicial complex $\mathrm{K}$ with $|\sigma^{n}|$ finitely many $n$-simplex as the number of even- minus the number of odd-dimensional simplices:
 \begin{equation} \label{eq:euler_characteristic}
 \chi(\mathrm{K}) = \sum_{n = 0}^{dim \mathrm{K}} (-1)^{n} |\sigma^{n}|
@@ -233,12 +233,8 @@ Thus, two spaces with a different topological type can still have the same homot
 
 We saw in the last section that two maps are homotopic if one can be continuously deformed into the other.
 Now this idea gets applied to maps on surfaces, called paths.
-The fundamental group is especially concerned with paths that begin and start at the same basepoint $x_{bp}$, namely loops:
-\begin{equation}
-	f_{loop}: [0,1] \rightarrow \mathbb{X} ~~ \text{ with }~~ f_{loop}(0) = x_{bp} = f_{loop}(1)
-\end{equation}
-A trivial loop never leaves its basepoint.
-Also loops that are boundaries of a disk are contractible and belong to the same class of the trivial loop.
+Paths that begin and start at the same basepoint $x_{bp}$, namely loops, are of special concern and used to characterize the so called fundamental group.\\
+Loops that are boundaries of a disk are contractible and belong to the same class as the trivial loop, which never leaves its basepoint.
 If we find non-bounding loops, they form a different class, see picture \ref{fig:fundamental_group_torus}.
 %Figure
 \begin{figure}[htb]
@@ -246,7 +242,10 @@ If we find non-bounding loops, they form a different class, see picture \ref{fig
 \includegraphics[width=0.45\textwidth]{fundamental_group.jpg}
 \caption{One boundary loop (on the left) and two non-bounding loops on a torus.}
 \label{fig:fundamental_group_torus}
-\end{figure}\\
+\end{figure}
+\begin{equation}
+	f_{loop}: [0,1] \rightarrow \mathbb{X} ~~ \text{ with }~~ f_{loop}(0) = x_{bp} = f_{loop}(1)
+\end{equation}
 The non-bounding loops define the fundamental group.
 Formally the fundamental group of a topological space is the group formed by the set of equivalence classes of all loops with the same initial and final basepoint, under the equivalence relation of homotopy:
 \begin{equation}
@@ -258,7 +257,7 @@ Each homotopy class consists of all loops which wind around the circle a given n
 So the fundamental group of the circle is isomorphic to the additive group of integers $\mathbb{Z}$.
 Intuitively then, $\pi_{1}(\mathcal{S}^{1}) = \mathbb{Z}$ and similarly the two non-bounding loops in picture \label{fig:fundamental_group} generate the fundamental group of a torus: $\pi_{1}(\text{Torus}) \cong \mathbb{Z} \times \mathbb{Z}$.\\
 The fundamental group, in fact, measures the 1-dimensional hole structure of a space.
-Following is a table \ref{tab:fundamental_group} of the fundamental group for some common spaces:
+Following is table \ref{tab:fundamental_group} of the fundamental group for some common spaces:
 \begin{table}[htpb]
 \medskip
 \setlength{\tabcolsep}{25pt}
@@ -296,9 +295,9 @@ We now define this relation formally via the boundary operator:
 \begin{equation} \label{eq:boundary}
 	\partial \,\sigma^{n} = \partial \,\{ v_{0}, \dots , v_{n} \} = \sum_{i}^{n} \,\{v_{0}, \dots, \hat{v}_{i}, \dots, v_{n}\}
 \end{equation}
-\dots \,where $\hat{v}_{i}$ is the simplex that gets deleted from the sequence.
+where $\hat{v}_{i}$ is the simplex that gets deleted from the sequence.
 We extend this operator to entire chain groups, $\partial_{n}: \mathrm{C}^{n} \rightarrow \mathrm{C}^{n-1}$ and interpret $\partial_{0} \equiv \emptyset$.
-The entire series of the groups groups that are connected via the boundary operator is then called a chain complex $\mathrm{C}^{\mathrm{K}}$ : $\mathrm{C}^{\mathrm{K}} = \mathrm{C}^{n} \overset{\partial_{n}}{\longrightarrow} \mathrm{C}^{n-1} \overset{\partial_{n-1}}{\longrightarrow} \dots \overset{\partial_{1}}{\longrightarrow} \mathrm{C}^{0} \overset{\partial_{0}}{\longrightarrow} \emptyset$\\
+The entire series of the groups that are connected via the boundary operator is then called a chain complex $\mathrm{C}^{\mathrm{K}}$ : $\mathrm{C}^{\mathrm{K}} = \mathrm{C}^{n} \overset{\partial_{n}}{\longrightarrow} \mathrm{C}^{n-1} \overset{\partial_{n-1}}{\longrightarrow} \dots \overset{\partial_{1}}{\longrightarrow} \mathrm{C}^{0} \overset{\partial_{0}}{\longrightarrow} \emptyset$\\
 This gives us the definition of a $n$-circles as $n$-chains that have no boundary.
 As an example consider the triangle in figure \ref{fig:example_orientation}, with the obvious $1$-circle, formed by its edges: $\partial_{2} \sigma^{2} = \partial_{2} \{ \sigma^{1}_{0}, \sigma^{1}_{1}, \sigma^{1}_{2} \} = \{v_{1}, v_{2}\} + \{v_{0}, v_{2}\} + \{v_{0}, v_{1}\}$, now taking the boundary of the boundary we can see: $\partial_{1} (\{v_{1}, v_{2}\} + \{v_{0}, v_{2}\} + \{v_{0}, v_{1}\}) = 2v_{2}+2v_{1}+2v_{0}$ and with the addition defined modulo 2, the results is: $2v_{2}+2v_{1}+2v_{0} = \emptyset$.
 This is intuitively correct, as the boundary of a triangle is a cycle, and a cycle does not have a boundary.
@@ -376,8 +375,9 @@ With the equation \eqref{eq:homology_betti}: $rank ~\mathrm{H}^{n} = \beta^{n}$,
 	\sum_{n}^{dim \, \mathrm{K}} (-1)^{n}\, \beta^{n}
 \end{equation}
 This relation, besides its intrinsic mathematical appeal, has important implications for us.
-Firstly, it means that we can derive the Betti numbers by computing the Euler characteristic, which ultimately boils down to counting simplices.\\
-Secondly we have shown that the geometrical details, which we are interested in, that is tunnels and handles, are intimately related to the topological concept of circles.
+It means that we can derive the Euler characteristic by computing the Betti numbers. 
+More importantly it shows that Betti numbers are intimately related to the topological concept of certain paths, namely circles.
+And since tunnels and handles are described by circles, we have a connection between the former and the latter.
 Hence, in order to find special geometric structures, we can study specific groups of circles that are by themselves distinguishable via the decomposition of their simplices!
 
 \newpage
@@ -405,14 +405,14 @@ Afterwards we define topological persistence in section \ref{math_topological_pe
 
 Numerous papers have been published dealing with non-trivial loops on surfaces, as they hold important topological information.
 For a good overview, see the references in \citep[][especially section 2]{Ni2004}.
-For our thesis, we will focus on preceding work with a explicit context insimplification.
+For our thesis, we will focus on preceding work with a explicit context in simplification.
 Below are some references with descriptions:
 %List \vspace{-2ex}
 \begin{itemize}
 %\setlength{\itemsep}{0cm}
 %\setlength{\parskip}{0cm}
 	\item \citep[][]{El-Sana1997} \textit{``Controlled Simplification of Genus \dots''}\\
-They identify holes and the concavities by extending the concept of $\alpha$-hulls\footnote{ Generalization for the concept of convex hulls as a set of points associated with disks that represent simple curves \citep[introduced by][]{Edelsbrunner1983}.} to polygonal meshes under the $\mathrm{L}_{\infty}$ distance metric and then triangulate parts of the surface that are not accessible for a ball of defined radius.
+They identify holes and the concavities by extending the concept of $\alpha$-hulls\footnote{ Generalization for the concept of convex hulls as a set of points associated with disks that represent simple curves \citep[introduced by][]{Edelsbrunner1983}.} to polygonal meshes under the $\mathrm{L}_{\infty}$ distance metric and then triangulate parts of the surface that are not accessible for a ball of a defined radius.
 	\item \citep[][]{Guskov2001} \textit{``Topological Noise Removal''}\\
 Propose a surface growing strategy to find features and remove unnecessary non-trivial topology. They use a local wave front traversal to discover and identify small tunnels. Then they find and select non-separating cuts to sever and seal the mesh, thus reducing the genus.
 	\item \citep[][]{Nooruddin2003} \textit{``Simplification \dots Using Volumetric Techniques''}\\
@@ -422,7 +422,7 @@ They find handles by incrementally constructing and analyzing Reeb graphs\footno
 	\item \citep[][]{Dey2007} \textit{``On Computing Handle and Tunnel Loops''}\\
 Using the concept of topological persistence, they filter a manifold to get a set of simplices that are linked to edges that form handle and tunnel loops.
 The main advantage of this approach is, that unlike others, it can provide a mathematical guarantee to find relevant topological features without introducing artifacts.\\
-Hence we follow this idea\footnote{ The work of \textit{Tamal K. Dey} was first brought to my attention in a discussion with \textit{Tamy Boubekeur}.} and built upon their work as described in section \ref{math_loop_computation}.
+Hence we follow this idea\footnote{ The work of \textit{Tamal K. Dey} was first brought to our attention in a discussion with \textit{Tamy Boubekeur}.} and built upon their work as described in section \ref{math_loop_computation}.
 \end{itemize}
 
 \subsection{Definition \& Existence of Handle and Tunnel Loops}
@@ -452,14 +452,14 @@ Note that $\mathcal{M}$ is part of both $\mathbb{I}$ and $\mathbb{O}$, analogous
 	\item Accordingly a handle loop has a trivial homology class in $\mathrm{H}^{1}(\mathbb{I})$ and a non-trivial in $\mathrm{H}^{1}(\mathbb{O})$.
 \end{itemize}
 
-In other words, handles and tunnels are characterized by the fact that they can be contracted to a point on the inside but are in contractible from the outside and vice versa.
+In other words, handles and tunnels are characterized by the fact that they can be contracted to a point on the inside but are incontractible from the outside and vice versa.
 By definition, the set of tunnel loops are disjoint from the set of handle loops, i.e. no handle can be at the same time a tunnel and conversely.
 However, not every non-trivial loop on $\mathcal{M}$ is either a handle or a tunnel and both conditions have to be fulfilled, see figure \ref{fig:loop_nontrivial}.
 
 It can be shown shown that for any connected closed surface $\mathcal{M} \subset \mathcal{S}^{3}$ of genus $g$, there exist exactly g handle and tunnel loops: $\{\mathrm{c}^{handle}_{i}, \mathrm{c}^{tunnel}_{i}\}$, with $0 < i \leq g$ forming a basis for $\mathrm{H}(\mathbb{O})$, respectively $\mathrm{H}(\mathbb{I})$.
 Furthermore the homology class of circles, that is represented by $[\mathrm{c}^{handle}_{i}]$ and $[\mathrm{c}^{tunnel}_{i}]$ form a basis for $\mathrm{H}^{1}(\mathcal{M})$, which relates them directly to the Betti number $\beta^{1}$, as expected, and will be of great importance in subsection \ref{math_persistence}.\\
 The proof involves more algebraic topologic than what was already covered, especially Mayer–Vietoris sequences, therefore we omit the technicalities but instead describe the idea behind it.\\
-We saw that $\mathcal{M}$ bisects the the space in which it is embedded $\mathcal{S}^{3} = \mathbb{I} \cup \mathbb{O}$.
+We saw that $\mathcal{M}$ bisects the space in which it is embedded, $\mathcal{S}^{3} = \mathbb{I} \cup \mathbb{O}$.
 Hence it follows that: $\mathrm{H}^{1}(\mathcal{M}) = \mathrm{H}^{1}(\mathbb{I}) \oplus \mathrm{H}^{1}(\mathbb{O})$, with the direct sum of abelian groups.
 More importantly it also holds that:
 \begin{equation}
@@ -483,8 +483,8 @@ This problems can be ameliorated but it introduces unnecessary complexity and co
 \subsection{Topological Persistence}
 \label{math_topological_persistance}
 
-The concept of persistent homology has been introduced, independently by \textit{Robins} \citep[][]{Robins1999} and \textit{Edelsbrunner} \citep[cf.][]{Edelsbrunner2000}, provides a mathematical tool, along with a combinatorial algorithm, to capture geometric shapes.
-It is closely related to spectral sequences, mathematical structures that have been developed about half a century ago\footnote{ See the glossary in \ref{appendix_glossary} and chapter 1.4 of \citep[][]{Zomorodian2005} for more information.}.\\
+The concept of persistent homology has been introduced, independently by \textit{Robins} \citep[][]{Robins1999} and \textit{Edelsbrunner} \citep[cf.][]{Edelsbrunner2000}.
+It provides a mathematical tool, along with a combinatorial algorithm, to capture geometric shapes and is closely related to spectral sequences, mathematical ideas that have been developed 50 ago\footnote{ See the glossary in \ref{appendix_glossary} and chapter 1.4 of \citep[][]{Zomorodian2005} for more information.}.\\
 The main idea behind it, is to study the topological changes of a mesh during an induced growth process and to keep track of how long a topological change lasts, that was induced by a  certain simplex.
 This is done by monitoring the homology groups and Betti numbers.\\
 In order to measure the longevity of a topological feature, we need two further ingredients, one geometric, assigning a function to a space, the other algebraic, turning the function into measurements.
@@ -565,7 +565,7 @@ The correctness of the incremental algorithm implies:
 \begin{equation} \label{eq:incremental_betti}
 	\beta^{i} = |\Prefix^{+}{\sigma^{i}}|-|\Prefix^{-}{\sigma^{i+1}}| \text{ for } i \geq 0
 \end{equation}
-In words, the $i^{th}$-Betti number $\beta^{i}$ is the number of $i$-simplices that create $i$-cycles minus the number of ($i$+1)-simplices that destroy $i$-cycles by creating $i$-boundaries.
+In other words, the $i^{th}$-Betti number $\beta^{i}$ is the number of $i$-simplices that create $i$-cycles minus the number of ($i$+1)-simplices that destroy $i$-cycles by creating $i$-boundaries.
 
 \subsubsection{Persistent Homology}
 \label{math_persistence}
@@ -625,7 +625,7 @@ We now describe the principal steps\footnote{ The following algorithms were firs
 \begin{enumerate}
 \setlength{\itemsep}{0cm}
 \setlength{\parskip}{0.15cm}
-\item The input is a simplicial complex $\mathrm{K}_{S}$ that constitutes a closed, orientable surface $\mathcal{M}$. By using a Delaunay meshing algorithm\footnote{ We used the freely available implementation named \textsc{DELPSC} for that purpose \citep[cf.][]{Cheng2007}.}, one obtains the tessellated convex hull of $\mathcal{M}$, i.e. the simplicial representations for the inside $\mathrm{K}_{\mathbb{I}}$ and the outside $\mathrm{K}_{\mathbb{O}}$, that together form $\mathrm{K} = \mathrm{K}_{S} \cup \mathrm{K}_{\mathbb{I}} \cup \mathrm{K}_{\mathbb{O}}$. Although we are only interested in the circles on $\mathrm{K}_{S}$, we need triangles for the inside and the outside in order to add them to our filtration and find not only unpaired edges but also their corresponding loops.
+\item The input is a simplicial complex $\mathrm{K}_{S}$ that constitutes a closed, orientable surface $\mathcal{M}$. By using a Delaunay meshing algorithm\footnote{ We used the freely available implementation named \href{http://tetgen.berlios.de/}{TetGen} for that purpose \citep[cf.][]{Si2010}.}, one obtains the tessellated convex hull of $\mathcal{M}$, i.e. the simplicial representations for the inside $\mathrm{K}_{\mathbb{I}}$ and the outside $\mathrm{K}_{\mathbb{O}}$, that together form $\mathrm{K} = \mathrm{K}_{S} \cup \mathrm{K}_{\mathbb{I}} \cup \mathrm{K}_{\mathbb{O}}$. Although we are only interested in the circles on $\mathrm{K}_{S}$, we need triangles for the inside and the outside in order to add them to our filtration and find not only unpaired edges but also their corresponding loops.
 \item The simplices of the surface $\mathrm{K}_{S}$ are added to filtration in an arbitrary order. Paring each of them with the algorithm described in \ref{math_algorithm_pairing}, gives $2g$ unpaired edges $\mathbb{U}^{1}$.
 \item The simplices of $\mathrm{K}_{\mathbb{I}}$ are added to the filtration. Which pairs half of the edges in $\mathbb{U}^{1}$ with negative triangles $\Prefix^{-}{\sigma_{i}^{2}}$ and associates an explicit circle to each edge, i.e. the one that got killed by $\Prefix^{-}{\sigma_{i}^{2}}$, which by definition is a handle loop. The filtration with $\mathrm{K}_{\mathbb{I}}$ can be stopped as soon as $g$ edges of $\mathbb{U}^{1}$ are paired with their circles $\{c^{1}_{handle~i}\}^{g}_{i=1}$, see figure \ref{fig:unpaired-edges_paired-loops} illustrating the steps 2-4.
 \item Lastly the simplices of $\mathrm{K}_{\mathbb{O}}$ are included into the filtration. The remaining positive edges in $\mathbb{U}^{1}$ get paired as before, thereby obtaining $g$ more circles that are by definition tunnel loops $\{c^{1}_{tunnel~i}\}^{g}_{i=1}$. Note that loops that get killed by negative triangles in $\mathrm{K}_{\mathbb{I}}$ or $\mathrm{K}_{\mathbb{O}}$ have all their edges lying on $\mathrm{K}_{S}$ because the simplices of the inside and outside only get added after all simplices of $\mathrm{K}_{S}$ are in the filtration.
@@ -653,7 +653,7 @@ Generally speaking $\sigma_{j} = \mathrm{K}_{j} - \mathrm{K}_{j-1}$ is younger t
 We analyze parts of the filtration from example \ref{fig:filtration_sequence} to see how the algorithm works before we give a formal description in \ref{algo:simplex_pairing}.\\
 In the stage $\mathrm{K}_{3}$ of the process the first edge gets added, before that only the vertices $\sigma^{0}_{0}$ up to $\sigma^{0}_{2}$ populate the simplicial complex. 
 All vertices are trivially positive, as there are no ($p$-1)-cycles that could be closed.
-This can be shown formally: $\partial \sigma^{0} = \partial \{v\} = \emptyset \,\rightarrow \,\Prefix^{+}{\sigma^{0}}$, since the boundary operator, applied to any vertex, leaves the empty set.
+This can be shown formally: $\partial \sigma^{0} = \partial \{v\} = \emptyset \,\rightarrow \,\Prefix^{+}{\sigma^{0}}$, since the boundary operator, applied to any vertex, results in the empty set.
 Now to pair the new edge $\sigma^{1}_{3} = \{s,t\}$, we check its boundary: $c = \partial \sigma^{1}_{3} = \partial \{s,t\} = (s+t)$.
 No circle was closed, which would have left the the boundary empty, thus must be negative and we can pair the simplex with the youngest candidate.
 By convention we always assign the youngest unpaired positive simplex to the pair, in this case this is vertex $t$ as it is younger than $s$: $\sigma^{0}_{1} > \sigma^{0}_{0}$ and we get the pairing: $\langle t, st \rangle = \langle \Prefix^{+}{\sigma^{0}_{1}}, \Prefix^{-}{\sigma^{1}_{3}} \rangle$, which is visualized as the first triangle in figure \ref{fig:persistent_homology}.
@@ -670,7 +670,7 @@ Generalizing this for the entire simplicial complex, gives us the pairing algori
 			&	\textsc{Pairing ($\sigma$)} \\[1ex]
 		\tiny{1}	&	\hspace{0.2cm}	\textsf{$\mathrm{c} = \partial \sigma^{p} = \{ \sigma_{i}^{p-1}, \dots , \sigma_{j}^{p-1}  \}$} \\
 		\tiny{2}	&	\hspace{0.2cm}	\textsf{let $\sigma_{last}$ be the youngest ($p$-1)-simplex in $\mathrm{c}$} \\
-		\tiny{3}	&	\hspace{0.2cm}	\textsf{while $\sigma_{last}$ is paired and $\mathrm{c} \neq \emptyset$} do \\
+		\tiny{3}	&	\hspace{0.2cm}	\textsf{while $\sigma_{last}$ is paired and $\mathrm{c} \neq \emptyset$ do} \\
 		\tiny{4}	&	\hspace{1.0cm}	\textsf{let $c_{kill}$ be the cycle which was killed by $\sigma_{last}$} \\
 		\tiny{5}	&	\hspace{1.0cm}	\textsf{$c = c + c_{kill}$} \\
 		\tiny{6}	&	\hspace{1.0cm}	\textsf{update $\sigma_{last}$ to the youngest ($p$-1)-simplex in $c$} \\
@@ -720,16 +720,16 @@ The only costly stage in the entire sequence thus far has been the Delaunay tria
 One advantage of the persistence based algorithm is that it is combinatorial in nature and thereby avoids costly, error-prone numerical computations.
 Unlike many previous methods, the algorithm does not require computing any extra data structures such as Reeb graphs, medial axes, or curve skeletons\footnote{ In 2D, the medial axis of a shape is a set of curves defined as the locus of points that have at least two closest points on the boundary of the shape. In 3D, the corresponding object is also called the medial surface because in addition to curves, it can contain surface patches.\\
 Likewise a curve skeleton is an abstract 1D geometrical representation of 3D shapes that considers topological features. By segmenting the object it can help spatial understanding, providing a higher level description of the object.}.
-We find it of pivotal importance to try and keep the workflow in the a fast workflow regime.
-As mentioned in section \ref{introduction4}, we believe that intractability trumps automation and legitimates then necessary user interaction to obtain similar results.\\
+We find it of pivotal importance to try and keep the workflow as fast as possible, not changing workflow regime.
+As mentioned in section \ref{introduction4}, we firmly believe that interactivity trumps automation and legitimates then necessary user interaction to obtain similar results.\\
 Accordingly our solution for refining the computer loops is to substitute the geodesic metric by a simple edge-count.
-This is reasonable given the fact that most triangle surfaces don't vary edge size very much in local neighborhoods.
+This is reasonable given the fact that for most triangle surfaces the edge size does not vary much in local neighborhoods.
 To further improve the results we give the user the freedom to manually tweak circles be changing parts of the path.
 Not only does this ameliorate the quality chasm between the reference implementation and our solution but also lends itself nicely to the simplification step where the user defines which loops to kill by triangulating them, see section \ref{topstoc0} for the details.
 
 This concludes this chapter \ref{math0}, we have talked about basic topology in section \ref{math1}, as well as more advanced concepts like filtration in section \ref{math2} and found a way to leverage the theory to describe and find topological features.
 Having described the algorithms involved we now turn to the actual application of the techniques.
 We will discuss in the next chapter \ref{topstoc0}, among other principles, how to put them use.
-Resulting in a direct and useful workflow to simplify not only fast and robustly, but also with numerous levers that can be tweaked directly by the user -- one being the control over the topology.
+Resulting in a direct and useful workflow to simplify not only fast and robustly, but also with numerous levers that can be tweaked directly by the user -- one being the control over topology.
 
 % smiley command: $\ddot\smile$
