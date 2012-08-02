@@ -12,6 +12,13 @@ Viewer::Viewer() :
     connect(&topstoc, SIGNAL(writeToConsole(QString, int)),
             this, SLOT(passToConsole(QString, int)));
 
+
+    // I have no freakin' clue why this doesn't wokr :(
+//    this->setBackgroundColor( QColor("white") );
+//    this->setForegroundColor( QColor("white") );
+//    this->qglColor( QColor("white") );
+//    QColor a = backgroundColor();
+//    std::cout << "C: " << a.red() << a.green() << a.blue() << std::endl;
 }
 
 void Viewer::init() {
@@ -256,7 +263,7 @@ void Viewer::stocSampling (const float& adaptivity, const float& subsetTargetSiz
 
 void Viewer::topReMeshing (const QString &mode) {
 	emit writeToConsole ("try remeshing", 0);
-	if (!topstoc.runTopReMeshing (mode)) {
+    if (!topstoc.runTopReMeshing (mode, false, false)) {
 		emit writeToConsole ("could not remesh", 0);
         emit meshstatus (0);
 	} else {

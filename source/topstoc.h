@@ -42,14 +42,15 @@ public:
 
     void initMesh();
     bool calculateWeights(const QString& mode);
-    bool runStocSampling(const float& adaptivity, const float& subsetTargetSize);
+    float runStocSampling(const float& adaptivity, const float& subsetTargetSize);
     MyMesh::FaceHandle rayIntersectsTriangle(int x, int y);
     bool setUserWeights(MyMesh::FaceHandle selectedFace, float value, int mode);
     bool setUserWeights(float value); // for all selected faces
     void clearSelection();
     void selectAll(int keyboardcharIdx);
 
-    bool runTopReMeshing(const QString& mode);
+    void densityControl(const int ringDistance);
+    float runTopReMeshing(const QString& mode, bool fastPath, bool densityControl);
     void calculateHausdorff(double sampling_density_user);
 
     void setModelBounds();

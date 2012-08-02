@@ -109,10 +109,10 @@ void TopStoc::setModelBounds () {
 void TopStoc::drawSamplAndControlPoints (bool sampledVertices, bool controlPoints, int boundaries, int loops) {
 
     // Draw handle and tunnel loops
-    if (boundaries) {
+    if (boundaries && controlPoints) {
         glEnd();
+        glLineWidth(2.5); // can not be changed within glBegin-glEnd
         glBegin(GL_LINES);
-        glLineWidth(50.0);
         for (MyMesh::EdgeIter e_it=mesh.edges_begin(); e_it!=mesh.edges_end(); ++e_it) {
 
             switch (mesh.data(e_it.handle()).getEdgeCircle()) {
@@ -120,7 +120,7 @@ void TopStoc::drawSamplAndControlPoints (bool sampledVertices, bool controlPoint
             case -1: glColor3f(1.0f, 0.0f, 1.0f); break;
             // generating edge  - handle loop
             case -2: glColor3f(1.0f, 0.5f, 0.0f); break;
-            // generating edge  - handle loop
+            // generating edge  - tunnel loop
             case -3: glColor3f(0.0f, 0.5f, 1.0f); break;
             // handle loop
             case +2: glColor3f(1.0f, 1.0f, 0.0f); break;
@@ -136,6 +136,7 @@ void TopStoc::drawSamplAndControlPoints (bool sampledVertices, bool controlPoint
             glVertex3f(	mesh.point( vh1 )[0], mesh.point( vh1 )[1], mesh.point( vh1 )[2]);
         }
         glEnd();
+        glLineWidth(1.0); // can not be changed within glBegin-glEnd
         glBegin(GL_POINTS);
     }
 
@@ -173,13 +174,58 @@ void TopStoc::drawSamplAndControlPoints (bool sampledVertices, bool controlPoint
         }
     }
 
-    for (MyMesh::VertexIter v_it=mesh.vertices_begin(); v_it!=mesh.vertices_end(); ++v_it) {
-        if ( mesh.is_boundary( v_it.handle() ) ) {
-
-        glVertex3f(	mesh.point( v_it )[0],
-                    mesh.point( v_it )[1],
-                    mesh.point( v_it )[2]);
-        }
+    // --- cheat until tegen is solved
+    if (false) {
+        glEnd();
+        glLineWidth(2.5); // can not be changed within glBegin-glEnd
+        glBegin(GL_LINES);
+        MyMesh::VertexHandle vh;
+        // generating tunnel edge
+        glColor3f(0.0f, 0.5f, 1.0f);
+        vh = MyMesh::VertexHandle(9);
+        glVertex3f(	mesh.point(vh)[0],mesh.point(vh)[1],mesh.point(vh)[2]);
+        vh = MyMesh::VertexHandle(6);
+        glVertex3f(	mesh.point(vh)[0],mesh.point(vh)[1],mesh.point(vh)[2]);
+        // tunnel loop
+        glColor3f(0.0f, 1.0f, 1.0f);
+        vh = MyMesh::VertexHandle(14);
+        glVertex3f(	mesh.point(vh)[0],mesh.point(vh)[1],mesh.point(vh)[2]);
+        vh = MyMesh::VertexHandle(13);
+        glVertex3f(	mesh.point(vh)[0],mesh.point(vh)[1],mesh.point(vh)[2]);
+        glVertex3f(	mesh.point(vh)[0],mesh.point(vh)[1],mesh.point(vh)[2]);
+        vh = MyMesh::VertexHandle(6);
+        glVertex3f(	mesh.point(vh)[0],mesh.point(vh)[1],mesh.point(vh)[2]);
+        glVertex3f(	mesh.point(vh)[0],mesh.point(vh)[1],mesh.point(vh)[2]);
+        vh = MyMesh::VertexHandle(5);
+        glVertex3f(	mesh.point(vh)[0],mesh.point(vh)[1],mesh.point(vh)[2]);
+        glVertex3f(	mesh.point(vh)[0],mesh.point(vh)[1],mesh.point(vh)[2]);
+        vh = MyMesh::VertexHandle(14);
+        glVertex3f(	mesh.point(vh)[0],mesh.point(vh)[1],mesh.point(vh)[2]);
+        // generating handle edge
+        glColor3f(1.0f, 0.5f, 0.0f);
+        vh = MyMesh::VertexHandle(6);
+        glVertex3f(	mesh.point(vh)[0],mesh.point(vh)[1],mesh.point(vh)[2]);
+        vh = MyMesh::VertexHandle(10);
+        glVertex3f(	mesh.point(vh)[0],mesh.point(vh)[1],mesh.point(vh)[2]);
+        // handle loop
+        glColor3f(1.0f, 1.0f, 0.0f);
+        vh = MyMesh::VertexHandle(3);
+        glVertex3f(	mesh.point(vh)[0],mesh.point(vh)[1],mesh.point(vh)[2]);
+        vh = MyMesh::VertexHandle(10);
+        glVertex3f(	mesh.point(vh)[0],mesh.point(vh)[1],mesh.point(vh)[2]);
+        glVertex3f(	mesh.point(vh)[0],mesh.point(vh)[1],mesh.point(vh)[2]);
+        vh = MyMesh::VertexHandle(13);
+        glVertex3f(	mesh.point(vh)[0],mesh.point(vh)[1],mesh.point(vh)[2]);
+        glVertex3f(	mesh.point(vh)[0],mesh.point(vh)[1],mesh.point(vh)[2]);
+        vh = MyMesh::VertexHandle(8);
+        glVertex3f(	mesh.point(vh)[0],mesh.point(vh)[1],mesh.point(vh)[2]);
+        glVertex3f(	mesh.point(vh)[0],mesh.point(vh)[1],mesh.point(vh)[2]);
+        vh = MyMesh::VertexHandle(3);
+        glVertex3f(	mesh.point(vh)[0],mesh.point(vh)[1],mesh.point(vh)[2]);
+        glEnd();
+        glLineWidth(1.0); // can not be changed within glBegin-glEnd
+        glColor3f(0.5f, 0.5f, 0.5f);
+        glBegin(GL_POINTS);
     }
 
     // Debug to draw specific tris
@@ -332,6 +378,56 @@ void TopStoc::drawDecimatedMesh (bool vertexWeights, bool hausdorffDistance) {
                     mesh.point( decimatedMesh[i] )[1],
                     mesh.point( decimatedMesh[i] )[2]);
 	}
+
+    //--- Draw edges for flood fill visualization
+    if (false){
+        glEnd();
+        glLineWidth(1.0); // can not be changed within glBegin-glEnd
+        glBegin(GL_LINES);
+        glColor3f(1.0f, 1.0f, 1.0f);
+        for (int i=0; i<(int)decimatedMesh.size()-2; i=i+3){
+            glNormal3f(	mesh.normal( decimatedMesh[i] )[0],
+                        mesh.normal( decimatedMesh[i] )[1],
+                        mesh.normal( decimatedMesh[i] )[2]);
+            glVertex3f(	mesh.point( decimatedMesh[i] )[0],
+                        mesh.point( decimatedMesh[i] )[1],
+                        mesh.point( decimatedMesh[i] )[2]);
+            glNormal3f(	mesh.normal( decimatedMesh[i+1] )[0],
+                        mesh.normal( decimatedMesh[i+1] )[1],
+                        mesh.normal( decimatedMesh[i+1] )[2]);
+            glVertex3f(	mesh.point( decimatedMesh[i+1] )[0],
+                        mesh.point( decimatedMesh[i+1] )[1],
+                        mesh.point( decimatedMesh[i+1] )[2]);
+            glNormal3f(	mesh.normal( decimatedMesh[i+2] )[0],
+                        mesh.normal( decimatedMesh[i+2] )[1],
+                        mesh.normal( decimatedMesh[i+2] )[2]);
+            glVertex3f(	mesh.point( decimatedMesh[i+2] )[0],
+                        mesh.point( decimatedMesh[i+2] )[1],
+                        mesh.point( decimatedMesh[i+2] )[2]);
+            glNormal3f(	mesh.normal( decimatedMesh[i+1] )[0],
+                        mesh.normal( decimatedMesh[i+1] )[1],
+                        mesh.normal( decimatedMesh[i+1] )[2]);
+            glVertex3f(	mesh.point( decimatedMesh[i+1] )[0],
+                        mesh.point( decimatedMesh[i+1] )[1],
+                        mesh.point( decimatedMesh[i+1] )[2]);
+            glNormal3f(	mesh.normal( decimatedMesh[i] )[0],
+                        mesh.normal( decimatedMesh[i] )[1],
+                        mesh.normal( decimatedMesh[i] )[2]);
+            glVertex3f(	mesh.point( decimatedMesh[i] )[0],
+                        mesh.point( decimatedMesh[i] )[1],
+                        mesh.point( decimatedMesh[i] )[2]);
+            glNormal3f(	mesh.normal( decimatedMesh[i+2] )[0],
+                        mesh.normal( decimatedMesh[i+2] )[1],
+                        mesh.normal( decimatedMesh[i+2] )[2]);
+            glVertex3f(	mesh.point( decimatedMesh[i+2] )[0],
+                        mesh.point( decimatedMesh[i+2] )[1],
+                        mesh.point( decimatedMesh[i+2] )[2]);
+        }
+        glEnd();
+        glColor3f(0.5f, 0.5f, 0.5f);
+        glBegin(GL_POINTS);
+    }
+    //---
 }
 
 void TopStoc::drawMesh(bool vertexWeights, bool remeshedRegions) {
@@ -508,7 +604,7 @@ bool TopStoc::calculateWeights (const QString& mode) {
 }
 
 
-bool TopStoc::runStocSampling (const float& adaptivity, const float& subsetTargetSize) {
+float TopStoc::runStocSampling(const float& adaptivity, const float& subsetTargetSize) {
 
 	// clear DOH
 	// sampledVertexQueue.clear();
@@ -579,6 +675,8 @@ bool TopStoc::runStocSampling (const float& adaptivity, const float& subsetTarge
 		mesh.data( mesh.vertex_handle(i*2) ).setWeight( 1.1 );
 	} */
 
+//    std::cout << "sample: " << (float)sampled_vertices/(float)mesh.n_vertices();
+
 	consoleMessage = "sample ratio: " + QString::number((float)sampled_vertices/mesh.n_vertices())
 									 + ", smaller than mean weight vertices of the set in %: "
 									 + QString::number(((float)sampled_smalls/(float)sampled_vertices));
@@ -590,7 +688,7 @@ bool TopStoc::runStocSampling (const float& adaptivity, const float& subsetTarge
 	writeToConsole (QString::number( (int)(100*((float)sampled_vertices/(float)mesh.n_vertices())) ) + " [in %]", 6);
 
 	meshStatus = 3;
-	return (true);
+    return ((float)sampled_vertices/(float)mesh.n_vertices());
 }
 
 
@@ -830,15 +928,86 @@ void TopStoc::selectAll(int keyboardcharIdx) {
     writeToConsole( QString::number(selected), 9 );
 }
 
-bool TopStoc::runTopReMeshing (const QString &mode) {
+void TopStoc::densityControl(const int ringDistance) {
+
+    // make a copy of the queue
+    std::deque<MyMesh::VertexHandle> sampledVerticesCopy, floodedVertices ,sampledVerticesFinal;
+    sampledVerticesCopy = sampledVertexQueue;
+    floodedVertices.clear();
+    sampledVerticesFinal.clear();
+
+    int collectedVertices = 0;
+
+    OpenMesh::VPropHandleT<bool> conquered;
+    OpenMesh::VPropHandleT<int> ring;
+    mesh.add_property(conquered);
+    mesh.add_property(ring);
+    int maxRing = 1;
+    if (ringDistance > 0)
+        maxRing = ringDistance;
+
+    while ( !sampledVerticesCopy.empty() ) {
+
+        MyMesh::VertexHandle pos = sampledVerticesCopy.back();
+        sampledVerticesCopy.pop_back();
+
+        if ( mesh.property(conquered, pos) == false ) {
+
+            mesh.property(conquered, pos) = true;
+            if ( mesh.data(pos).getWeight() > meanVertexWeight ) {
+                mesh.property(ring, pos) = maxRing-1;
+            } else {
+                mesh.property(ring, pos) = maxRing+1;
+            }
+
+            sampledVerticesFinal.push_back( pos );
+            floodedVertices.push_back( pos );
+
+            while ( !floodedVertices.empty() ) {
+
+                MyMesh::VertexHandle posCurrent = floodedVertices.back();
+                floodedVertices.pop_back();
+
+                for (	MyMesh::ConstVertexVertexIter vvIter = mesh.cvv_iter(posCurrent);
+                        vvIter;
+                        ++vvIter ) {
+
+                    if ( mesh.property(conquered, vvIter) == false ) {
+
+                        int ringPos = mesh.property(ring, posCurrent);
+                        mesh.property(ring, vvIter) = ringPos-1;
+                        mesh.property(conquered, vvIter) = true;
+
+                        if ( ringPos > 1)
+                            floodedVertices.push_front(vvIter);
+                    }
+                }
+            }
+        }
+    }
+
+//    std::cout << "\n--- Density Control:" << std::endl;
+//    std::cout << " vertex sample reduction : " << sampledVerticesFinal.size() << " / " << sampledVertexQueue.size() << std::endl;
+//    std::cout << " vertices flooded        : " << collectedVertices << std::endl;
+
+    sampledVertexQueue.clear();
+    sampledVertexQueue = sampledVerticesFinal;
+}
+
+float TopStoc::runTopReMeshing(const QString &mode, bool fastPath, bool densityControl) {
 
 	// make the compiler happy, TODO: use it
 	writeToConsole ("start remeshing §" + mode, 2);
 
 	decimatedMesh.clear ();
 	std::deque<MyMesh::VertexHandle> sampledVertexQueueCopy;
+
+    if (densityControl)
+        this->densityControl(1);
+
 	sampledVertexQueueCopy = sampledVertexQueue;
 	MyMesh::VertexHandle mark;
+    MyMesh::VertexHandle unMark;
 
 	// init mesh
 	for (MyMesh::VertexIter v_it=mesh.vertices_begin(); v_it!=mesh.vertices_end(); ++v_it) {
@@ -852,45 +1021,45 @@ bool TopStoc::runTopReMeshing (const QString &mode) {
 
 		// to see the set marks
 		//std::cout << i << ". VH: " << mark << std::endl;
-	}
+    }
 
 	// all vertices get assigned to a seed vertex
 	int conquered = (int)sampledVertexQueueCopy.size();
-
 	//test
-	std::set<MyMesh::FaceHandle> facesToCheck;
-	std::set<MyMesh::FaceHandle>::iterator it;
 
-	while ( !sampledVertexQueueCopy.empty() ) {
-		// get front
-		MyMesh::VertexHandle vh = sampledVertexQueueCopy.front ();
-		mark = mesh.data(vh).getSeedVector();
+    std::set<MyMesh::FaceHandle> facesToCheck;
+    std::set<MyMesh::FaceHandle>::iterator it;
 
-		for (MyMesh::ConstVertexOHalfedgeIter vhe_it=mesh.cvoh_iter(vh); vhe_it; ++ vhe_it) {
-			MyMesh::VertexHandle vh = mesh.to_vertex_handle(vhe_it);
-			// if not taken set mark
-			if ( !mesh.data( vh ).isConquered() ) {
-				mesh.data( vh ).setSeedVector(mark);
-				mesh.data( vh ).setToConquered();
-				++conquered;
-				sampledVertexQueueCopy.push_back (vh);
-			}  else {
-				// check if vertex is our own
-				// if not put it in the face queue
-				if ( !(mesh.data(vh).getSeedVector() == mark) ) {
+    MyMesh::VertexHandle seedA, seedB, seedC;
+    MyMesh::VertexHandle vhA, vhB, vhC;
 
-					MyMesh::FaceHandle f1 = mesh.face_handle(vhe_it.handle());
-					MyMesh::FaceHandle f2 = mesh.face_handle(mesh.opposite_halfedge_handle(vhe_it.handle()));
+    while ( !sampledVertexQueueCopy.empty() ) {
+        // get front
+        MyMesh::VertexHandle vh = sampledVertexQueueCopy.front ();
+        mark = mesh.data(vh).getSeedVector();
 
-					facesToCheck.insert (f1);
-					facesToCheck.insert (f2);
-				}
-			}
-			//---
-		}
-		/*
-		for (MyMesh::ConstVertexVertexIter vv_it=mesh.cvv_iter(vh); vv_it; ++vv_it) {
-			// if not taken set mark
+        for (MyMesh::ConstVertexOHalfedgeIter vhe_it=mesh.cvoh_iter(vh); vhe_it; ++ vhe_it) {
+            MyMesh::VertexHandle vh = mesh.to_vertex_handle(vhe_it);
+            // if not taken set mark
+            if ( !mesh.data( vh ).isConquered() ) {
+                mesh.data( vh ).setSeedVector(mark);
+                mesh.data( vh ).setToConquered();
+                ++conquered;
+                sampledVertexQueueCopy.push_back (vh);
+            }  else if (fastPath) {
+                // check if vertex is our own
+                // if not put it in the face queue
+                MyMesh::VertexHandle cvh = mesh.data(vh).getSeedVector();
+                if ( (cvh != mark) && cvh.is_valid()) {
+
+                    MyMesh::FaceHandle cfh = mesh.face_handle(vhe_it.handle());
+                    mesh.data(cfh).setInteresting(true);
+                }
+            }
+        }
+        /*
+        for (MyMesh::ConstVertexVertexIter vv_it=mesh.cvv_iter(vh); vv_it; ++vv_it) {
+            // if not taken set mark
 			if ( !mesh.data(vv_it).isConquered() ) {
 				mesh.data( vv_it ).setSeedVector(mark);
 				mesh.data( vv_it ).setToConquered();
@@ -912,69 +1081,143 @@ bool TopStoc::runTopReMeshing (const QString &mode) {
 		} */
 		sampledVertexQueueCopy.pop_front ();
 	}
-/*
-	std::set<MyMesh::VertexHandle> difMarks;
-	MyMesh::VertexIter v_it = mesh.vertices_begin();
-	for (; 	v_it != mesh.vertices_end(); ++v_it){
-			difMarks.insert (v_it);
-	}
-		std::cout << "difMarks: " << difMarks.size () << std::endl;
-*/
 
-	MyMesh::VertexHandle seedA, seedB, seedC;
-	MyMesh::VertexHandle vhA, vhB, vhC;
-
-//	std::cout << "Savings: " << facesToCheck.size() << "/" << mesh.n_faces() << std::endl;
+//    std::cout << "Savings: " << facesToCheck.size() << "/" << mesh.n_faces() << " - " << (float)facesToCheck.size()/(float)mesh.n_faces() << std::endl;
 
 	int count1 = 0;
 	int count2 = 0;
 	int count3 = 0;
 
-	// changed to queue
-	//for (	it=facesToCheck.begin (); it!=facesToCheck.end (); ++it) {
-	// not so fast but stable!
-	for (MyMesh::ConstFaceIter f_it=mesh.faces_begin(); f_it!=mesh.faces_end(); ++f_it) {
+    // Visualization
+//    for (MyMesh::ConstFaceIter f_it=mesh.faces_begin(); f_it!=mesh.faces_end(); ++f_it) {
 
-		//MyMesh::ConstFaceVertexIter cfv_it = mesh.cfv_iter(*it);
-		MyMesh::ConstFaceVertexIter cfv_it = mesh.cfv_iter(f_it);
-		vhA = cfv_it;
-		vhB = (++cfv_it);
-		vhC = (++cfv_it);
-		seedA = mesh.data( vhA ).getSeedVector();
-		seedB = mesh.data( vhB ).getSeedVector();
-		seedC = mesh.data( vhC ).getSeedVector();
+//        MyMesh::ConstFaceVertexIter cfv_it = mesh.cfv_iter(f_it);
+//        vhA = cfv_it;
+//        vhB = (++cfv_it);
+//        vhC = (++cfv_it);
 
+//        mesh.set_color(vhA, MyMesh::Color(0.0,0.0,0.0));
+//        mesh.set_color(vhB, MyMesh::Color(0.0,0.0,0.0));
+//        mesh.set_color(vhC, MyMesh::Color(0.0,0.0,0.0));
+//    }
+    // ---
 
-		if (		(seedA != seedB) && (seedB != seedC) && (seedA != seedC) ) {
+    if (fastPath) {
+        int skipped = 0;
 
-			decimatedMesh.push_front ( seedA );
-			decimatedMesh.push_front ( seedB );
-			decimatedMesh.push_front ( seedC );
+//        for (	it=facesToCheck.begin (); it!=facesToCheck.end (); ++it) {
+        for (MyMesh::ConstFaceIter f_it=mesh.faces_begin(); f_it!=mesh.faces_end(); ++f_it) {
+            if ( mesh.data( f_it ).isInteresting() ) {
+                MyMesh::ConstFaceVertexIter cfv_it = mesh.cfv_iter(f_it);
+                vhA = cfv_it;
+                vhB = (++cfv_it);
+                vhC = (++cfv_it);
+                seedA = mesh.data( vhA ).getSeedVector();
+                seedB = mesh.data( vhB ).getSeedVector();
+                seedC = mesh.data( vhC ).getSeedVector();
 
-			mesh.set_color(vhA, MyMesh::Color(1.0,0.0,0.0));
-			mesh.set_color(vhB, MyMesh::Color(1.0,0.0,0.0));
-			mesh.set_color(vhC, MyMesh::Color(1.0,0.0,0.0));
-			++count1;
-		}
-		else if (		((seedA == seedB) && (seedB == seedC)) ) {
-			// transitive so no need to check for (A == C)
-			mesh.set_color(vhA, MyMesh::Color(0.0,1.0,0.0));
-			mesh.set_color(vhB, MyMesh::Color(0.0,1.0,0.0));
-			mesh.set_color(vhC, MyMesh::Color(0.0,1.0,0.0));
-			++count2;
-		}
-		else {
-//			case:
-//			(	((seedA != seedB) && (seedB != seedC) && (seedA == seedC)) ||
-//			((seedA != seedB) && (seedB == seedC) && (seedA != seedC)) ||
-//			((seedA == seedB) && (seedB != seedC) && (seedA != seedC)) ) {
+                if (		(seedA != seedB) && (seedB != seedC) && (seedA != seedC) ) {
 
-			mesh.set_color(vhA, MyMesh::Color(0.0,0.0,1.0));
-			mesh.set_color(vhB, MyMesh::Color(0.0,0.0,1.0));
-			mesh.set_color(vhC, MyMesh::Color(0.0,0.0,1.0));
-			++count3;
-		}
-	}
+                    decimatedMesh.push_front ( seedA );
+                    decimatedMesh.push_front ( seedB );
+                    decimatedMesh.push_front ( seedC );
+                    mesh.set_color(vhA, MyMesh::Color(1.0,0.0,0.0));
+                    mesh.set_color(vhB, MyMesh::Color(1.0,0.0,0.0));
+                    mesh.set_color(vhC, MyMesh::Color(1.0,0.0,0.0));
+                    ++count1;
+                }
+                // not necessary in fastpath
+                //          else if (		((seedA == seedB) && (seedB == seedC)) ) {
+                //              // transitive so no need to check for (A == C)
+                //              mesh.set_color(vhA, MyMesh::Color(0.0,1.0,0.0));
+                //              mesh.set_color(vhB, MyMesh::Color(0.0,1.0,0.0));
+                //              mesh.set_color(vhC, MyMesh::Color(0.0,1.0,0.0));
+                //              ++count2;
+                //          }
+                else {
+                    //			case:
+                    //			(	((seedA != seedB) && (seedB != seedC) && (seedA == seedC)) ||
+                    //			((seedA != seedB) && (seedB == seedC) && (seedA != seedC)) ||
+                    //			((seedA == seedB) && (seedB != seedC) && (seedA != seedC)) ) {
+                    mesh.set_color(vhA, MyMesh::Color(0.0,0.0,1.0));
+                    mesh.set_color(vhB, MyMesh::Color(0.0,0.0,1.0));
+                    mesh.set_color(vhC, MyMesh::Color(0.0,0.0,1.0));
+                    ++count3;
+                }
+            } else {
+                ++skipped;
+            }
+        }
+        std::cout << "Skipped: " << skipped << " - " << mesh.n_vertices() << std::endl;
+    } else {
+        // not so fast but stable!
+        for (MyMesh::ConstFaceIter f_it=mesh.faces_begin(); f_it!=mesh.faces_end(); ++f_it) {
+
+            MyMesh::ConstFaceVertexIter cfv_it = mesh.cfv_iter(f_it);
+            vhA = cfv_it;
+            vhB = (++cfv_it);
+            vhC = (++cfv_it);
+            seedA = mesh.data( vhA ).getSeedVector();
+            seedB = mesh.data( vhB ).getSeedVector();
+            seedC = mesh.data( vhC ).getSeedVector();
+
+            if ((seedA != seedB) && (seedB != seedC) && (seedA != seedC) ) {
+                decimatedMesh.push_front ( seedA );
+                decimatedMesh.push_front ( seedB );
+                decimatedMesh.push_front ( seedC );
+                mesh.set_color(vhA, MyMesh::Color(1.0,0.0,0.0));
+                mesh.set_color(vhB, MyMesh::Color(1.0,0.0,0.0));
+                mesh.set_color(vhC, MyMesh::Color(1.0,0.0,0.0));
+                ++count1;
+            }
+            else if (((seedA == seedB) && (seedB == seedC)) ) {
+                // transitive so no need to check for (A == C)
+                mesh.set_color(vhA, MyMesh::Color(0.0,1.0,0.0));
+                mesh.set_color(vhB, MyMesh::Color(0.0,1.0,0.0));
+                mesh.set_color(vhC, MyMesh::Color(0.0,1.0,0.0));
+                ++count2;
+            }
+            else {
+                mesh.set_color(vhA, MyMesh::Color(0.0,0.0,1.0));
+                mesh.set_color(vhB, MyMesh::Color(0.0,0.0,1.0));
+                mesh.set_color(vhC, MyMesh::Color(0.0,0.0,1.0));
+                ++count3;
+            }
+        }
+    }
+    // calculate aspect ratio of triangles
+//    std::cout << "Aspect Ratios" << std::endl;
+    float meanAR = 0;
+    float maxAR = 0;
+    float minAR = 100;
+
+    for (int i=0; i<(int)decimatedMesh.size()-2; i=i+3) {
+
+        OpenMesh::VertexHandle vh0 = decimatedMesh.at(i);
+        OpenMesh::VertexHandle vh1 = decimatedMesh.at(i+1);
+        OpenMesh::VertexHandle vh2 = decimatedMesh.at(i+2);
+
+        OpenMesh::Vec3f p0 = mesh.point(vh0);
+        OpenMesh::Vec3f p1 = mesh.point(vh1);
+        OpenMesh::Vec3f p2 = mesh.point(vh2);
+
+        float l0 = p0.length();
+        float l1 = p1.length();
+        float l2 = p2.length();
+        float s = (l0+l1+l2)/2.0f;
+
+        float AR = (l0*l1*l2)/(8.0f*(s-l0)*(s-l1)*(s-l2));
+
+        meanAR += AR*3;
+        if (AR < minAR)
+            minAR = AR;
+        if (AR > maxAR)
+            maxAR = AR;
+    }
+    meanAR /= (float)decimatedMesh.size();
+//    std::cout << "min : " << minAR*100 << std::endl;
+//    std::cout << "max : " << maxAR*1000 << std::endl;
+//    std::cout << "mean: " << 1000*meanAR/(float)decimatedMesh.size() << std::endl;
 
     QString consoleMessage = "blau : "+QString::number(count1)
         +"gruen: "+QString::number(count2) +"grau : "+QString::number(count3)
@@ -989,7 +1232,8 @@ bool TopStoc::runTopReMeshing (const QString &mode) {
     writeToConsole ("-", 8);
 	meshStatus = 1;
 
-	return (true);
+//    return ((float)facesToCheck.size()/(float)mesh.n_faces());
+    return( (meanAR/maxAR) );
 }
 
 
@@ -1284,23 +1528,49 @@ void TopStoc::test () {
     std::cout << "\n-Test Button START-\n" << std::endl;
 
     time_t timeToken0, timeToken1;
-    double difTime;
-    timeToken0 = clock();
+    double difTime0, difTime1;
+    calculateWeights("test");
 
-    loops.init(this->mesh);
-    loops.pairing(this->mesh);
-    loops.findBoundaries(this->mesh);
+    for (float n=10; n>0; --n) {
 
-    loops.meshInsideAndConvexHull(this->mesh);
-    loops.findHandleLoops(this->mesh);
+        float a = 0;
+        timeToken0 = clock();
+
+        runStocSampling(0.65, n);
+        a += runTopReMeshing("test", true, false);
+        a += runTopReMeshing("test", true, false);
+        a += runTopReMeshing("test", true, false);
+        a += runTopReMeshing("test", true, false);
+
+//        std::cout << n << ". dec: " << b/5.0f;
+//        std::cout << ", triQ: " << a/5.0f << std::endl;
+        timeToken1 = clock();
+        difTime0 = difftime(timeToken1, timeToken0)/CLOCKS_PER_SEC;
+        std::cout << "time : " << difTime0 << std::endl;
+
+        timeToken0 = clock();
+
+        a += runTopReMeshing("test", false, false);
+        a += runTopReMeshing("test", false, false);
+        a += runTopReMeshing("test", false, false);
+        a += runTopReMeshing("test", false, false);
+
+        timeToken1 = clock();
+        difTime1 = difftime(timeToken1, timeToken0)/CLOCKS_PER_SEC;
+        std::cout << "time : " << difTime1 << std::endl;
+        std::cout << "------" << std::endl;
+        std::cout << n << ". difference: " << difTime0/difTime1 << std::endl;
+    }
+
+//    loops.init(this->mesh);
+//    loops.pairing(this->mesh);
+//    loops.findBoundaries(this->mesh);
+//    loops.meshInsideAndConvexHull(this->mesh);
+//    loops.findHandleLoops(this->mesh);
 //    loops.findTunnelLoops(this->mesh);
 //    tetrahedrsTris = loops.test_function(this->mesh);
 
-    timeToken1 = clock();
-    difTime = difftime(timeToken0, timeToken1)/CLOCKS_PER_SEC;
-
     std::cout << "\n-Test Button END-" << std::endl;
-    std::cout << "Time: " << difTime << "\n" << std::endl;
 }
 
 

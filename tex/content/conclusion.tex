@@ -11,8 +11,22 @@
 \section{Summary}
 \label{conclusion1}
 
-Lore ipsum.
+In the beginning we tried to clarifying why mesh decimation is and will continue to be an important issue, as model complexity is still on the rise.
+We also mentioned the importance of work-flows and time regimes that often get overlooked but fundamentally determine how a tool is seen and used.
 
+In the second chapter, we looked at the spectrum of available concepts to simplify geometry and ways to categorize them.
+This lead to a taxonomie and a checklist in which we formulated our goals.
+But before we could evaluate our results, we gave an introduction to the mathematical concepts that were necessary in order to master the topological challenges.
+In contrast to most of the previous work, we decided to implement a mathematical more demanding approach that relies on persistent homology but guarantees to find all topological relevant features.\\
+Although this gave us very good results, it turned out that calculating the defining loops, breaks the otherwise fast decimation pipeline.
+Fortunately we are still equipped with all the necessary information, as single edges take on the role of indicating topology.
+Nevertheless we think that the processes can still be improved and might turn out to be viable in terms of time complexity after all, see \ref{conclusion22}.
+
+Besides the topology we also tried to make sensible additions to the base algorithms and extend the scope of application to take full advantage of user input.
+Additionally we addressed some practical issues like how to best measurement decimation, support textures, or in cooperate point of view decimation -- which fit really nice to the decimation pipeline.
+
+As a result, ``TopStoc'' in its current iteration not only offers fast and robust automatic decimation, but can take full advantage of user-guidance.
+In the interplay between the program and the user, the user is not restricted to some selected features for improving the results but instead really has full control over the entire decimation process, as well as the topology!
 
 %\newpage
 %\vspace*{1ex}
@@ -50,6 +64,7 @@ Just now, \textit{Campen et al.} presented a novel approach, called ``Dual Loops
 Their method uses a field of principal curvature directions, to get a collection of transversally crossing loops on the surface.
 These loops partition the surface into polygonal regions whose valences are connected to their total curvature, see figure \ref{fig:dual_loop_meshing}.
 And although we haven't analyzed the actual familiarities between their concept and the techniques we use, it is clear that they are related and could generate synergies.
+
 
 \subsection{Fast $\beta^{1}$ Calculation via Decimation \& Segmentation}
 \label{conclusion22}

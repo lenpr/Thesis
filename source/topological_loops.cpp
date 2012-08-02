@@ -67,6 +67,10 @@ int topological_loops::getBetti(int idx) {
 // -- Filtration of the surface simplicials
 void topological_loops::pairing(MyMesh &mesh) {
 
+    time_t timeToken0, timeToken1;
+    double difTime0, difTime1;
+    timeToken0 = clock();
+
     // Filtration of the edges, vertices have been set in the initialization
     for (MyMesh::EdgeIter e_it=mesh.edges_begin(); e_it!=mesh.edges_end(); ++e_it) {
         //        std::cout << "Edge: " << e_it << std::endl;
@@ -158,6 +162,10 @@ void topological_loops::pairing(MyMesh &mesh) {
             ++bettiNumber[1];
         }
     }
+    timeToken1 = clock();
+    difTime0 = difftime(timeToken1, timeToken0)/CLOCKS_PER_SEC;
+    std::cout << "time : " << difTime0 << std::endl;
+    timeToken0 = clock();
 
     // Filtration of the faces
     for (MyMesh::FaceIter f_it=mesh.faces_begin(); f_it!=mesh.faces_end(); ++f_it) {
@@ -234,6 +242,11 @@ void topological_loops::pairing(MyMesh &mesh) {
             ++bettiNumber[2];
         }
     }
+    timeToken1 = clock();
+    difTime1 = difftime(timeToken1, timeToken0)/CLOCKS_PER_SEC;
+    std::cout << "time : " << difTime1 << std::endl;
+    std::cout << "difference: " << difTime0/difTime1 << std::endl;
+    std::cout << "------" << std::endl;
 
     for (MyMesh::EdgeIter e_it=mesh.edges_begin(); e_it!=mesh.edges_end(); ++e_it) {
 
@@ -1238,10 +1251,10 @@ void topological_loops::findHandleLoops(MyMesh &mesh) {
     int maxHandles = bettiNumber[1]/2;
     std::cout << "Max. number of handle loops: " << maxHandles << std::endl;
 
-    cout_tg( edgesIn.at(33) );
-    cout_tg( edgesIn.at(34) );
-    cout_tg( edgesIn.at(35) );
-    cout_tg( facesIn.at(34) );
+//    cout_tg( edgesIn.at(33) );
+//    cout_tg( edgesIn.at(34) );
+//    cout_tg( edgesIn.at(35) );
+//    cout_tg( facesIn.at(34) );
 
     for (int i=0; i<(int)facesNewIn.size(); ++i) {
         // fallback for problems due to the mesh
@@ -1291,20 +1304,20 @@ void topological_loops::findHandleLoops(MyMesh &mesh) {
         int maxCountEdges = mesh.n_edges()+edgesNewIn.size();
 
         // Debug
-        int unpaired = 0;
-        int unpairedSurface = 0;
-        for (int j=0; j<(int)edgesIn.size(); ++j) {
-            tgE current = edgesIn.at(j);
-            if (current.positive && !current.isPaired) {
-                ++unpaired;
-                if (current.surfaceEdge)
-                    ++unpairedSurface;
-            }
-        }
-        std::cout << "> "; int ch = std::cin.get();
-        std::cout << "->Face "<< i << ". unpaired surface edges: " << unpairedSurface << ", in total: " << unpaired << std::endl;
-        std::cout << "  edge: " << youngestEdge.eh_tg << ", age: " << youngestEdge.age << ", pos.: " << youngestEdge.positive
-                  << ", paired: " << youngestEdge.isPaired << ", bd: "<< eh0 << ", "<< eh1 << ", "<< eh2 << std::endl;
+//        int unpaired = 0;
+//        int unpairedSurface = 0;
+//        for (int j=0; j<(int)edgesIn.size(); ++j) {
+//            tgE current = edgesIn.at(j);
+//            if (current.positive && !current.isPaired) {
+//                ++unpaired;
+//                if (current.surfaceEdge)
+//                    ++unpairedSurface;
+//            }
+//        }
+//        std::cout << "> "; int ch = std::cin.get();
+//        std::cout << "->Face "<< i << ". unpaired surface edges: " << unpairedSurface << ", in total: " << unpaired << std::endl;
+//        std::cout << "  edge: " << youngestEdge.eh_tg << ", age: " << youngestEdge.age << ", pos.: " << youngestEdge.positive
+//                  << ", paired: " << youngestEdge.isPaired << ", bd: "<< eh0 << ", "<< eh1 << ", "<< eh2 << std::endl;
 
         while ( (youngestEdge.positive) && (youngestEdge.isPaired) && !boundaryChain.empty() ) {
 
@@ -1323,22 +1336,22 @@ void topological_loops::findHandleLoops(MyMesh &mesh) {
             //mod2 addition
             // Debug
             std::set<int>::iterator set_it;
-            std::cout << "  boundary chain:";
-            for (set_it = boundaryChain.begin(); set_it != boundaryChain.end(); ++set_it) {
-                std::cout << " " << *set_it;
-            }
-            std::cout << std::endl;
-            std::cout << "  paired killed chain:";
+//            std::cout << "  boundary chain:";
+//            for (set_it = boundaryChain.begin(); set_it != boundaryChain.end(); ++set_it) {
+//                std::cout << " " << *set_it;
+//            }
+//            std::cout << std::endl;
+//            std::cout << "  paired killed chain:";
             for ( kc_it = killedChain.begin(); kc_it != killedChain.end(); ++kc_it ) {
-                std::cout << " " << *kc_it;
+//                std::cout << " " << *kc_it;
                 if ( boundaryChain.find( *kc_it ) != boundaryChain.end() ) {
                     boundaryChain.erase( *kc_it );
                 } else {
                     boundaryChain.insert( *kc_it );
                 }
             }
-            std::cout << std::endl;
-            std::cout << "> "; ch = std::cin.get();
+//            std::cout << std::endl;
+//            std::cout << "> "; ch = std::cin.get();
 
             if (!boundaryChain.empty()) {
 
@@ -1359,7 +1372,7 @@ void topological_loops::findHandleLoops(MyMesh &mesh) {
                     firsthandle = false;
                 } else if (allSurfaceEdges){
                     if (boundaryChain.size() < handleLoopsShortest.size())
-                        handleLoopsShortest = handleLoops;
+                        handleLoopsShortest = boundaryChain;
                 }
                 if (youngest == -1)
                     std::cout << "Couldn't find a younger simplex in the chain." << std::endl;
@@ -1379,7 +1392,7 @@ void topological_loops::findHandleLoops(MyMesh &mesh) {
 //                    int e1 = f.eh1_tg;
 //                    int e2 = f.eh2_tg;
 //                    std::cout << "  new edges: " << e0 << " " << e1 << " " << e2 << std::endl;
-                    std::cout << "  youngest edge: " << youngestEdge.eh_tg << ", age:" << youngestEdge.age << std::endl;
+//                    std::cout << "  youngest edge: " << youngestEdge.eh_tg << ", age:" << youngestEdge.age << std::endl;
 //                    for (set_it = chainBoundary.begin(); set_it != chainBoundary.end(); ++set_it) {
 //                        cout_tg( edgesIn.at(*set_it) );
 //                    }
@@ -1389,7 +1402,7 @@ void topological_loops::findHandleLoops(MyMesh &mesh) {
 //                }
                 --maxCountEdges;
                 if (maxCountEdges == 0) {
-                    std::cout << "Cyclic pairing of edges and faces -> skip face: " << currentFace.fh_tg << std::endl;
+//                    std::cout << "Cyclic pairing of edges and faces -> skip face: " << currentFace.fh_tg << std::endl;
                     ++i; goto prob;
                 }
             }
@@ -1397,6 +1410,10 @@ void topological_loops::findHandleLoops(MyMesh &mesh) {
         if ( !boundaryChain.empty() ) {
 
             (facesNewIn.at(i)).positive = false;
+//            boundaryChain.clear();
+//            boundaryChain.insert( currentFace.eh0_tg );
+//            boundaryChain.insert( currentFace.eh1_tg );
+//            boundaryChain.insert( currentFace.eh2_tg );
             (facesNewIn.at(i)).killedEdges = boundaryChain;
             (facesNewIn.at(i)).isPaired = false;
             facesIn.at(currentFace.fh_tg).positive = false;
@@ -1427,7 +1444,7 @@ void topological_loops::findHandleLoops(MyMesh &mesh) {
                 }
             }
             // Debug
-            std::cout << "  face: " << currentFace.fh_tg << ", gets paired with edge: " << youngestEdge.eh_tg << std::endl;;
+//            std::cout << "  face: " << currentFace.fh_tg << ", gets paired with edge: " << youngestEdge.eh_tg << std::endl;;
 //            cout_tg( currentFace );
 //            cout_tg( edgesIn.at(youngestEdge.eh_tg) );
 

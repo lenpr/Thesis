@@ -13,30 +13,43 @@ For example, the figures shown in picture \ref{fig:topology_examples} illustrate
 %Figure
 \begin{figure}[ht]
 \centering
-\includegraphics[width=0.70\textwidth]{topology_examples.jpg}
+\includegraphics[width=0.6 0\textwidth]{topology_examples.jpg}
 \caption{Connectivities of prominent 2D manifolds.}
 \label{fig:topology_examples}
-\end{figure}
-
+\end{figure}\\
 Although topology is a comparatively young field in the history of mathematics, it would be futile trying to give a comprehensive explanation of the entire field\footnote{ The beginnings of Topology are closely related to advances in set theory at the end of the $19^{th}$ century. An iconic date for the commencement is the formal definition of metric spaces by \textit{Maurice Fréchet} in 1906. Today topology can be divided into algebraic topology (which includes combinatorial topology), differential topology, geometric topology and low-dimensional topology known as point-set topology \citep[][cf. p.2]{Weisstein2012}.}.\\
-For our purposes we split this chapter in two parts, firstly we introduce the most important definitions in chapter \ref{math1}.
+For our purposes we split this chapter in two parts, firstly we introduce the most important definitions in section \ref{math1}.
 Many of the presented concepts will be already known, at least in an intuitive way, but in order to proceed to more demanding theories, it is necessary to formulate them in an concise and unifying manner.
 Key ingredient is the notion of 'Simplicial Complexes' in \ref{math_simplicalcomplexes}, a powerful abstraction for spaces with triangulations, subsequently constructed by gluing together series of lower-dimensional simplices.\\
 The second chapter \ref{math2} then will introduce a set of mathematical tools to describe and compute geometric features like handles and tunnels in a precise and rigid way, see figure \ref{fig:loops_handles}.
 As a means to do this, it will be necessary to introduce advanced theories like 'Filtration' and 'Topological Persistence', first described by Edelsbrunner \citep[cf.][]{Edelsbrunner2000}.
 Some of the definitions might seem overly abstract at times, but as it turns out, describing and finding handles or tunnels in a mathematically sound manner is a challenging task.
+
+What we ultimately want to achieve, by mobilizing all the mathematical machinery, is best expressed by the relation expressed in equation \ref{mother_equation}:
+\begin{equation}
+	\underbrace{ \chi = \sum (-1)^{n} \, \beta^{n}}_{Euler-Poincaré}
+	\hspace{3ex} \longrightarrow \hspace{1ex}
+	\underbrace{ \beta^{n}}_{n-Betti} =
+	\underbrace{ rank ~{Z}^{n} - rank ~\mathrm{B}^{n}}_{Homology~groups} =
+	\underbrace{ |\Prefix^{+}{\sigma^{n}}|-|\Prefix^{-}{\sigma^{n+1}}|}_{Filtration}
+\end{equation}\\
+In a nutshell what it says, is that the topological important information is connected to the filtration of simplices.
+The Euler-Poincaré characteristic representing the topological important information can be calculate with Betti numbers.
+This conclusion can be further used because the Betti numbers in turn, represent ranks of homology.
+In other words, at the end we want to find groups of chains and circles that are either trivial or bounding.
+All of that and more will be covered in this chapter.
 %Figure
-\begin{figure}[ht]
-\centering
-\includegraphics[width=0.4\textwidth]{loops_handles.jpg}
-\caption{Tunnel (red) and handle (green) loops \citep[cf.][]{Dey2012}.}
-\label{fig:loops_handles}
-\end{figure}\\
-The given expositions are somewhat informal in so far that they focus on conveying the concepts rather than building a strict series of deductions.
+%\begin{figure}[ht]
+%\centering
+%\includegraphics[width=0.1\textwidth]{loops_handles.jpg}
+%\caption{Tunnel (red) and handle (green) loops \citep[cf.][]{Dey2012}.}
+%\label{fig:loops_handles}
+%\end{figure}\\
+
+Note that the following expositions are somewhat informal in so far that they focus on conveying the concepts rather than building a strict series of deductions.
 Lemmata or proofs will only be given if they are of importance for the understanding, further details and side-notes generally refer to sections in the appendix.
 
-%\newpage
-%\vspace*{1ex}
+\newpage
 \section{Mathematical Primer}
 \label{math1}
 
@@ -65,7 +78,7 @@ To do so, we need to identify intrinsic properties of spaces, especially the one
 \label{math_topology}
 
 A topology is simply a system of sets that describe the connectivity of a set.
-Formally a topology on a set $\mathrm{X}$ is a subset $\mathrm{T} \subseteq 2^{X}$ such that\footnote{ Definitions in this chapter are a compilation of mainly three resources and won't be cited individually:\begin{itemize}
+Formally a topology on a set $\mathrm{X}$ is a subset $\mathrm{T} \subseteq 2^{X}$ such that\footnote{ Definitions and figures in this chapter stem from mainly three resources and won't be cited individually:\begin{itemize}
 \item \citep[][]{Hatcher2002} is a freely available textbook on algebraic topology and very often cited.
 \item \citep[][]{Zomorodian1996} the PhD thesis of Prof. Afra Zomorodian, which features an extensive introductory chapter on topology (often citing Hatcher).
 \item \citep[][]{Weisstein2002} the online resources of MathWorld, written and curated by \textit{Eric W. Weisstein}, hosted/sponsored by and licensed to 'Wolfram Research, Inc'.\end{itemize}}:
@@ -428,7 +441,7 @@ Hence we follow this idea\footnote{ The work of \textit{Tamal K. Dey} was first 
 \subsection{Definition \& Existence of Handle and Tunnel Loops}
 \label{math_loop_definition}
 
-One goal for this thesis was, not only to preserve, but to control topology.
+One goal for this thesis is, not only to preserve, but to control topology.
 This entails mathematically having to define even very intuitive concepts like handles and tunnels.
 Formally this was first done in reference to mesh simplification by \citep[][]{Dey2007}.
 %Figure
@@ -488,7 +501,7 @@ It provides a mathematical tool, along with a combinatorial algorithm, to captur
 The main idea behind it, is to study the topological changes of a mesh during an induced growth process and to keep track of how long a topological change lasts, that was induced by a  certain simplex.
 This is done by monitoring the homology groups and Betti numbers.\\
 In order to measure the longevity of a topological feature, we need two further ingredients, one geometric, assigning a function to a space, the other algebraic, turning the function into measurements.
-The measurements make sense, only if the function does, which is studied by substituting an ordering of the simplices for the function\footnote{ This section is compiled, from the papers: \citep[cf.][]{Delfinado1995}, \citep[cf.][]{Edelsbrunner2000}, \citep[cf.][]{Edelsbrunner2001}, \citep[cf.][]{Zomorodian2008} and \citep[cf.][]{Edelsbrunner2006}. It is one scholar focused, but not only did \textit{Edelsbrunner} lay the foundations of the field, he is also one of the most prolific and highly cited researchers, see: \href{http://researchanalytics.thomsonreuters.com/highlycited/categories/computer_science/}{ISI Highly Cited}. For a complete introduction, a thorough survey of the entire field and the current research, see \citep[][]{Kozlov2008}.}.
+The measurements make sense, only if the function does, which is studied by substituting an ordering of the simplices for the function\footnote{ This section and its figures are compiled, from the papers: \citep[cf.][]{Delfinado1995}, \citep[cf.][]{Edelsbrunner2000}, \citep[cf.][]{Edelsbrunner2001}, \citep[cf.][]{Zomorodian2008} and \citep[cf.][]{Edelsbrunner2006}. It seems one scholar focused, but not only did \textit{Edelsbrunner} lay the foundations of the field, he is also one of the most highly cited researchers, see: \href{http://researchanalytics.thomsonreuters.com/highlycited/categories/computer_science/}{ISI Highly Cited}. For a complete introduction, a thorough survey of the entire field and the current research, see \citep[][]{Kozlov2008}.}.
 
 \subsubsection{Filtration}
 \label{math_filtration}
@@ -589,7 +602,7 @@ In other words, each simple connected manifold $\beta^{0} = 1$, has a representa
 Formally the reasoning behind this observation combines and concludes the work of the entire chapter and will finally explain why we are interested in all of this, as we initially set out to identify certain geometrical features, specifically handles and tunnels.
 Combining the relations of $\beta$ as introduced in equations \ref{eq:euler_poincare}, \ref{eq:homology_betti} and \ref{eq:incremental_betti}, we get:
 %Equation
-\begin{equation}
+\begin{equation} \label{mother_equation}
 	\underbrace{ \chi = \sum (-1)^{n} \, \beta^{n}}_{Euler-Poincaré}
 	\hspace{3ex} \longrightarrow \hspace{1ex}
 	\underbrace{ \beta^{n}}_{n-Betti} =
@@ -635,7 +648,7 @@ We now describe the principal steps\footnote{ The following algorithms were firs
 \begin{figure}[htb]
 \centering
 \includegraphics[width=1.0\textwidth]{unpaired-edges_paired-loops.jpg}
-\caption{Left: Unpaired edges, Middle: Handle loops, Right: Tunnel loops.}
+\caption{Left to right: Unpaired edges,handle loops and tunnel loops \citep[][]{Dey2012}.}
 \label{fig:unpaired-edges_paired-loops}
 \bigskip
 \end{figure}
@@ -711,11 +724,11 @@ Instead the shortest circle in the homology class is searched, broadening the se
 \begin{figure}[htb]
 \centering
 \includegraphics[width=1.0\textwidth]{loop_refinement.jpg}
-\caption{Left: Handle \& tunnel loop, Right: Via geodesic distances refined loops.}
+\caption{Initial results and refined loops on the right \citep[][]{Dey2009}.}
 \label{fig:loop_refinement}
 \end{figure}\\
 These two refinements undoubtedly improve the geometrical appearance greatly, as seen in figure \ref{fig:loop_refinement}.
-However we find the prize in computational expenses to be infeasible high.\\
+However we find the prize in computational expenses to be too high.\\
 The only costly stage in the entire sequence thus far has been the Delaunay triangulation, which we consider to be a pre-process that can be automated and done in advance.
 One advantage of the persistence based algorithm is that it is combinatorial in nature and thereby avoids costly, error-prone numerical computations.
 Unlike many previous methods, the algorithm does not require computing any extra data structures such as Reeb graphs, medial axes, or curve skeletons\footnote{ In 2D, the medial axis of a shape is a set of curves defined as the locus of points that have at least two closest points on the boundary of the shape. In 3D, the corresponding object is also called the medial surface because in addition to curves, it can contain surface patches.\\

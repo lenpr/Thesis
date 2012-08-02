@@ -6,7 +6,7 @@
 int main(int argc, char *argv[]) {
 
 	QApplication a(argc, argv);
-	MainWidget w;
+    MainWidget w;
     w.resize(1100,750);
 
 //    system ("pwd");

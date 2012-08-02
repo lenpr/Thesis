@@ -54,7 +54,7 @@ $C_{n} = \frac{1}{n+1}{2n \choose n} = \frac{(2n)!}{(n+1)!\,n!} = \prod \limits_
 \end{figure} 
 
     \item Redistributing vertices over a surface \citep[cf.][]{Turk1992}.\\
-The idea is to reduce the number of polygons by adding new points on the surface of the model, connecting these new vertices into triangles forming a mutual tessellation. Thus creating an intermediate polygonal surface that incorporates both the old vertices and the newly placed ones and then deleting the old vertices, i.e. re-tiling the surface. In order to maintain accurately the features of the surface, the point distribution is modified so that more new vertices are placed in regions of higher curvature (also see figure \ref{fig:dec_turk}).
+The idea is to reduce the number of polygons by adding new points on the surface of the model, connecting these new vertices into triangles forming a mutual tessellation. Thus creating an intermediate polygonal surface that incorporates both the old vertices and the newly placed ones and then deleting the old vertices, i.e. re-tiling the surface. In order to maintain the features of the surface accurately, the point distribution is modified so that more new vertices are placed in regions of higher curvature (also see figure \ref{fig:dec_turk}).
 %Bild
 \begin{figure}[ht]
 \centering
@@ -75,7 +75,7 @@ Is done by merging vertices based on their spatial proximity. All vertices withi
 The algorithm is very robust as it can handle degenerated models, but it is sensitive to the orientation of the clustering grid. It can be implemented quite efficiently. Unfortunately topology is not preserved, and it is very hard to give guaranteed explicit error bounds (also see figure \ref{fig:dec_rossignac}).
 
     \item Merging nearly coplanar polygons \citep[cf.][]{Hinker1993}.\\
-This method obtains impressive reductions for large models with nearly flat surfaces. It identifying coplanar or nearly coplanar polygons, merging them together into a larger complex polygon and finally re-triangulating them into fewer polygons than the original description. However, this approach offers only small gains
+This method obtains impressive reductions for large models with nearly flat surfaces. It identifies coplanar or nearly coplanar polygons, merging them together into a larger complex polygon and finally re-triangulating them into fewer polygons than the original description. However, this approach offers only small gains
 for surfaces of high curvature (also see figure \ref{fig:dec_hinker}).
 %Bild
 \begin{figure}[ht]
@@ -181,7 +181,7 @@ Especially noteworthy is that the paper explicitly mentions response times and t
 \end{figure}
 
     \item Using image compression for geometry \citep[cf.][]{Gu2002}.\\
-Most of the time surface geometry is modeled with irregular triangle meshes, i.e. not constant valency. In their paper, the authors devise a method to remesh an arbitrary surface onto a completely regular structure they call a geometry image, by this enabling them to represent geometry as a simple 2D array of quantized points. Surface signals like normals and colors are stored in similar 2D arrays using the same implicit surface parametrization. To create this geometry image, the mesh is cut along a network of edge paths, and the resulting single chart is parametrized onto a square\footnote{ More precisely the geometry is mapped onto a torus, since it is the only 3D manifold that can be a completely regular quad mesh and accordingly a regular triangle mesh with valence 6. With two cuts the torus then is equivalent to a 2D array (for a proof of this statement see Appendix \ref{appendix4}).}. The ingenious twist is, that in this form geometry images can be encoded using traditional lossy image compression algorithms, such as JPEG.
+Most of the time surface geometry is modeled with irregular triangle meshes, i.e. not constant valency. In their paper, the authors devise a method to remesh an arbitrary surface onto a completely regular structure they call a geometry image, enabling them to represent geometry as a simple 2D array of quantized points. Surface signals like normals and colors are stored in similar 2D arrays using the same implicit surface parametrization. To create this geometry image, the mesh is cut along a network of edge paths, and the resulting single chart is parametrized onto a square\footnote{ More precisely the geometry is mapped onto a torus, since it is the only 3D manifold that can be a completely regular quad mesh and accordingly a regular triangle mesh with valence 6. With two cuts the torus then is equivalent to a 2D array (for a proof of this statement see Appendix \ref{appendix4}).}. The ingenious twist is, that in this form geometry images can be encoded using traditional lossy image compression algorithms, such as JPEG.
 A compelling example of how lifting one problem into another domain can lead to unexpected connections and new ideas (also see figure \ref{fig:dec_gu}).
 %Bild
 \begin{figure}[ht]
@@ -201,18 +201,19 @@ The next section will try to bring together the various ideas presented here in 
 Besides listing important ideas and trying to get a feel for viable solutions, there is a second important step to get a firm grasp of a topic.
 Namely by aggregating the ideas in question, grouping the similar ones and putting them into a relational structure, i.e. building a taxonomy.
 This way, one does not only inductively broaden his knowledge one case at a time, but also deductively establish an overall framework for the principle problems in question.
-Good taxonomies give the impression of necessity, as insofar as the taxa used to create the divides seem to be without alternatives, however some times at the cost of blocking the sight for alternatives\footnote{ It is worth mentioning that taxonomies are normally presented as prefaces to discussions of individual solutions. By doing this, the view on the actual evolution gets biased. Research is a fundamentally inductive endeavor. \begin{quote} \textit{``The view is often defended that sciences should be built up on clear and sharply defined basal concepts. In actual fact no science, not even the most exact, begins with such definitions. The true beginning of scientific activity consists rather in describing phenomena [and coming up with heuristics, only then] to group, classify and correlate them.''} \citep[cf.][]{Freud1963} \end{quote}.}.\\
+Good taxonomies give the impression of necessity, as insofar as the taxa used to create the divides seem to be without alternatives.
+Sometimes this happens at the cost of blocking the sight for alternatives\footnote{ It is worth mentioning that taxonomies are normally presented as prefaces to discussions of individual solutions. By doing this, the view on the actual evolution gets biased. Research is a fundamentally inductive endeavor. \begin{quote} \textit{``The view is often defended that sciences should be built up on clear and sharply defined basal concepts. In actual fact no science, not even the most exact, begins with such definitions. The true beginning of scientific activity consists rather in describing phenomena [and coming up with heuristics, only then] to group, classify and correlate them.''} \citep[cf.][]{Freud1963} \end{quote}.}.\\
 Most taxonomies concerning mesh simplification, that can be found today, seem to be derived from the seminal work of Kobbelt \citep[][cf. p.6]{Gotsman2002}.
 As it were, the prototypical taxonomy is as follows \citep[][cf. p.11]{Shene2005}:
 \begin{itemize}
   \setlength{\itemsep}{0cm}%
   \setlength{\parskip}{0cm}%
-    \item \textbf{Vertex Clustering} -- Usually very efficient, robust and typically with linear complexity: $\mathbf{O}(|\mathcal{V}|)$. However, the quality of the resulting mesh is not always satisfactory and it is hard to guarantee the preservation of topological features.\\
-    \item \textbf{Incremental Decimation} -- Delivers higher quality meshes in most cases and can take arbitrary user-defined criteria into account, according to how the next removal operation is chosen. Though, complexity is generally higher: $\mathbf{O}(|\mathcal{V}| \log_{2} |\mathcal{V}|)$, and can go up to $\mathbf{O}(|\mathcal{V}|^{2})$ especially when a global threshold has to be met.\\
-    \item \textbf{Resampling} -- Most general approach. The major motivation for building a completely new mesh is to maintain a special connectivity structure like subdivision connectivity. Problematic is its higher proneness to alias errors.\\
+    \item \textbf{Vertex Clustering} -- Usually very efficient, robust and typically with linear complexity: $\mathcal{O}(|\mathcal{V}|)$. However, the quality of the resulting mesh is not always satisfactory and it is hard to guarantee the preservation of topological features.\\
+    \item \textbf{Incremental Decimation} -- Delivers higher quality meshes in most cases and can take arbitrary user-defined criteria into account, according to how the next removal operation is chosen. Though, complexity is generally higher: $\mathcal{O}(|\mathcal{V}| \log_{2} |\mathcal{V}|)$, and can go up to $\mathcal{O}(|\mathcal{V}|^{2})$ especially when a global threshold has to be met.\\
+    \item \textbf{Resampling} -- Most general approach. The major motivation for building a completely new mesh is to maintain a special connectivity structure like subdivision connectivity. Problematic is its higher proneness to aliasing errors.\\
 \end{itemize}
 The three cases are obviously very broad and each of them can be further characterized by classifying more details.
-For example could 'Vertex Clustering' algorithms be sorted whether they apply a hierarchical or top-down approach, or how they compute representative vertices: average, median, error quadrics and so forth.
+For example, 'Vertex Clustering' algorithms can be sorted whether they apply a hierarchical or top-down approach, or how they compute representative vertices: average, median, error quadrics and so forth.
 Likewise 'Incremental Decimation' algorithms can be organized by the decimation operators they use: Topology-changing vs. topology-preserving, subsampling vs. filtering, existence of inverse operations, etc. -- for an exhaustive discussion of these aspects, we recommend the paper ``A General Framework for Mesh Decimation'' \citep[cf.][]{Kobbelt1998}.
 
 The standard taxonomy is practical and easy to understand but it does not seem to follow any specific principle or foundation.
@@ -243,7 +244,7 @@ Gersho and Gray list the four basic types for vector quantization algorithms \ci
 \begin{enumerate}
 	\item So called \textbf{'product code'} algorithms use scalar quantizers that are independently applied to each input vector element.
 	The main difference to other methods is, that the partitioning set $\mathcal{T}$ is built once and not iterated upon.\\
-	An analogy for these type are clustering algorithms, where partitions are formed with a uniform voxelization.	
+	An analogy for this type are clustering algorithms, where partitions are formed with a uniform voxelization.	
 	\item  In \textbf{'pruning algorithms'}, $\mathcal{T}$ initially contains all the vectors of the input set $\mathcal{S}$. The entry $\vec{v}_{mindis} \in \mathcal{T}$ that increases distortion least is removed and removals continue until the desired size of $\mathcal{T}$ reached.\\
 	Simplification algorithms taking the pruning approach are for instance algorithms, that growing coplanar patches, or that remove and pruning away single vertices.
 	\item Pairwise \textbf{'nearest neighbor'} algorithms also set $\mathcal{T}$ to contain all the vectors in $\mathcal{S}$. All possible pairs $(\vec{v}_{i},\vec{v}_{j}) \in \mathcal{T} \text{ with } i\neq j$ are considered and the pair that introduces the least distortion is merged. Merging continues until the desired size for $\mathcal{T}$ or distortion tolerance is reached.\\

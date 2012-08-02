@@ -20,10 +20,11 @@ struct MyTraits : public OpenMesh::DefaultTraits {
         // face color RGB
         float fcR, fcG, fcB;
         bool selected;
+        bool interesting;
 
 
     public:
-        FaceT() : fcR(0.0), fcG(0.0), fcB(0.0), selected(false) {}
+        FaceT() : fcR(0.0), fcG(0.0), fcB(0.0), selected(false), interesting(false) {}
 
         void setColor(const float& R, const float& G, const float& B) {
             fcR = R; fcG = G; fcB = B;
@@ -34,6 +35,8 @@ struct MyTraits : public OpenMesh::DefaultTraits {
 
         bool isSelected() { return selected;}
         void setSelected(bool newSelected) { selected = newSelected; }
+        bool isInteresting() { return interesting;}
+        void setInteresting(bool newInteresting) { interesting = newInteresting; }
     };
 
     EdgeTraits {
