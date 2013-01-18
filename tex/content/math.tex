@@ -13,7 +13,7 @@ For example, the figures shown in picture \ref{fig:topology_examples} illustrate
 %Figure
 \begin{figure}[ht]
 \centering
-\includegraphics[width=0.6 0\textwidth]{topology_examples.jpg}
+\includegraphics[width=0.6\textwidth]{topology_examples.jpg}
 \caption{Connectivities of prominent 2D manifolds.}
 \label{fig:topology_examples}
 \end{figure}\\
@@ -21,7 +21,7 @@ Although topology is a comparatively young field in the history of mathematics, 
 For our purposes we split this chapter in two parts, firstly we introduce the most important definitions in section \ref{math1}.
 Many of the presented concepts will be already known, at least in an intuitive way, but in order to proceed to more demanding theories, it is necessary to formulate them in an concise and unifying manner.
 Key ingredient is the notion of 'Simplicial Complexes' in \ref{math_simplicalcomplexes}, a powerful abstraction for spaces with triangulations, subsequently constructed by gluing together series of lower-dimensional simplices.\\
-The second chapter \ref{math2} then will introduce a set of mathematical tools to describe and compute geometric features like handles and tunnels in a precise and rigid way, see figure \ref{fig:loops_handles}.
+The second chapter \ref{math2} then will introduce a set of mathematical tools to describe and compute geometric features like handles and tunnels in a precise and rigid way.
 As a means to do this, it will be necessary to introduce advanced theories like 'Filtration' and 'Topological Persistence', first described by Edelsbrunner \citep[cf.][]{Edelsbrunner2000}.
 Some of the definitions might seem overly abstract at times, but as it turns out, describing and finding handles or tunnels in a mathematically sound manner is a challenging task.
 
@@ -497,7 +497,7 @@ This problems can be ameliorated but it introduces unnecessary complexity and co
 \label{math_topological_persistance}
 
 The concept of persistent homology has been introduced, independently by \textit{Robins} \citep[][]{Robins1999} and \textit{Edelsbrunner} \citep[cf.][]{Edelsbrunner2000}.
-It provides a mathematical tool, along with a combinatorial algorithm, to capture geometric shapes and is closely related to spectral sequences, mathematical ideas that have been developed 50 ago\footnote{ See the glossary in \ref{appendix_glossary} and chapter 1.4 of \citep[][]{Zomorodian2005} for more information.}.\\
+It provides a mathematical tool, along with a combinatorial algorithm, to capture geometric shapes and is closely related to spectral sequences, mathematical ideas that have been developed 50 years ago\footnote{ See the glossary in \ref{appendix_glossary} and chapter 1.4 of \citep[][]{Zomorodian2005} for more information.}.\\
 The main idea behind it, is to study the topological changes of a mesh during an induced growth process and to keep track of how long a topological change lasts, that was induced by a  certain simplex.
 This is done by monitoring the homology groups and Betti numbers.\\
 In order to measure the longevity of a topological feature, we need two further ingredients, one geometric, assigning a function to a space, the other algebraic, turning the function into measurements.
